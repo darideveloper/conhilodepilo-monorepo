@@ -1,0 +1,44 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+}
+
+const {
+  title = "Con Hilo Depilo | Estética K-Beauty",
+  description = "Definición natural con técnica coreana para un arco perfecto.",
+  canonical = Astro.url.href,
+  image = "/og-image.jpg"
+} = Astro.props;
+
+const siteName = "Con Hilo Depilo";
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": siteName,
+  "url": Astro.site,
+  "description": description,
+  "image": new URL(image, Astro.site),
+};
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.site)} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={Astro.url.href} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={new URL(image, Astro.site)} />
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

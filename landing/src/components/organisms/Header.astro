@@ -1,0 +1,129 @@
+---
+import Icon from "../atoms/Icon.astro";
+import Button from "../atoms/Button.astro";
+
+const navLinks = [
+  { label: "Tratamientos", href: "#servicios" },
+  { label: "Cursos", href: "#cursos" },
+  { label: "Resultados", href: "#resultados" },
+  { label: "Sobre mí", href: "#info" },
+  { label: "Contacto", href: "#footer" },
+];
+---
+
+<header
+  class="sticky top-0 z-50 w-full bg-white md:bg-ui-bg-light/90 md:backdrop-blur-md shadow-sm border-b border-brand-primary/10 transition-all duration-300"
+  id="main-header"
+>
+  <div
+    class="max-w-[1200px] mx-auto px-6 h-20 flex items-center justify-between"
+  >
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-2 z-50 relative bg-white py-2 md:bg-ui-bg-light/90">
+      <img
+        src="/logo.webp"
+        alt="Con Hilo Depilo"
+        class="h-12 w-auto object-contain"
+      />
+    </a>
+
+    <!-- Single Navigation (Responsive) -->
+    <nav
+      id="main-nav"
+      class="fixed md:static inset-0 bg-white/95 md:bg-transparent z-40 flex flex-col md:flex-row items-center justify-center md:justify-end md:gap-8 pt-20 md:pt-0 px-6 md:px-0 opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto transition-all duration-300 -translate-y-8 md:translate-y-0"
+    >
+      <ul
+        class="flex flex-col md:flex-row items-center gap-8 text-2xl md:text-sm font-bold text-ui-text-main w-full md:w-auto text-center"
+      >
+        {
+          navLinks.map((link) => (
+            <li class="w-full md:w-auto">
+              <a
+                href={link.href}
+                class="nav-link hover:text-brand-primary transition-colors duration-200 block py-2 md:py-0"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+        <!-- Mobile CTA inside ul -->
+        <li class="w-full md:hidden mt-4">
+          <Button href="#" size="lg" class="w-full">Reserva Ahora</Button>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Desktop CTA & Mobile Toggle -->
+    <div class="flex items-center gap-4 z-50 relative py-2 pl-4">
+      <div class="hidden md:block">
+        <Button href="#" size="md">Reserva Ahora</Button>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button
+        id="mobile-menu-toggle"
+        class="md:hidden flex items-center justify-center p-2 text-ui-text-main hover:text-brand-primary transition-colors"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+      >
+        <Icon name="Menu" id="menu-icon-open" size={28} class="block" />
+        <Icon name="X" id="menu-icon-close" size={28} class="hidden" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const nav = document.getElementById("main-nav");
+  const iconOpen = document.getElementById("menu-icon-open");
+  const iconClose = document.getElementById("menu-icon-close");
+  const links = document.querySelectorAll(".nav-link");
+
+  let isMenuOpen = false;
+
+  const toggleMenu = () => {
+    // Only process toggle on mobile (if hamburger is visible)
+    if (window.getComputedStyle(toggle!).display === "none") return;
+
+    isMenuOpen = !isMenuOpen;
+
+    if (isMenuOpen) {
+      nav?.classList.remove(
+        "opacity-0",
+        "pointer-events-none",
+        "-translate-y-8",
+      );
+      nav?.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
+      iconOpen?.classList.add("hidden");
+      iconOpen?.classList.remove("block");
+      iconClose?.classList.remove("hidden");
+      iconClose?.classList.add("block");
+      document.body.style.overflow = "hidden";
+      toggle?.setAttribute("aria-expanded", "true");
+    } else {
+      nav?.classList.add("opacity-0", "pointer-events-none", "-translate-y-8");
+      nav?.classList.remove(
+        "opacity-100",
+        "pointer-events-auto",
+        "translate-y-0",
+      );
+      iconOpen?.classList.remove("hidden");
+      iconOpen?.classList.add("block");
+      iconClose?.classList.add("hidden");
+      iconClose?.classList.remove("block");
+      document.body.style.overflow = "";
+      toggle?.setAttribute("aria-expanded", "false");
+    }
+  };
+
+  toggle?.addEventListener("click", toggleMenu);
+
+  // Close menu when clicking a link (mobile only)
+  links.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (isMenuOpen) toggleMenu();
+    });
+  });
+</script>

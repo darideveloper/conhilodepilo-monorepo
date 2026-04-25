@@ -1,0 +1,27 @@
+---
+import SectionHeader from "../molecules/SectionHeader.astro";
+import CourseCard from "../molecules/CourseCard.astro";
+
+import { getCourses } from "../../lib/api/getCourses";
+
+const courses = await getCourses();
+---
+
+<section class="max-w-[1200px] mx-auto px-6 py-24" id="cursos">
+  <div class="mb-16">
+    <slot name="header">
+      <SectionHeader centered={true}>
+        <Fragment slot="title">Formación Exclusiva: Cursos Presenciales</Fragment>
+      </SectionHeader>
+    </slot>
+    <div class="w-20 h-1 bg-brand-primary mx-auto rounded-full mt-4"></div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    {courses.map(course => (
+      <CourseCard {...course}>
+        {course.description}
+      </CourseCard>
+    ))}
+  </div>
+</section>

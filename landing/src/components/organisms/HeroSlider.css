@@ -1,0 +1,24 @@
+/* HeroSlider.css */
+.hero-slider-bullet {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 0 !important;
+  background: var(--color-ui-bullet);
+  transition:
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s ease;
+}
+ 
+.hero-pagination .swiper-pagination-bullet-active {
+  width: 1.5rem;
+  background: var(--color-brand-primary);
+}
+
+.hero-swiper-main .swiper-slide {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+ 
+.hero-swiper-main .swiper-slide-active {
+  opacity: 1;
+}

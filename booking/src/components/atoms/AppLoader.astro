@@ -1,0 +1,33 @@
+---
+const { title = "Loading..." } = Astro.props;
+---
+<!-- Branded Loader -->
+<div id="app-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background transition-opacity duration-500">
+    <div class="flex flex-col items-center gap-6">
+        <!-- Spinner -->
+        <div class="relative w-16 h-16">
+            <div class="absolute inset-0 rounded-full border-4 border-primary/20"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+        </div>
+        <!-- Brand Text -->
+        <p class="font-serif text-lg text-foreground/70 animate-pulse tracking-wide">
+            {title}
+        </p>
+    </div>
+</div>
+
+<script is:inline>
+    // Hide loader after a short delay to allow hydration and avoid blinks
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('app-loader');
+        if (loader) {
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.pointerEvents = 'none'; // Allow clicking through once it starts fading
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }, 1000); // 1.0s is usually enough for React hydration
+        }
+    });
+</script>

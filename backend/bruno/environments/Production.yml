@@ -1,0 +1,6 @@
+name: Production
+variables:
+  - name: base_url
+    value: https://api.example.com
+    type: string
+    enabled: true

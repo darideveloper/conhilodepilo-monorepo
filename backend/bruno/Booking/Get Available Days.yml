@@ -1,0 +1,28 @@
+info:
+  name: Get Available Days
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{base_url}}/api/availability/days/?service_ids=5"
+  params:
+    - name: service_ids
+      value: "5"
+      type: query
+
+runtime:
+  assertions:
+    - expression: ""
+      operator: eq
+      value: res.status
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  # Get Available Days
+  Public endpoint to fetch available dates for selected services.

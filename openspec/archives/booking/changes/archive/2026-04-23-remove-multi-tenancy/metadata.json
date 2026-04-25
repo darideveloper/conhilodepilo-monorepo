@@ -1,0 +1,17 @@
+{
+  "id": "remove-multi-tenancy",
+  "title": "Remove Multi-Tenancy Feature",
+  "description": "Transition to a single-tenant architecture by removing client-specific logic and subdomain manipulation.",
+  "status": "COMPLETED",
+  "related_files": [
+    "src/store/useBookingStore.ts",
+    "src/layouts/Layout.astro",
+    "src/components/organisms/BookingFlow.tsx",
+    "docs/apis.md"
+  ],
+  "specs": [
+    "brand-config",
+    "url-params",
+    "routing"
+  ]
+}

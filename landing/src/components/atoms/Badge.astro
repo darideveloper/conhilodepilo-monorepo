@@ -1,0 +1,21 @@
+---
+import { cn } from "../../utils/cn";
+interface Props {
+  variant?: "primary" | "secondary";
+  class?: string;
+}
+
+const { variant = "primary", class: className } = Astro.props;
+
+const variants = {
+  primary: "bg-brand-primary/15 text-ui-text-main border-brand-primary/30",
+  secondary: "bg-brand-secondary/15 text-ui-text-main border-brand-secondary/30",
+};
+
+const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border";
+---
+
+<span class={cn(baseClasses, variants[variant], className)}>
+  <slot />
+
+</span>

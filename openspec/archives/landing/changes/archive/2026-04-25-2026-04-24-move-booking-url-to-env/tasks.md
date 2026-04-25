@@ -1,0 +1,3 @@
+- [x] Update `.env.example` with `PUBLIC_BOOKING_URL`
+- [x] Update `src/pages/booking/[id].astro` to replace `BOOKING_BASE_URL` with `import.meta.env.PUBLIC_BOOKING_URL`
+- [x] Verify that `bookingUrl` is still correctly constructed in the browser console/network tab

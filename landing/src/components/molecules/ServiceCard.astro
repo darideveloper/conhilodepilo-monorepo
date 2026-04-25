@@ -1,0 +1,95 @@
+---
+import Badge from "../atoms/Badge.astro";
+import Button from "../atoms/Button.astro";
+import Icon from "../atoms/Icon.astro";
+import { cn } from "../../utils/cn";
+import { marked } from "marked";
+
+interface Props {
+  id: number;
+  title: string;
+  price?: string;
+  duration?: number;
+  description?: string | null;
+  image: string | null;
+  category?: string;
+  class?: string;
+  variant?: "primary" | "outline" | "ghost";
+}
+
+const {
+  id,
+  title,
+  price,
+  duration,
+  description,
+  image,
+  class: className,
+  variant = "outline",
+} = Astro.props;
+
+const parsedDescription = description ? marked.parse(description) : "";
+---
+
+<article
+  class={cn(
+    "group/card flex flex-col bg-white border border-brand-primary/10 overflow-hidden transition-all rounded-2xl shadow-sm hover:shadow-lg cursor-pointer",
+    className,
+  )}
+>
+  <div class="relative overflow-hidden aspect-[4/3]">
+    {
+      price && (
+        <Badge
+          class="absolute top-4 right-4 z-20 bg-white border-brand-primary/50"
+          variant="primary"
+        >
+          {price}
+        </Badge>
+      )
+    }
+    {
+      image ? (
+        <img
+          src={image}
+          alt={title}
+          class="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105"
+        />
+      ) : (
+        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+          <Icon name="Image" size={32} class="text-gray-300" />
+        </div>
+      )
+    }
+  </div>
+
+  <div class="flex flex-col flex-1 gap-3 p-6">
+    <div class="flex flex-col gap-1">
+      <h3 class="font-bold">
+        {title}
+      </h3>
+      {
+        duration && (
+          <small class="flex items-center gap-1 text-ui-text-muted">
+            <Icon name="Clock" size={14} />
+            {duration} min
+          </small>
+        )
+      }
+    </div>
+
+    <div class="markdown text-ui-text-muted flex-1 text-sm prose prose-sm prose-p:my-1 prose-ul:my-1 prose-li:list-disc prose-li:ml-4">
+      {
+        parsedDescription ? (
+          <Fragment set:html={parsedDescription} />
+        ) : (
+          <slot />
+        )
+      }
+    </div>
+
+    <Button variant={variant} size="sm" class="w-full mt-auto uppercase" href={`/booking/${id}`}>
+      Reservar ahora
+    </Button>
+  </div>
+</article>

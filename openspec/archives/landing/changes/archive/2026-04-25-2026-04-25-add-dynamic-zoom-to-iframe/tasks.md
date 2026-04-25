@@ -1,0 +1,3 @@
+- [x] Add `id="booking-iframe"` to the `<iframe>` tag in `src/pages/booking/[id].astro`
+- [x] Implement client-side script to calculate and append the `zoom` parameter based on `window.innerWidth`
+- [x] Verify zoom levels in browser (Mobile/Tablet/Desktop simulation)

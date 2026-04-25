@@ -1,0 +1,44 @@
+---
+import HeroSlider from "./HeroSlider";
+import heroImg from "../../assets/images/hero.png";
+
+const slides = [
+  {
+    badge: "K-Beauty Aesthetics",
+    title: "Tratamientos",
+    titleAccent: "de Autor",
+    description:
+      "Precisión y belleza artesanal para realzar tu mirada con la delicadeza de la estética coreana. Cada detalle cuenta en nuestra búsqueda de la armonía facial.",
+    primaryCta: { label: "Ver Servicios", href: "#servicios" },
+    secondaryCta: { label: "Nuestro Método", href: "#info" },
+    image: heroImg.src,
+    imageAlt: "Tratamiento de cejas",
+  },
+  {
+    badge: "K-Beauty Aesthetics",
+    title: "Tratamientos",
+    titleAccent: "de Autor",
+    description:
+      "Precisión y belleza artesanal para realzar tu mirada con la delicadeza de la estética coreana. Cada detalle cuenta en nuestra búsqueda de la armonía facial.",
+    primaryCta: { label: "Ver Servicios", href: "#servicios" },
+    secondaryCta: { label: "Nuestro Método", href: "#info" },
+    image: heroImg.src,
+    imageAlt: "Tratamiento de cejas",
+  },
+  {
+    badge: "K-Beauty Aesthetics",
+    title: "Tratamientos",
+    titleAccent: "de Autor",
+    description:
+      "Precisión y belleza artesanal para realzar tu mirada con la delicadeza de la estética coreana. Cada detalle cuenta en nuestra búsqueda de la armonía facial.",
+    primaryCta: { label: "Ver Servicios", href: "#servicios" },
+    secondaryCta: { label: "Nuestro Método", href: "#info" },
+    image: heroImg.src,
+    imageAlt: "Tratamiento de cejas",
+  },
+];
+---
+
+<section id="hero">
+  <HeroSlider slides={slides} client:load />
+</section>

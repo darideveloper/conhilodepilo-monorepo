@@ -1,0 +1,125 @@
+---
+import SectionHeader from "../molecules/SectionHeader.astro";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+export interface GalleryItem {
+  src: ImageMetadata | string;
+  alt: string;
+}
+
+interface Props {
+  items?: GalleryItem[];
+}
+
+// Local imports for optimized images
+import img1 from "../../assets/images/gallery/gallery-01.jpg";
+import img2 from "../../assets/images/gallery/gallery-02.jpg";
+import img3 from "../../assets/images/gallery/gallery-03.jpg";
+import img4 from "../../assets/images/gallery/gallery-04.jpg";
+import img5 from "../../assets/images/gallery/gallery-05.jpg";
+import img6 from "../../assets/images/gallery/gallery-06.jpg";
+import img7 from "../../assets/images/gallery/gallery-07.jpg";
+import img8 from "../../assets/images/gallery/gallery-08.jpg";
+
+// In the future this data will come from an API
+const defaultGalleryData: GalleryItem[] = [
+  { src: img1, alt: "Before and after brow design result" },
+  { src: img2, alt: "Close up of perfected eyelashes" },
+  { src: img3, alt: "Subtle microblading result" },
+  { src: img4, alt: "Clean eyebrow threading work" },
+  { src: img5, alt: "Healed microblading brows" },
+  { src: img6, alt: "Before after lash lift" },
+  { src: img7, alt: "Brow lamination before and after" },
+  { src: img8, alt: "High precision brow line" },
+];
+
+const { items = defaultGalleryData } = Astro.props;
+---
+
+<section class="bg-brand-primary/5 py-20 px-6" id="resultados">
+  <div class="container relative z-10 mx-auto">
+    <div class="mb-16">
+      <slot name="header">
+        <SectionHeader centered={true}>
+          <Fragment slot="title">Resultados Reales</Fragment>
+          <Fragment slot="subtitle">La sutileza es nuestra firma</Fragment>
+        </SectionHeader>
+      </slot>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="space-y-4">
+        <div class="rounded-xl overflow-hidden aspect-[3/4]">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[0].src}
+            alt={items[0].alt}
+            inferSize
+          />
+        </div>
+        <div class="rounded-xl overflow-hidden aspect-square">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[1].src}
+            alt={items[1].alt}
+            inferSize
+          />
+        </div>
+      </div>
+      <div class="space-y-4 pt-10">
+        <div class="rounded-xl overflow-hidden aspect-square">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[2].src}
+            alt={items[2].alt}
+            inferSize
+          />
+        </div>
+        <div class="rounded-xl overflow-hidden aspect-[3/4]">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[3].src}
+            alt={items[3].alt}
+            inferSize
+          />
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-xl overflow-hidden aspect-[3/4]">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[4].src}
+            alt={items[4].alt}
+            inferSize
+          />
+        </div>
+        <div class="rounded-xl overflow-hidden aspect-square">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[5].src}
+            alt={items[5].alt}
+            inferSize
+          />
+        </div>
+      </div>
+      <div class="space-y-4 pt-10">
+        <div class="rounded-xl overflow-hidden aspect-square">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[6].src}
+            alt={items[6].alt}
+            inferSize
+          />
+        </div>
+        <div class="rounded-xl overflow-hidden aspect-[3/4]">
+          <Image
+            class="w-full h-full object-cover"
+            src={items[7].src}
+            alt={items[7].alt}
+            inferSize
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

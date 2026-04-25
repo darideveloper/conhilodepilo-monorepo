@@ -1,0 +1,52 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HeroSection from '../components/organisms/HeroSection.astro';
+import { CategoryShowcase } from '../components/organisms/CategoryShowcase';
+import CoursesSection from '../components/organisms/CoursesSection.astro';
+import Gallery from '../components/organisms/Gallery.astro';
+import InfoCardSection from '../components/organisms/InfoCardSection.astro';
+import SectionHeader from '../components/molecules/SectionHeader.astro';
+import { getServiceCategories } from "../lib/api/getServices";
+
+const categories = await getServiceCategories();
+---
+
+<Layout>
+	<!-- Hero Section -->
+	<HeroSection />
+
+	<!-- Services Section -->
+	<section id="servicios" class="py-24 bg-ui-bg-light relative overflow-hidden">
+		<div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-brand-primary/10 rounded-full blur-3xl"></div>
+		<div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-brand-secondary/10 rounded-full blur-3xl"></div>
+
+		<div class="container relative z-10 flex flex-col gap-12">
+			<div class="flex flex-col items-center gap-4">
+				<SectionHeader centered={true}>
+					<Fragment slot="title">Nuestra Carta de Servicios</Fragment>
+				</SectionHeader>
+				<span class="w-16 h-0.5 bg-brand-primary rounded-full"></span>
+			</div>
+
+			<CategoryShowcase categories={categories} client:load />
+		</div>
+	</section>
+
+	<!-- Courses Section -->
+	<CoursesSection>
+		<SectionHeader slot="header" centered={true}>
+			<Fragment slot="title">Formación Exclusiva: Cursos Presenciales</Fragment>
+		</SectionHeader>
+	</CoursesSection>
+
+	<!-- Gallery Section -->
+	<Gallery>
+		<SectionHeader slot="header" centered={true}>
+			<Fragment slot="title">Resultados Reales</Fragment>
+			<Fragment slot="subtitle">La sutileza es nuestra firma</Fragment>
+		</SectionHeader>
+	</Gallery>
+
+	<!-- Info Section -->
+	<InfoCardSection />
+</Layout>

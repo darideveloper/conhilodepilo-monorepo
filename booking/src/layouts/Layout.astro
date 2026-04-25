@@ -1,0 +1,107 @@
+---
+import "../styles/global.css";
+import AppLoader from "../components/atoms/AppLoader.astro";
+import { fetchConfig } from "../lib/api/endpoints/config";
+
+let config = null;
+try {
+	config = await fetchConfig();
+} catch (error) {
+	console.error('Error fetching config in Layout:', error);
+}
+
+const pageTitle = config?.company_name || "Booking System";
+const brandColor = config?.brand_color || "#a01313";
+const zoom = Astro.url.searchParams.get('zoom');
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{pageTitle}</title>
+		
+		{/* Dynamic Brand Color Injection */}
+		<style is:inline define:vars={{ brandColor }}>
+			:root {
+				--brand-color: var(--brandColor);
+				--primary: var(--brandColor);
+			}
+		</style>
+
+		{zoom && (
+			<style is:global set:html={`body { zoom: ${zoom}%; }`} />
+		)}
+
+		<script is:inline>
+			// Theme initialization
+			const theme = (() => {
+				const urlParams = new URLSearchParams(window.location.search);
+				const themeParam = urlParams.get('theme');
+				if (themeParam === 'light' || themeParam === 'dark') {
+					localStorage.setItem('theme', themeParam);
+					return themeParam;
+				}
+				if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+					return localStorage.getItem('theme');
+				}
+				if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					return 'dark';
+				}
+				return 'light';
+			})();
+			if (theme === 'dark') {
+				document.documentElement.classList.add('dark');
+			} else {
+				document.documentElement.classList.remove('dark');
+			}
+
+			// Language initialization
+			const syncLanguage = () => {
+				const urlParams = new URLSearchParams(window.location.search);
+				const langParam = urlParams.get('lang');
+				
+				if (langParam === 'es' || langParam === 'en') {
+					document.documentElement.lang = langParam;
+					return;
+				}
+
+				const storageStr = localStorage.getItem('booking-storage');
+				if (storageStr) {
+					try {
+						const storage = JSON.parse(storageStr);
+						const lang = storage.state?.language || 'es';
+						document.documentElement.lang = lang;
+					} catch (e) {
+						console.error('Error parsing booking-storage', e);
+					}
+				}
+			};
+			syncLanguage();
+
+			// Listen for storage changes (for multiple tabs)
+			window.addEventListener('storage', (e) => {
+				if (e.key === 'booking-storage') {
+					syncLanguage();
+				}
+			});
+		</script>
+	</head>
+	<body class="font-sans relative overflow-x-hidden">
+		<AppLoader title={pageTitle} />
+		<slot />
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>

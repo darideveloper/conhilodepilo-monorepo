@@ -1,0 +1,24 @@
+info:
+  name: Get Company Config
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}/api/config/"
+
+runtime:
+  assertions:
+    - expression: ""
+      operator: eq
+      value: res.status
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  # Get Company Config
+  Public endpoint to fetch company branding, contact details, and UI labels.

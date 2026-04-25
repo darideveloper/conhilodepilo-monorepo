@@ -1,0 +1,23 @@
+---
+import InfoCard from "../molecules/InfoCard.astro";
+import Icon from "../atoms/Icon.astro";
+---
+
+<section class="max-w-[900px] mx-auto px-6 py-24" id="info">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <InfoCard 
+      title="¿Qué esperar?"
+      variant="primary"
+    >
+      <Icon slot="icon" name="HelpCircle" size={24} />
+      Nuestra sesión comienza con un diagnóstico personalizado de visagismo. Analizamos tu estructura ósea y dirección del vello para garantizar un resultado que no solo embellezca, sino que armonice tu rostro de forma natural.
+    </InfoCard>
+    <InfoCard 
+      title="Cuidados Post"
+      variant="secondary"
+    >
+      <Icon slot="icon" name="ShieldCheck" size={24} />
+      La durabilidad del tratamiento depende del cuidado. Evitar el agua directa en las primeras 24h, no usar saunas y aplicar nuestro sérum regenerador diario son pasos clave para mantener tu mirada radiante por semanas.
+    </InfoCard>
+  </div>
+</section>

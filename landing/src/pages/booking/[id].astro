@@ -1,0 +1,152 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import SectionHeader from '../../components/molecules/SectionHeader.astro'
+import { getServices } from '../../lib/api/getServices'
+import { getCourses } from '../../lib/api/getCourses'
+import { ReactIcon } from '../../components/atoms/ReactIcon'
+import { marked } from 'marked'
+
+export async function getStaticPaths() {
+  const [services, courses] = await Promise.all([getServices(), getCourses()])
+  const allItems = [...services, ...courses]
+
+  return allItems.map((item) => ({
+    params: { id: item.id.toString() },
+    props: { item },
+  }))
+}
+
+const { id } = Astro.params
+const { item } = Astro.props
+
+// Parse markdown description
+const parsedDescription = item.description ? marked.parse(item.description) : ''
+
+// Dynamic booking URL based on item ID
+const bookingUrl = `${import.meta.env.PUBLIC_BOOKING_URL}/?service=${id}&lang=es&theme=light`
+---
+
+<Layout title={`${item.title} | Reserva | Con Hilo Depilo`}>
+  <section class='py-12 md:py-20 bg-ui-bg-light min-h-[80vh]'>
+    <div class='flex flex-col lg:grid lg:grid-cols-12 gap-12'>
+      <!-- Left Column: Details -->
+      <div class='container lg:col-span-6 flex flex-col gap-8'>
+        <a
+          href='/'
+          class='group inline-flex items-center gap-2 text-brand-primary font-bold uppercase tracking-widest text-[10px] md:text-xs hover:gap-3 transition-all'
+        >
+          <ReactIcon
+            name='LuArrowLeft'
+            size={16}
+          />
+          Volver al inicio
+        </a>
+
+        <div class='flex flex-col gap-6 md:gap-8'>
+          {
+            item.image && (
+              <div class='aspect-[16/9] lg:aspect-[4/3] rounded-3xl overflow-hidden border border-brand-primary/10 shadow-xl bg-white'>
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  class='w-full h-full object-cover transition-transform duration-700 hover:scale-105'
+                />
+              </div>
+            )
+          }
+
+          <div class='flex flex-col gap-6'>
+            <div class='flex flex-col gap-4'>
+              <SectionHeader title={item.title} />
+              <div class='flex items-center gap-4'>
+                <span
+                  class='text-2xl md:text-3xl font-black text-brand-primary tracking-tighter'
+                >
+                  {item.price}
+                </span>
+                <span
+                  class='flex items-center gap-2 text-[10px] md:text-xs text-ui-text-muted font-bold uppercase tracking-widest bg-white px-4 py-2 rounded-full border border-brand-primary/10 shadow-sm'
+                >
+                  <ReactIcon
+                    name='LuClock'
+                    size={14}
+                    className='text-brand-primary'
+                  />
+                  {item.duration} min
+                </span>
+              </div>
+            </div>
+
+            <div
+              class='markdown text-sm md:text-base text-ui-text-muted leading-relaxed prose prose-sm md:prose-base prose-brand max-w-none prose-p:leading-relaxed'
+              set:html={parsedDescription}
+            />
+          </div>
+        </div>
+
+        <!-- Secondary CTA: WhatsApp Support -->
+        <div
+          class='bg-white p-6 md:p-8 rounded-[2rem] border border-brand-primary/10 flex flex-col gap-5 shadow-sm mt-4 lg:mt-8'
+        >
+          <div class='flex flex-col gap-1'>
+            <h4
+              class='font-bold text-ui-text-main uppercase tracking-widest text-xs md:text-sm'
+            >
+              ¿Necesitas ayuda?
+            </h4>
+            <p class='text-[11px] md:text-xs text-ui-text-muted'>
+              Conversa con una de nuestras expertas por WhatsApp para resolver
+              cualquier duda.
+            </p>
+          </div>
+          <a
+            href='https://wa.me/34600000000'
+            target='_blank'
+            class='flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs hover:bg-[#1ebd5e] hover:scale-[1.02] active:scale-95 transition-all shadow-md'
+          >
+            <ReactIcon
+              name='LuPhone'
+              size={18}
+            />
+            Contactar vía WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Booking Iframe -->
+      <div class='lg:col-span-6 flex flex-col gap-6'>
+        <div class='container flex flex-col gap-2 mb-2 lg:hidden'>
+          <span
+            class='text-[10px] font-bold text-brand-secondary uppercase tracking-[0.2em]'
+            >Paso final</span
+          >
+          <h2 class='text-2xl font-black uppercase tracking-tight'>
+            Finaliza tu reserva
+          </h2>
+        </div>
+        <iframe
+          id='booking-iframe'
+          src={bookingUrl}
+          class='w-full h-full border-none z-10 min-h-[680px] md:min-h-[750px] sticky top-8 group/iframe rounded-3xl overflow-y-hidden'
+          title='Sistema de Reservas - Con Hilo Depilo'
+          loading='lazy'
+        ></iframe>
+        <script>
+          const iframe = document.getElementById(
+            'booking-iframe',
+          ) as HTMLIFrameElement
+          const width = window.innerWidth
+          let zoom = 100
+          if (width < 768) {
+            zoom = 80
+          } else if (width >= 1024) {
+            zoom = 110
+          }
+          if (iframe && iframe.src) {
+            iframe.src += `&zoom=${zoom}`
+          }
+        </script>
+      </div>
+    </div>
+  </section>
+</Layout>

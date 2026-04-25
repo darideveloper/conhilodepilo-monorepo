@@ -1,0 +1,48 @@
+---
+import "../styles/global.css";
+import clsx from "clsx";
+import Header from "../components/organisms/Header.astro";
+import Footer from "../components/organisms/Footer.astro";
+import WhatsAppButton from "../components/molecules/WhatsAppButton.astro";
+import BaseSEO from "../components/atoms/BaseSEO.astro";
+
+interface Props {
+	title?: string;
+	description?: string;
+	class?: string;
+}
+
+const { 
+	title,
+	description,
+	class: className 
+} = Astro.props;
+
+const isProd = import.meta.env.PROD;
+---
+
+<!doctype html>
+<html lang="es" class="h-full scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="theme-color" content="#d946ef" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		
+		{!isProd && <meta name="robots" content="noindex, nofollow" />}
+		
+		<BaseSEO title={title} description={description} />
+	</head>
+	<body class="min-h-full font-sans bg-ui-bg-light text-ui-text-main antialiased selection:bg-brand-primary/30">
+		<Header />
+		<main class={className}>
+			<slot />
+		</main>
+		<Footer />
+		<WhatsAppButton />
+	</body>
+</html>

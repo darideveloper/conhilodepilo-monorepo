@@ -1,0 +1,823 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SectionHeader from "../components/molecules/SectionHeader.astro";
+import Button from "../components/atoms/Button.astro";
+import Badge from "../components/atoms/Badge.astro";
+import Icon from "../components/atoms/Icon.astro";
+import ServiceCard from "../components/molecules/ServiceCard.astro";
+import CourseCard from "../components/molecules/CourseCard.astro";
+import { getServices } from "../lib/api/getServices";
+import HeroImage from "../components/molecules/HeroImage.astro";
+import placeholderImg from "../assets/images/hero.png";
+import courseImg from "../assets/images/course/iniciacion-hilo.jpg";
+import InfoCard from "../components/molecules/InfoCard.astro";
+import { ReactIcon } from "../components/atoms/ReactIcon";
+import { ReactTest } from "../components/atoms/ReactTest";
+import { ServicesSlider } from "../components/organisms/ServicesSlider";
+
+const services = await getServices();
+---
+
+<Layout title="Design System | Con Hilo Depilo" class="py-20">
+  <div class="container flex flex-col gap-20">
+      <SectionHeader
+        title="Design System"
+        subtitle="Referencia visual de los componentes atómicos y variantes del proyecto."
+      />
+
+      <!-- Typography System -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Typography
+        </h3>
+
+        <div class="flex flex-col gap-10">
+          <!-- H1 — Hero Title -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >H1 — Hero Title</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;h1&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted"
+                >3rem / 48px · weight 500 · tracking -0.025em</span
+              >
+            </div>
+            <h1>Con Hilo Depilo</h1>
+          </div>
+
+          <!-- H2 — Section Title -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >H2 — Section Title</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;h2&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted"
+                >1.875rem / 30px · weight 500 · tracking -0.02em</span
+              >
+            </div>
+            <h2>Nuestros Servicios</h2>
+          </div>
+
+          <!-- H3 — Subtitle / Card Title -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >H3 — Cards / Subtitles</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;h3&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted"
+                >1.25rem / 20px · weight 500</span
+              >
+            </div>
+            <h3>Diseño de cejas con hilo</h3>
+          </div>
+
+          <!-- H4 -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >H4</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;h4&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted"
+                >1rem / 16px · weight 500</span
+              >
+            </div>
+            <h4>Limpieza facial con hilo</h4>
+          </div>
+
+          <!-- H5 -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >H5</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;h5&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted"
+                >0.875rem / 14px · weight 500</span
+              >
+            </div>
+            <h5>Duración y precio</h5>
+          </div>
+
+          <!-- H6 -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >H6</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;h6&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted"
+                >0.75rem / 12px · weight 500</span
+              >
+            </div>
+            <h6>Nota adicional</h6>
+          </div>
+
+          <!-- Body Text -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >Body Text</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;p&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted">1rem / 16px</span>
+            </div>
+            <p class="max-w-prose">
+              Definición natural con técnica coreana para un arco perfecto.
+              Resultados visibles desde la primera sesión con productos de alta
+              calidad.
+            </p>
+          </div>
+
+          <!-- Small / Caption -->
+          <div
+            class="flex flex-col gap-1 p-6 bg-white rounded-xl border border-brand-primary/10"
+          >
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+              <span
+                class="text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                >Small / Caption</span
+              >
+              <code
+                class="text-micro bg-brand-primary/10 text-ui-text-main px-1.5 py-0.5 rounded"
+                >&lt;small&gt;</code
+              >
+              <span class="text-micro text-ui-text-muted">0.875rem / 14px</span>
+            </div>
+            <small class="text-ui-text-muted">30 min · Desde 15 €</small>
+          </div>
+        </div>
+
+        <!-- Token Reference Table -->
+        <div class="overflow-x-auto mt-4">
+          <table class="w-full text-left text-caption">
+            <thead>
+              <tr class="border-b border-brand-primary/20">
+                <th
+                  class="py-2 pr-4 text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                  >Element</th
+                >
+                <th
+                  class="py-2 pr-4 text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                  >Token</th
+                >
+                <th
+                  class="py-2 pr-4 text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                  >Size</th
+                >
+                <th
+                  class="py-2 text-micro font-bold text-ui-text-muted uppercase tracking-widest"
+                  >Use</th
+                >
+              </tr>
+            </thead>
+            <tbody class="text-ui-text-main">
+              <tr class="border-b border-brand-primary/10">
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;h1&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-display</code
+                  ></td
+                >
+                <td class="py-2 pr-4">3rem / 48px</td>
+                <td class="py-2 text-ui-text-muted">Hero title</td>
+              </tr>
+              <tr class="border-b border-brand-primary/10">
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;h2&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-heading</code
+                  ></td
+                >
+                <td class="py-2 pr-4">1.875rem / 30px</td>
+                <td class="py-2 text-ui-text-muted">Section titles</td>
+              </tr>
+              <tr class="border-b border-brand-primary/10">
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;h3&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-subheading</code
+                  ></td
+                >
+                <td class="py-2 pr-4">1.25rem / 20px</td>
+                <td class="py-2 text-ui-text-muted">Card / course titles</td>
+              </tr>
+              <tr class="border-b border-brand-primary/10">
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;h4&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-body</code
+                  ></td
+                >
+                <td class="py-2 pr-4">1rem / 16px</td>
+                <td class="py-2 text-ui-text-muted">Sub-sections</td>
+              </tr>
+              <tr class="border-b border-brand-primary/10">
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;h5&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-caption</code
+                  ></td
+                >
+                <td class="py-2 pr-4">0.875rem / 14px</td>
+                <td class="py-2 text-ui-text-muted">Detail labels</td>
+              </tr>
+              <tr class="border-b border-brand-primary/10">
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;h6&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-micro</code
+                  ></td
+                >
+                <td class="py-2 pr-4">0.75rem / 12px</td>
+                <td class="py-2 text-ui-text-muted">Fine print headings</td>
+              </tr>
+              <tr class="border-b border-brand-primary/10">
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;p&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-body</code
+                  ></td
+                >
+                <td class="py-2 pr-4">1rem / 16px</td>
+                <td class="py-2 text-ui-text-muted">Body text</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >&lt;small&gt;</code
+                  ></td
+                >
+                <td class="py-2 pr-4"
+                  ><code
+                    class="text-micro bg-brand-primary/10 px-1.5 py-0.5 rounded"
+                    >--font-size-caption</code
+                  ></td
+                >
+                <td class="py-2 pr-4">0.875rem / 14px</td>
+                <td class="py-2 text-ui-text-muted">Captions, durations</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Colors Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Colors
+        </h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div class="flex flex-col gap-3">
+            <div
+              class="h-24 w-full rounded-xl bg-brand-primary border border-black/5 shadow-sm"
+            >
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm font-bold">Brand Primary</span>
+              <code class="text-xs text-ui-text-muted">#f3c6bf</code>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3">
+            <div
+              class="h-24 w-full rounded-xl bg-brand-secondary border border-black/5 shadow-sm"
+            >
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm font-bold">Brand Secondary</span>
+              <code class="text-xs text-ui-text-muted">#C7B7A3</code>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3">
+            <div
+              class="h-24 w-full rounded-xl bg-brand-accent border border-black/5 shadow-sm"
+            >
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm font-bold">Brand Accent</span>
+              <code class="text-xs text-ui-text-muted">#25D366</code>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3">
+            <div
+              class="h-24 w-full rounded-xl bg-ui-bg-light border border-black/5 shadow-sm"
+            >
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm font-bold">UI BG Light</span>
+              <code class="text-xs text-ui-text-muted">#FFF9F6</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Buttons Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Buttons
+        </h3>
+
+        <div class="flex flex-col gap-12">
+          <!-- Variants -->
+          <div class="flex flex-col gap-4">
+            <p
+              class="text-sm font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              Variants
+            </p>
+            <div class="flex flex-wrap gap-4 items-center">
+              <Button variant="primary">Primary Button</Button>
+              <Button variant="outline">Outline Button</Button>
+              <Button variant="ghost">Ghost Button</Button>
+            </div>
+          </div>
+
+          <!-- Sizes -->
+          <div class="flex flex-col gap-4">
+            <p
+              class="text-sm font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              Sizes
+            </p>
+            <div class="flex flex-wrap gap-4 items-center">
+              <Button size="sm">Small</Button>
+              <Button size="md">Medium (Default)</Button>
+              <Button size="lg">Large</Button>
+            </div>
+          </div>
+
+          <!-- States -->
+          <div class="flex flex-col gap-4">
+            <p
+              class="text-sm font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              States
+            </p>
+            <div class="flex flex-wrap gap-4 items-center">
+              <Button disabled>Disabled Button</Button>
+              <Button variant="outline" disabled>Disabled Outline</Button>
+            </div>
+          </div>
+
+          <!-- As Link (Polymorphic) -->
+          <div class="flex flex-col gap-4">
+            <p
+              class="text-sm font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              As Link (Polymorphic)
+            </p>
+            <div class="flex flex-wrap gap-4 items-center">
+              <Button href="/">Back to Home</Button>
+              <Button href="#servicios" variant="outline">Go to Anchor</Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Badges Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Badges
+        </h3>
+
+        <div class="flex flex-wrap gap-4">
+          <Badge variant="primary">Primary Badge</Badge>
+          <Badge variant="secondary">Secondary Badge</Badge>
+        </div>
+      </section>
+
+      <!-- Info Card Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Info Card
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <InfoCard
+            title="¿Qué esperar?"
+            text="Nuestra sesión comienza con un diagnóstico personalizado de visagismo para garantizar un resultado natural."
+            variant="primary"
+          >
+            <ReactIcon
+              slot="icon"
+              name="BsQuestionSquare"
+              size={18}
+              client:load
+            />
+          </InfoCard>
+
+          <InfoCard title="Cuidados Post (con Slots)" variant="secondary">
+            <ReactIcon slot="icon" name="LuShieldCheck" size={18} client:load />
+            Evitar el agua directa en las primeras <strong>24h</strong> y aplicar
+            nuestro <a
+              href="#"
+              class="text-brand-primary underline underline-offset-4 font-bold"
+              >sérum regenerador</a
+            > diario son pasos clave.
+          </InfoCard>
+
+          <InfoCard
+            title="Duración"
+            text="El tratamiento tiene una duración aproximada de 30 a 45 minutos dependiendo del área a tratar."
+            variant="accent"
+          >
+            <ReactIcon slot="icon" name="LuClock" size={18} client:load />
+          </InfoCard>
+        </div>
+      </section>
+
+      <!-- Hero Image Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Hero Image
+        </h3>
+
+        <div class="grid grid-cols-2 gap-12 max-w-2xl">
+          <!-- Decorator -->
+          <div class="flex flex-col gap-4">
+            <p
+              class="text-sm font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              Decorator
+            </p>
+            <HeroImage
+              src={placeholderImg}
+              alt="Demo decorator"
+              title="Título opcional"
+              variant="decorator"
+            />
+          </div>
+
+          <!-- Basic -->
+          <div class="flex flex-col gap-4">
+            <p
+              class="text-sm font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              Basic
+            </p>
+            <HeroImage src={placeholderImg} alt="Demo basic" variant="basic" />
+          </div>
+
+          <!-- As Link -->
+          <div class="flex flex-col gap-4">
+            <p
+              class="text-sm font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              With Link
+            </p>
+            <HeroImage
+              src={placeholderImg}
+              alt="Demo with link"
+              title="Ver servicios"
+              href="/servicios"
+              variant="decorator"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Headers Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Section Headers
+        </h3>
+
+        <div class="flex flex-col gap-12">
+          <div class="p-6 bg-white rounded-xl border border-brand-primary/10">
+            <SectionHeader
+              title="Left Aligned Header"
+              subtitle="This is the default alignment for section headers."
+            />
+          </div>
+          <div class="p-6 bg-white rounded-xl border border-brand-primary/10">
+            <SectionHeader
+              subtitle="Perfect for hero sections or main landing page dividers."
+              centered={true}
+            >
+              <div slot="title" class="flex items-center gap-3">
+                <Icon name="Sparkles" size={24} class="text-brand-primary" />
+                <span>Centered Header with Slot</span>
+              </div>
+            </SectionHeader>
+          </div>
+        </div>
+      </section>
+
+      <!-- Service Cards Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Service Cards
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="flex flex-col gap-2">
+            <p
+              class="text-[10px] font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              Variant: Outline (Default)
+            </p>
+            <ServiceCard
+              id={1}
+              title="Diseño de Cejas"
+              category="cejas"
+              price="Desde 15 €"
+              duration={30}
+              image={services[0]?.image || placeholderImg}
+              variant="outline"
+            >
+              Definición natural con técnica coreana para un arco perfecto.
+            </ServiceCard>
+          </div>
+          <div class="flex flex-col gap-2">
+            <p
+              class="text-[10px] font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              Variant: Primary
+            </p>
+            <ServiceCard
+              id={2}
+              title="Lifting de Pestañas"
+              category="pestanas"
+              price="Desde 35 €"
+              duration={45}
+              image={services[1]?.image || placeholderImg}
+              variant="primary"
+            >
+              Eleva tus pestañas naturales con un efecto rizado y duradero.
+            </ServiceCard>
+          </div>
+          <div class="flex flex-col gap-2">
+            <p
+              class="text-[10px] font-bold text-ui-text-muted uppercase tracking-widest"
+            >
+              Variant: Ghost
+            </p>
+            <ServiceCard
+              id={3}
+              title="Limpieza con Hilo"
+              category="facial"
+              price="Desde 20 €"
+              duration={20}
+              image={services[2]?.image || placeholderImg}
+              variant="ghost"
+            >
+              Elimina el vello facial más fino de forma suave y precisa.
+            </ServiceCard>
+          </div>
+        </div>
+      </section>
+
+      <!-- Services Slider Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Services Slider
+        </h3>
+        
+        <ServicesSlider services={services} client:load />
+      </section>
+
+      <!-- Course Cards Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Course Cards
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+          <CourseCard
+            id={101}
+            title="Iniciación al Hilo"
+            duration={480}
+            image={courseImg}
+          >
+            Aprende la técnica milenaria de depilación con hilo desde cero.
+          </CourseCard>
+
+          <CourseCard
+            title="Masterclass Avanzada"
+            duration="16 Horas · 2 Jornadas"
+            level="Profesional"
+            image={courseImg}
+            alt="Curso Avanzado"
+          >
+            Perfecciona tu técnica y especialízate en visagismo avanzado.
+          </CourseCard>
+        </div>
+      </section>
+
+      <!-- Icons Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          Icons (Lucide)
+        </h3>
+
+        <div
+          class="flex flex-wrap gap-8 p-8 bg-white rounded-xl border border-brand-primary/10 items-center justify-center"
+        >
+          <div class="flex flex-col items-center gap-2">
+            <Icon name="Tag" size={32} class="text-brand-primary" />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >Tag</span
+            >
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <Icon name="Clock" size={32} class="text-brand-secondary" />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >Clock</span
+            >
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <Icon name="CheckCircle" size={32} class="text-brand-accent" />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >Check</span
+            >
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <Icon name="Instagram" size={32} />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >Social</span
+            >
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <Icon name="ChevronRight" size={32} strokeWidth="3" />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >Stroke 3</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- React Icons Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          React Icons (On-demand)
+        </h3>
+
+        <p class="text-sm text-ui-text-muted max-w-2xl">
+          Componente React que carga iconos de múltiples librerías (Lucide,
+          Bootstrap, FontAwesome, Material) bajo demanda usando ESM.sh.
+        </p>
+
+        <div
+          class="flex flex-wrap gap-8 p-8 bg-white rounded-xl border border-brand-primary/10 items-center justify-center"
+        >
+          <div class="flex flex-col items-center gap-2">
+            <ReactIcon name="LuShieldCheck" size={32} client:load />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >LuShieldCheck</span
+            >
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <ReactIcon name="BsQuestionSquare" size={32} client:load />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >BsQuestionSquare</span
+            >
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <ReactIcon name="FiHeart" size={32} client:load />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >FiHeart</span
+            >
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <ReactIcon name="MdOutlineCleanHands" size={32} client:load />
+            <span class="text-[10px] uppercase font-bold text-ui-text-muted"
+              >MdOutlineCleanHands</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- React Integration Section -->
+      <section class="flex flex-col gap-8">
+        <h3
+          class="text-xl font-bold border-b pb-2 uppercase tracking-wider text-brand-secondary"
+        >
+          React Hydration Test
+        </h3>
+
+        <div class="max-w-md">
+          <ReactTest client:load />
+        </div>
+      </section>
+
+      <div class="pt-10 border-t flex justify-center">
+        <Button variant="ghost" href="/">
+          <Icon name="ArrowLeft" size={18} class="mr-2" />
+          Volver a la Home
+        </Button>
+      </div>
+    </div>
+  </Layout>

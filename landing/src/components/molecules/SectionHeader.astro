@@ -1,0 +1,25 @@
+---
+import { cn } from "../../utils/cn";
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  centered?: boolean;
+  class?: string;
+}
+
+const { title, subtitle, centered = false, class: className } = Astro.props;
+
+const baseClasses = "flex flex-col gap-2";
+---
+
+<header class={cn(baseClasses, centered ? "items-center text-center" : "items-start", className)}>
+  <h2 class="text-3xl md:text-4xl font-black tracking-tighter uppercase text-ui-text-main">
+    <slot name="title">{title}</slot>
+  </h2>
+  {(Astro.slots.has("subtitle") || subtitle) && (
+    <p class="max-w-2xl text-lg text-ui-text-muted">
+      <slot name="subtitle">{subtitle}</slot>
+    </p>
+  )}
+</header>

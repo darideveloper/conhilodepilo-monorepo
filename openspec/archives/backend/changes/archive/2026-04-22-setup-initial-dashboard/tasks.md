@@ -1,0 +1,28 @@
+# Tasks: Setup Initial Dashboard
+
+- [x] Create `requirements.txt` with core dependencies (Django, Unfold, DRF, Solo, Storages, etc.)
+- [x] Initialize virtual environment and install dependencies
+- [x] Initialize Django project and create "booking" application in the current directory
+- [x] Initialize Git and create `.gitignore`
+- [x] Create environment files (`.env`, `.env.dev`, `.env.prod`) with email and `Europe/Madrid` settings
+- [x] Refactor `project/settings.py` for dynamic initialization and load environment variables
+- [x] Configure `TIME_ZONE = 'Europe/Madrid'` in `settings.py`
+- [x] Configure `DATABASES` in `settings.py` with dynamic switching for testing
+- [x] Configure `STORAGES` in `settings.py` with conditional AWS/Local logic
+- [x] Create `project/storage_backends.py` for S3 custom backends
+- [x] Create `project/pagination.py` for metadata-rich API responses
+- [x] Create `project/handlers.py` for standardized API exception handling
+- [x] Create `project/admin.py` with Unfold customizations for User and Group
+- [x] Create `project/templates/admin/base.html` to inject custom assets
+- [x] Configure `UNFOLD` settings in `settings.py`
+- [x] Create `utils/callbacks.py` for environment badges
+- [x] Create `utils/admin_helpers.py` for permission validation
+- [x] Create `utils/automation.py` for Selenium helpers
+- [x] Create `utils/media.py` for image and URL processing
+- [x] Create static assets: `js/add_tailwind_styles.js`, `js/load_markdown.js`, `js/range_date_filter_es.js`
+- [x] Create `static/js/copy_clipboard.js` and `static/js/script.js`
+- [x] Setup `project/urls.py` with DRF router and root redirects
+- [x] Create `ModelAdminUnfoldBase` in `project/admin.py` or a dedicated module
+- [x] Run initial migrations and create a superuser
+- [x] Create `Dockerfile` and `start.sh` for production deployment
+- [x] Initialize OpenSpec with `openspec init`

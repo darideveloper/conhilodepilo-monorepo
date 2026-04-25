@@ -1,0 +1,54 @@
+---
+import { cn } from "../../utils/cn";
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  title: string;
+  text?: string;
+  variant?: "primary" | "secondary" | "accent";
+  class?: string;
+}
+
+const {
+  title,
+  text,
+  variant = "primary",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const variants = {
+  primary: "border-l-brand-primary   [&_.icon-wrapper]:text-brand-primary",
+  secondary: "border-l-brand-secondary [&_.icon-wrapper]:text-brand-secondary",
+  accent: "border-l-brand-accent    [&_.icon-wrapper]:text-brand-accent",
+};
+---
+
+<div
+  class={cn(
+    "flex flex-col gap-3.5 p-7 rounded-2xl bg-ui-bg-light border-l-[3px]",
+    "shadow-card transition-[box-shadow,translate] duration-[250ms]",
+    "hover:shadow-card-hover hover:-translate-y-0.5",
+    variants[variant],
+    className,
+  )}
+  {...rest}
+>
+  <div class="flex items-center gap-2.5">
+    <span
+      class="icon-wrapper flex items-center justify-center shrink-0 w-6 h-6"
+    >
+      <slot name="icon" />
+    </span>
+    <h3
+      class="text-[length:--text-size-card-title] font-bold text-ui-text-main m-0"
+    >
+      {title}
+    </h3>
+  </div>
+  <p
+    class="text-[length:--text-size-card-body] leading-[1.65] text-ui-text-muted m-0"
+  >
+    <slot>{text}</slot>
+  </p>
+</div>

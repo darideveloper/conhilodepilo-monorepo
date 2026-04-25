@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %} {% load static %}
+
+{% block title %}
+    {% if title %}{{ title }} | {% endif %}{{ site_title|default:"Con Hilo Depilo" }}
+{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<!-- Load markdown libraries -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" />
+<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+<!-- Load Unfold custom scripts -->
+<script src="{% static 'js/add_tailwind_styles.js' %}"></script>
+<script src="{% static 'js/load_markdown.js' %}"></script>
+<script src="{% static 'js/range_date_filter_es.js' %}"></script>
+{% endblock %}

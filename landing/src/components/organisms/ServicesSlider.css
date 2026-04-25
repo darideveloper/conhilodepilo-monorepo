@@ -1,0 +1,14 @@
+.swiper-pagination-bullet {
+  background-color: var(--color-ui-bullet, rgba(42, 42, 42, 0.18)) !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--color-brand-primary, #f3c6bf) !important;
+  transform: scale(1.25);
+}
+
+.swiper-wrapper {
+  align-items: stretch;
+}

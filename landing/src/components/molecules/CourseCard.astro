@@ -1,0 +1,60 @@
+---
+import Icon from "../atoms/Icon.astro";
+import Button from "../atoms/Button.astro";
+import { marked } from "marked";
+
+interface Props {
+  id: number;
+  title: string;
+  duration: number;
+  description?: string | null;
+  image: string | null;
+}
+
+const { id, title, duration, description, image } = Astro.props;
+
+// format duration
+const hours = Math.floor(duration / 60);
+const formattedDuration = hours > 0 ? `${hours} horas` : `${duration} min`;
+const parsedDescription = description ? marked.parse(description) : "";
+---
+
+<div
+  class="group/card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-brand-primary/10 flex flex-col"
+>
+  <div class="h-64 overflow-hidden relative">
+    {
+      image ? (
+        <img
+          src={image}
+          alt={title}
+          class="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+        />
+      ) : (
+        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+          <Icon name="Image" size={32} class="text-gray-300" />
+        </div>
+      )
+    }
+  </div>
+  <div class="p-6 space-y-4 flex flex-col flex-1">
+    <h3 class="text-xl font-bold text-ui-text-main">{title}</h3>
+    <div
+      class="flex items-center gap-2 text-xs text-brand-secondary font-medium uppercase tracking-wide"
+    >
+      <Icon name="Calendar" size={16} />
+      {formattedDuration}
+    </div>
+    <div class="markdown text-sm text-ui-text-muted leading-relaxed flex-1 prose prose-sm prose-p:my-1 prose-ul:my-1 prose-li:list-disc prose-li:ml-4">
+      {
+        parsedDescription ? (
+          <Fragment set:html={parsedDescription} />
+        ) : (
+          <slot />
+        )
+      }
+    </div>    <Button variant="outline" class="w-full mt-auto text-xs uppercase" href={`/booking/${id}`}>
+      Ver detalles y reservar
+    </Button>
+  </div>
+</div>

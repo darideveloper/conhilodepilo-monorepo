@@ -1,0 +1,16 @@
+---
+import * as LucideIcons from "@lucide/astro";
+import type { LucideProps } from "@lucide/astro";
+
+interface Props extends LucideProps {
+  name: keyof typeof LucideIcons;
+  class?: string;
+  size?: number;
+}
+
+const { name, size = 24, class: className, ...rest } = Astro.props;
+
+const LucideIcon = LucideIcons[name] as any;
+---
+
+{LucideIcon && <LucideIcon size={size} class={className} {...rest} />}
