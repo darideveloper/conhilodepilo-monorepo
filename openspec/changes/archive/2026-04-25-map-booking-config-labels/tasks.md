@@ -1,0 +1,4 @@
+- [x] **Fix limited availability status mapping**: In `booking/src/lib/i18n/useTranslation.ts`, change the assignment of `config.availability_regular_label` from `status.standard` to `status.limited`.
+- [x] **Add extras label mapping**: In `booking/src/lib/i18n/useTranslation.ts`, add a `form` section override to set `specialRequests: config.extras_label ? \`\${config.extras_label} (opcional)\` : baseT.form.specialRequests`.
+- [x] **Add stripe requests mapping**: In `booking/src/lib/i18n/useTranslation.ts`, add a `stripe` section override to set `requests: config.extras_label || baseT.stripe.requests`.
+- [x] **Validate**: Run TypeScript checks in the booking app to verify no type errors are introduced.

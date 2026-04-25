@@ -25,6 +25,8 @@ export interface AppConfig {
 
 interface Availability {
   available: Date[];
+  limited?: Date[];
+  booked?: Date[];
 }
 
 export interface SelectedService {
@@ -150,7 +152,7 @@ export const useBookingStore = create<BookingState>()(
           theme: true,
           service: true,
         },
-        availability: { limited: [], booked: [] },
+        availability: { available: [], limited: [], booked: [] },
       }),
 
 

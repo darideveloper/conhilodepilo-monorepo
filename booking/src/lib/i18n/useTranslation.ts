@@ -23,8 +23,18 @@ export function useTranslation() {
       status: { 
         ...baseT.status,
         available: config.availability_free_label || baseT.status.available,
-        standard: config.availability_regular_label || baseT.status.standard,
+        limited: config.availability_regular_label || baseT.status.limited,
         booked: config.availability_no_free_label || baseT.status.booked
+      },
+      form: {
+        ...baseT.form,
+        specialRequests: config.extras_label 
+          ? `${config.extras_label} (opcional)` 
+          : baseT.form.specialRequests
+      },
+      stripe: {
+        ...baseT.stripe,
+        requests: config.extras_label || baseT.stripe.requests
       },
       layout: { 
         ...baseT.layout,
