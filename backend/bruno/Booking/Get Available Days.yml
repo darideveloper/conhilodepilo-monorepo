@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{base_url}}/api/availability/days/?service_ids=5"
+  url: "{{base_url}}/api/availability/days/?service_ids=5,6"
   params:
     - name: service_ids
-      value: "5"
+      value: 5,6
       type: query
 
 runtime:
