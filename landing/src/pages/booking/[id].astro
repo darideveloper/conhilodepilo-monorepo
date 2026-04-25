@@ -36,6 +36,7 @@ const bookingUrl = `${import.meta.env.PUBLIC_BOOKING_URL}/?service=${id}&lang=es
           class='group inline-flex items-center gap-2 text-brand-primary font-bold uppercase tracking-widest text-[10px] md:text-xs hover:gap-3 transition-all'
         >
           <ReactIcon
+            client:load
             name='LuArrowLeft'
             size={16}
           />
@@ -68,6 +69,7 @@ const bookingUrl = `${import.meta.env.PUBLIC_BOOKING_URL}/?service=${id}&lang=es
                   class='flex items-center gap-2 text-[10px] md:text-xs text-ui-text-muted font-bold uppercase tracking-widest bg-white px-4 py-2 rounded-full border border-brand-primary/10 shadow-sm'
                 >
                   <ReactIcon
+                    client:load
                     name='LuClock'
                     size={14}
                     className='text-brand-primary'
@@ -105,6 +107,7 @@ const bookingUrl = `${import.meta.env.PUBLIC_BOOKING_URL}/?service=${id}&lang=es
             class='flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs hover:bg-[#1ebd5e] hover:scale-[1.02] active:scale-95 transition-all shadow-md'
           >
             <ReactIcon
+              client:load
               name='LuPhone'
               size={18}
             />
