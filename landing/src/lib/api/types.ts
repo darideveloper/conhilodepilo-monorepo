@@ -14,6 +14,7 @@ export interface ServiceCategory {
   description: string | null;
   image: string | null;
   services: Service[];
+  group_id: number;
 }
 
 export interface Course {

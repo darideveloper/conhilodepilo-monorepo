@@ -5,7 +5,12 @@ export async function getCourses(): Promise<Course[]> {
   const categories = await fetchCategories();
   if (categories.length === 0) return [];
 
-  return categories[0].services.map((svc) => ({
+  const COURSES_GROUP_ID = Number(import.meta.env.PUBLIC_COURSES_GROUP_ID);
+  const courseCategory = categories.find((cat) => cat.group_id === COURSES_GROUP_ID);
+
+  if (!courseCategory) return [];
+
+  return courseCategory.services.map((svc) => ({
     id: svc.id,
     title: svc.title,
     description: svc.description,
