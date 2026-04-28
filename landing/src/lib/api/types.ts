@@ -25,3 +25,19 @@ export interface Course {
   duration: number;
   image: string | null;
 }
+
+export interface AppConfig {
+  company_name: string;
+  brand_color: string;
+  logo: string | null;
+  currency: string;
+  contact_email: string | null;
+  contact_phone: string | null;
+  event_type_label: string;
+  event_label: string;
+  availability_free_label: string;
+  availability_regular_label: string;
+  availability_no_free_label: string;
+  extras_label: string;
+  timezone: string;
+}

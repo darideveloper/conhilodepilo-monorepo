@@ -1,5 +1,8 @@
 ---
 import Icon from "../atoms/Icon.astro";
+import { getConfig } from "../../lib/api/getConfig";
+import { formatPhoneForDisplay, formatPhoneForWhatsApp } from "../../utils/phone";
+import { DEFAULT_CONTACT } from "../../lib/constants";
 
 export interface SocialLink {
   icon: string;
@@ -42,6 +45,10 @@ interface Props {
   data?: FooterData;
 }
 
+const config = await getConfig();
+const contactPhone = config?.contact_phone || DEFAULT_CONTACT.phone;
+const contactEmail = config?.contact_email || DEFAULT_CONTACT.email;
+
 const defaultFooterData: FooterData = {
   brand: {
     name: "Cuidado y Salud para ti",
@@ -51,7 +58,7 @@ const defaultFooterData: FooterData = {
   },
   socialLinks: [
     { icon: "Globe", url: "#" },
-    { icon: "Mail", url: "#" },
+    { icon: "Mail", url: `mailto:${contactEmail}` },
     { icon: "Instagram", url: "#" },
   ],
   location: {
@@ -63,9 +70,9 @@ const defaultFooterData: FooterData = {
   },
   contact: {
     title: "Contacto Directo",
-    description: "info@conhilodepilo.com | Phone: 915 23 14 06",
+    description: `${contactEmail} | Teléfono: ${formatPhoneForDisplay(contactPhone)}`,
     whatsappText: "WhatsApp Reservas",
-    whatsappUrl: "#",
+    whatsappUrl: `https://wa.me/${formatPhoneForWhatsApp(contactPhone)}`,
     schedule: ["L-S 10:00 a 20:30h.", "D 12:00 a 19:00h."],
   },
   legal: {
