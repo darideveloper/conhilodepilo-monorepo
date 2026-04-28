@@ -133,7 +133,6 @@ export function BookingCalendar() {
               modifiers={modifiers}
               disabled={(d: Date) => {
                 const dateObj = d instanceof Date ? d : new Date(d);
-                if (dateObj <= today) return true;
                 const isAvailable = availability.available.some((availableDate: Date) => {
                   const a = availableDate instanceof Date ? availableDate : new Date(availableDate);
                   return a.toDateString() === dateObj.toDateString();

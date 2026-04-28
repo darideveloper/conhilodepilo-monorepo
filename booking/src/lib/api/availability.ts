@@ -13,6 +13,9 @@ export const fetchAvailability = async (serviceIds: string[], signal: AbortSigna
   const availableDates: string[] = await response.json();
 
   return {
-    available: availableDates.map((d: string) => new Date(d)),
+    available: availableDates.map((d: string) => {
+      const [year, month, day] = d.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }),
   };
 };

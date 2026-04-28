@@ -205,22 +205,28 @@ export const useBookingStore = create<BookingState>()(
         }
         // ------------------------------
 
-        // Revive selectedDate
+        // Revive selectedDate (ensure local day integrity)
         if (state.selectedDate && typeof state.selectedDate === 'string') {
-          state.selectedDate = new Date(state.selectedDate);
+          const d = new Date(state.selectedDate);
+          state.selectedDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
         }
         
-        // Revive availability dates
+        // Revive availability dates (ensure local day integrity)
         if (state.availability) {
+          const reviveDate = (d: any) => {
+            if (typeof d !== 'string') return d;
+            const date = new Date(d);
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+          };
+
+          if (Array.isArray(state.availability.available)) {
+            state.availability.available = state.availability.available.map(reviveDate);
+          }
           if (Array.isArray(state.availability.limited)) {
-            state.availability.limited = state.availability.limited.map(d => 
-              typeof d === 'string' ? new Date(d) : d
-            );
+            state.availability.limited = state.availability.limited.map(reviveDate);
           }
           if (Array.isArray(state.availability.booked)) {
-            state.availability.booked = state.availability.booked.map(d => 
-              typeof d === 'string' ? new Date(d) : d
-            );
+            state.availability.booked = state.availability.booked.map(reviveDate);
           }
         }
       },
