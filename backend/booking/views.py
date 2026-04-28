@@ -2,9 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.conf import settings
+from datetime import datetime
 from .models import CompanyProfile, CompanyWeekdaySlot, EventType
 from .serializers import CompanyProfileSerializer, BusinessHoursSerializer, EventTypeSerializer
-from utils.availability import get_available_dates
+from utils.availability import get_available_dates, get_available_slots
 
 class CompanyConfigView(APIView):
     """
@@ -63,3 +64,25 @@ class AvailabilityView(APIView):
             
         available_dates = get_available_dates(ids)
         return Response(available_dates)
+
+class AvailabilitySlotsView(APIView):
+    """
+    Public endpoint to check available time slots for selected services on a specific date.
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        service_ids = request.query_params.get('service_ids')
+        date_str = request.query_params.get('date')
+        
+        if not service_ids or not date_str:
+            return Response({"error": "service_ids and date are required"}, status=400)
+            
+        try:
+            ids = [int(sid) for sid in service_ids.split(',')]
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            return Response({"error": "Invalid service_ids or date format (YYYY-MM-DD)"}, status=400)
+            
+        slots = get_available_slots(target_date, ids)
+        return Response(slots)

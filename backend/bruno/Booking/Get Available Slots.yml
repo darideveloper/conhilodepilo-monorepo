@@ -1,0 +1,24 @@
+meta {
+  name: Get Available Slots
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/availability/slots/?service_ids=1&date=2026-06-01
+  body: none
+  auth: none
+}
+
+query {
+  service_ids: 1
+  date: 2026-06-01
+}
+
+docs {
+  Returns a list of available HH:MM start times for the selected services on a specific date.
+  
+  Query Parameters:
+  - service_ids: Comma-separated IDs of events.
+  - date: YYYY-MM-DD format.
+}
