@@ -1,8 +1,9 @@
 from django.test import TestCase
-from datetime import date, timedelta
-from booking.models import CompanyProfile, EventType, Event, EventAvailability, EventDateOverride, AvailabilitySlot
+from datetime import date, timedelta, time, datetime
+from booking.models import CompanyProfile, EventType, Event, EventAvailability, EventDateOverride, AvailabilitySlot, Booking
 from utils.availability import get_available_dates
 from django.db import reset_queries
+from django.utils import timezone
 
 class AvailabilityIntersectionTest(TestCase):
     def setUp(self):
@@ -50,9 +51,6 @@ class AvailabilityIntersectionTest(TestCase):
     def test_intersection_logic(self):
         """
         Verify that the returned dates are only the intersection of all validations.
-        Service A: 01/01 to 10/01 + 15/01 (override)
-        Service B: 05/01 to 10/02
-        Intersection should be 05/01 to 10/01. 15/01 should NOT be included.
         """
         service_ids = [self.service_a.id, self.service_b.id]
         available_dates = get_available_dates(service_ids, start_date=date(2026, 1, 1))
@@ -68,17 +66,100 @@ class AvailabilityIntersectionTest(TestCase):
         service_ids = [self.service_a.id, self.service_b.id]
         reset_queries()
         
-        # We expect a constant number of queries regardless of the 30-day loop.
-        # 1. Event.objects.filter(id__in=service_ids)
-        # 2. EventAvailability.objects.filter(...)
-        # 3. CompanyAvailability.objects.filter(...)
-        # 4. EventDateOverride.objects.filter(...)
-        # 5. CompanyDateOverride.objects.filter(...)
-        # 6. AvailabilitySlot.objects.filter(...)
-        # 7. AvailabilitySlot.objects.filter(...).values_list('event_id', flat=True).distinct()
-        # 8. CompanyWeekdaySlot.objects.all()
-        # 9. CompanyWeekdaySlot.objects.exists()
-        
-        # Let's count them exactly.
-        with self.assertNumQueries(9):
+        # We expect a constant number of queries.
+        with self.assertNumQueries(10):
             get_available_dates(service_ids, start_date=date(2026, 1, 1))
+
+class BookingConflictTest(TestCase):
+    def setUp(self):
+        self.category_private = EventType.objects.create(name="Private", allow_overlap=False)
+        self.category_overlap = EventType.objects.create(name="Group", allow_overlap=True)
+        
+        self.service_private = Event.objects.create(
+            event_type=self.category_private,
+            name="Private Service",
+            price="100.00",
+            duration_minutes=60
+        )
+        self.service_short = Event.objects.create(
+            event_type=self.category_private,
+            name="Short Service",
+            price="50.00",
+            duration_minutes=30
+        )
+        self.service_overlap = Event.objects.create(
+            event_type=self.category_overlap,
+            name="Group Service",
+            price="20.00",
+            duration_minutes=60
+        )
+        
+        # Available from 09:00 to 11:00 (2 hours)
+        for i in range(7):
+            AvailabilitySlot.objects.create(event=self.service_private, weekday=i, start_time="09:00:00", end_time="11:00:00")
+            AvailabilitySlot.objects.create(event=self.service_short, weekday=i, start_time="09:00:00", end_time="11:00:00")
+            AvailabilitySlot.objects.create(event=self.service_overlap, weekday=i, start_time="09:00:00", end_time="11:00:00")
+
+    def test_strict_conflict(self):
+        """
+        Private service should be unavailable if the remaining window is too small.
+        """
+        target_date = date(2026, 6, 1) # a Monday
+        
+        # Book 09:30 to 10:30 (leaves two 30-min windows: 09:00-09:30 and 10:30-11:00)
+        start_time = timezone.make_aware(datetime.combine(target_date, time(9, 30)))
+        booking = Booking.objects.create(
+            client_name="Test",
+            client_email="test@test.com",
+            start_time=start_time,
+            status="CONFIRMED"
+        )
+        booking.services.add(self.service_private) # 60 mins
+        
+        # Service Private needs 60 mins. 
+        # Neither 30-min window is enough.
+        available_dates = get_available_dates([self.service_private.id], start_date=target_date)
+        self.assertNotIn(target_date.strftime('%Y-%m-%d'), available_dates)
+
+    def test_overlap_allowed(self):
+        """
+        Group service should be available even if someone else booked the same slot.
+        """
+        target_date = date(2026, 6, 1)
+        
+        # Book 09:00 to 11:00 (full day)
+        start_time = timezone.make_aware(datetime.combine(target_date, time(9, 0)))
+        booking = Booking.objects.create(
+            client_name="Test",
+            client_email="test@test.com",
+            start_time=start_time,
+            status="CONFIRMED"
+        )
+        # Add two 60m services to fill the 2h window
+        booking.services.add(self.service_private)
+        booking.services.add(self.service_private)
+        
+        # Group service needs 60 mins. Overlap is allowed.
+        available_dates = get_available_dates([self.service_overlap.id], start_date=target_date)
+        self.assertIn(target_date.strftime('%Y-%m-%d'), available_dates)
+
+    def test_mixed_services_strict_wins(self):
+        """
+        If one service is private, the whole booking follows strict conflict detection.
+        """
+        target_date = date(2026, 6, 1)
+        
+        # Book 09:30 to 10:30
+        start_time = timezone.make_aware(datetime.combine(target_date, time(9, 30)))
+        booking = Booking.objects.create(
+            client_name="Test",
+            client_email="test@test.com",
+            start_time=start_time,
+            status="CONFIRMED"
+        )
+        booking.services.add(self.service_private)
+        
+        # Request both Private and Group. Total 120m.
+        # Strict mode will see the booking and fail.
+        available_dates = get_available_dates([self.service_private.id, self.service_overlap.id], start_date=target_date)
+        self.assertNotIn(target_date.strftime('%Y-%m-%d'), available_dates)
