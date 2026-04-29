@@ -97,3 +97,7 @@
     color: var(--brand-primary-600, var(--color-primary-600));
     text-decoration: underline;
 }
+
+#content-main label {
+    margin-right: 5px;
+}
