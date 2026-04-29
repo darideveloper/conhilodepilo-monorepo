@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, time
 from collections import defaultdict
 from django.utils import timezone
-from booking.models import Event, Booking, CompanyAvailability, CompanyWeekdaySlot, CompanyDateOverride, AvailabilitySlot, EventDateOverride, EventAvailability
+from booking.models import Event, Booking, CompanyAvailability, CompanyWeekdaySlot, CompanyDateOverride, AvailabilitySlot, EventDateOverride, EventAvailability, CompanyProfile
 
 def get_available_dates(service_ids, start_date=None):
     if start_date is None:
@@ -16,6 +16,8 @@ def get_available_dates(service_ids, start_date=None):
 
     total_duration = sum(s.duration_minutes for s in services)
     all_allow_overlap = all(s.event_type.allow_overlap for s in services)
+    company_profile = CompanyProfile.get_solo()
+    cooldown = company_profile.booking_cooldown_minutes
 
     # 1. Fetch Availability Ranges
     s_avail = defaultdict(list)
@@ -71,7 +73,8 @@ def get_available_dates(service_ids, start_date=None):
         'service_ids': service_ids,
         'total_duration': total_duration,
         'all_allow_overlap': all_allow_overlap,
-        'bookings_by_date': bookings_by_date
+        'bookings_by_date': bookings_by_date,
+        'cooldown': cooldown
     }
 
     available_dates = []
@@ -125,25 +128,7 @@ def _is_day_available(day, context):
     
     # Subtract bookings
     bookings = context['bookings_by_date'].get(day, [])
-    free_windows = working_windows
-    for b in bookings:
-        new_free_windows = []
-        # Convert to local time before getting the time part for comparison
-        b_local_start = timezone.localtime(b.start_time)
-        b_local_end = timezone.localtime(b.end_time)
-        b_start = b_local_start.time()
-        b_end = b_local_end.time()
-        for w_start, w_end in free_windows:
-            # If booking is outside window, keep window
-            if b_end <= w_start or b_start >= w_end:
-                new_free_windows.append((w_start, w_end))
-            else:
-                # Split window
-                if b_start > w_start:
-                    new_free_windows.append((w_start, b_start))
-                if b_end < w_end:
-                    new_free_windows.append((b_end, w_end))
-        free_windows = new_free_windows
+    free_windows = _get_free_windows(working_windows, bookings, context['cooldown'])
         
     # Check if any free window is large enough
     for w_start, w_end in free_windows:
@@ -195,6 +180,8 @@ def get_available_slots(day, service_ids):
 
     # Grouping is simple since it's one day
     bookings_list = list(bookings)
+    company_profile = CompanyProfile.get_solo()
+    cooldown = company_profile.booking_cooldown_minutes
 
     context = {
         'service_availabilities': s_avail,
@@ -207,7 +194,8 @@ def get_available_slots(day, service_ids):
         'has_company_slots': has_c_slots,
         'service_ids': service_ids,
         'total_duration': total_duration,
-        'all_allow_overlap': all_allow_overlap
+        'all_allow_overlap': all_allow_overlap,
+        'cooldown': cooldown
     }
 
     # 2. Get combined working windows
@@ -218,21 +206,7 @@ def get_available_slots(day, service_ids):
     # 3. Calculate free windows
     free_windows = working_windows
     if not all_allow_overlap:
-        for b in bookings_list:
-            new_free_windows = []
-            b_local_start = timezone.localtime(b.start_time)
-            b_local_end = timezone.localtime(b.end_time)
-            b_start = b_local_start.time()
-            b_end = b_local_end.time()
-            for w_start, w_end in free_windows:
-                if b_end <= w_start or b_start >= w_end:
-                    new_free_windows.append((w_start, w_end))
-                else:
-                    if b_start > w_start:
-                        new_free_windows.append((w_start, b_start))
-                    if b_end < w_end:
-                        new_free_windows.append((b_end, w_end))
-            free_windows = new_free_windows
+        free_windows = _get_free_windows(working_windows, bookings_list, context['cooldown'])
 
     # 4. Generate slots (15-min interval)
     slots = []
@@ -240,7 +214,11 @@ def get_available_slots(day, service_ids):
     now_local = timezone.localtime(timezone.now())
     
     for w_start, w_end in free_windows:
-        curr_dt = timezone.make_aware(datetime.combine(day, w_start))
+        # Snap w_start to the next 15-minute grid
+        start_dt = timezone.make_aware(datetime.combine(day, w_start))
+        minutes_to_add = (interval - (start_dt.minute % interval)) % interval
+        curr_dt = start_dt + timedelta(minutes=minutes_to_add)
+        
         end_dt_limit = timezone.make_aware(datetime.combine(day, w_end))
         
         while curr_dt + timedelta(minutes=total_duration) <= end_dt_limit:
@@ -249,6 +227,47 @@ def get_available_slots(day, service_ids):
             curr_dt += timedelta(minutes=interval)
             
     return slots
+
+def _get_free_windows(working_windows, bookings, cooldown):
+    """
+    Subtracts bookings from working windows, accounting for cooldown.
+    """
+    free_windows = working_windows
+    
+    for b in bookings:
+        new_free_windows = []
+        b_local_start = timezone.localtime(b.start_time)
+        b_local_end = timezone.localtime(b.end_time)
+        
+        # Apply cooldown to the booking boundaries
+        # b_start_dt = b_local_start - cooldown
+        # b_end_dt = b_local_end + cooldown
+        
+        b_start_dt = b_local_start - timedelta(minutes=cooldown)
+        b_end_dt = b_local_end + timedelta(minutes=cooldown)
+        
+        # We only care about the time part for window splitting within a day
+        if b_start_dt.date() < b_local_start.date():
+            b_start = time.min
+        else:
+            b_start = b_start_dt.time()
+            
+        if b_end_dt.date() > b_local_end.date():
+            b_end = time.max
+        else:
+            b_end = b_end_dt.time()
+
+        for w_start, w_end in free_windows:
+            if b_end <= w_start or b_start >= w_end:
+                new_free_windows.append((w_start, w_end))
+            else:
+                if b_start > w_start:
+                    new_free_windows.append((w_start, b_start))
+                if b_end < w_end:
+                    new_free_windows.append((b_end, w_end))
+        free_windows = new_free_windows
+        
+    return free_windows
 
 def _get_combined_windows(day, context):
     """

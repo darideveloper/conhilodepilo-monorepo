@@ -47,6 +47,9 @@ class AvailabilityIntersectionTest(TestCase):
         for i in range(7):
             AvailabilitySlot.objects.create(event=self.service_a, weekday=i, start_time="09:00:00", end_time="17:00:00")
             AvailabilitySlot.objects.create(event=self.service_b, weekday=i, start_time="09:00:00", end_time="17:00:00")
+        
+        # Pre-create company profile to avoid extra queries in get_available_dates
+        CompanyProfile.get_solo()
 
     def test_intersection_logic(self):
         """
@@ -66,8 +69,8 @@ class AvailabilityIntersectionTest(TestCase):
         service_ids = [self.service_a.id, self.service_b.id]
         reset_queries()
         
-        # We expect a constant number of queries.
-        with self.assertNumQueries(10):
+        # We expect a constant number of queries. 10 original + 1 for CompanyProfile.get_solo()
+        with self.assertNumQueries(11):
             get_available_dates(service_ids, start_date=date(2026, 1, 1))
 
 class BookingConflictTest(TestCase):

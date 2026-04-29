@@ -20,6 +20,7 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             'availability_no_free_label',
             'extras_label',
             'privacy_policy_url',
+            'booking_cooldown_minutes',
         ]
 
 class BusinessHoursSerializer(serializers.ModelSerializer):

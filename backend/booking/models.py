@@ -98,6 +98,7 @@ class CompanyProfile(SingletonModel):
     availability_no_free_label = models.CharField(_("Availability no free label"), max_length=50, default="Fully Booked")
     extras_label = models.CharField(_("Extras label"), max_length=50, default="Add-ons")
     privacy_policy_url = models.URLField(_("Privacy policy URL"), null=True, blank=True)
+    booking_cooldown_minutes = models.PositiveIntegerField(_("Booking cooldown (minutes)"), default=0)
 
     def __str__(self):
         return str(_("Company Profile"))

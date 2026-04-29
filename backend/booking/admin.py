@@ -124,12 +124,18 @@ class CompanyProfileAdmin(SingletonModelAdmin, ModelAdminUnfoldBase):
                 "brand_color",
                 "logo",
                 "currency",
+                "privacy_policy_url",
             )
         }),
         (_("Contact Information"), {
             "fields": (
                 "contact_email",
                 "contact_phone",
+            )
+        }),
+        (_("Scheduling Configuration"), {
+            "fields": (
+                "booking_cooldown_minutes",
             )
         }),
         (_("UI Labels"), {
@@ -255,7 +261,7 @@ class BookingAdmin(ModelAdminUnfoldBase):
     
     fieldsets = (
         (_("Client Information"), {
-            "fields": ("client_name", "client_email", "client_phone")
+            "fields": ("client_name", "client_email", "client_phone", "special_requests")
         }),
         (_("Scheduling"), {
             "fields": ("start_time", "end_time", "status")
