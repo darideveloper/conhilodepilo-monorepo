@@ -91,12 +91,12 @@ class CompanyProfile(SingletonModel):
     currency = models.CharField(_("Currency"), max_length=10, default="EUR")
     
     # UI Labels
-    event_type_label = models.CharField(_("Event type label"), max_length=50, default="Service Category")
-    event_label = models.CharField(_("Event label"), max_length=50, default="Consultation")
-    availability_free_label = models.CharField(_("Availability free label"), max_length=50, default="Available")
-    availability_regular_label = models.CharField(_("Availability regular label"), max_length=50, default="Partial")
-    availability_no_free_label = models.CharField(_("Availability no free label"), max_length=50, default="Fully Booked")
-    extras_label = models.CharField(_("Extras label"), max_length=50, default="Add-ons")
+    event_type_label = models.CharField(_("Event type label"), max_length=50, default=_("Service Category"))
+    event_label = models.CharField(_("Event label"), max_length=50, default=_("Consultation"))
+    availability_free_label = models.CharField(_("Availability free label"), max_length=50, default=_("Available"))
+    availability_regular_label = models.CharField(_("Availability regular label"), max_length=50, default=_("Partial"))
+    availability_no_free_label = models.CharField(_("Availability no free label"), max_length=50, default=_("Fully Booked"))
+    extras_label = models.CharField(_("Extras label"), max_length=50, default=_("Add-ons"))
     privacy_policy_url = models.URLField(_("Privacy policy URL"), null=True, blank=True)
     booking_cooldown_minutes = models.PositiveIntegerField(_("Booking cooldown (minutes)"), default=0)
 
@@ -115,15 +115,15 @@ class EventTypeGroup(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = _("Agrupación de servicios")
-        verbose_name_plural = _("Agrupaciones de servicios")
+        verbose_name = _("Event Type Group")
+        verbose_name_plural = _("Event Type Groups")
 
 class EventType(models.Model):
     PAYMENT_MODELS = [
         ("PRE-PAID", _("Pre-paid")),
         ("POST-PAID", _("Post-paid")),
     ]
-    group = models.ForeignKey(EventTypeGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="event_types", verbose_name=_("Agrupación"))
+    group = models.ForeignKey(EventTypeGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name="event_types", verbose_name=_("Group"))
     name = models.CharField(_("Name"), max_length=100)
     description = models.TextField(_("Description"), null=True, blank=True)
     payment_model = models.CharField(_("Payment model"), max_length=20, choices=PAYMENT_MODELS, default="POST-PAID")

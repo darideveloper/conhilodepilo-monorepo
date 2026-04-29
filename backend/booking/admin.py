@@ -188,7 +188,7 @@ class EventTypeAdmin(ModelAdminUnfoldBase):
 
     tabs = [
         (_("General"), ["fieldsets"]),
-        (_("Servicios"), ["events"]),
+        (_("Services"), ["events"]),
     ]
 
 @admin.register(Event)

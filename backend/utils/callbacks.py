@@ -2,17 +2,18 @@ import os
 import re
 import colorsys
 from django.templatetags.static import static
+from django.utils.translation import gettext_lazy as _
 from booking.models import CompanyProfile
 
 def environment_callback(request):
     env = os.getenv("ENV", "dev")
     env_mapping = {
-        "prod": ["Production", "danger"],
-        "staging": ["Staging", "warning"],
-        "dev": ["Development", "info"],
-        "local": ["Local", "success"],
+        "prod": [_("Production"), "danger"],
+        "staging": [_("Staging"), "warning"],
+        "dev": [_("Development"), "info"],
+        "local": [_("Local"), "success"],
     }
-    return env_mapping.get(env, ["Unknown", "info"])
+    return env_mapping.get(env, [_("Unknown"), "info"])
 
 def get_company():
     return CompanyProfile.get_solo()
