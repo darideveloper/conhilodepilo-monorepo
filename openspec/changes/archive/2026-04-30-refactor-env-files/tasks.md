@@ -1,0 +1,14 @@
+- [x] 1. **Migrate Real Local Environment Files:** For `backend`, `booking`, and `landing`: Backup existing `.env` files.
+- [x] 2. Move all variables (except `ENV`) from the existing `.env` files into `.env.dev` and `.env.prod` across all three apps.
+- [x] 3. Modify the root `.env` files in all three apps to contain ONLY `ENV=dev` (or `prod`).
+- [x] 4. **Update Backend Templates:** Update `backend/.env.example` to ONLY contain `ENV=dev`.
+- [x] 5. Ensure `backend/.env.dev.example` and `backend/.env.prod.example` are fully populated with required keys but contain NO sensitive values (use placeholders).
+- [x] 6. Verify `backend/project/settings.py` gracefully handles the environment cascade as expected without relying on variables in the root `.env` beyond `ENV`.
+- [x] 7. **Implement Landing App Strategy:** Create `landing/.env.example` containing only `ENV=dev`.
+- [x] 8. Create `landing/.env.dev.example` and `landing/.env.prod.example` with existing Vite keys (e.g., `PUBLIC_API_URL`, `PUBLIC_BOOKING_URL`, `PUBLIC_COURSES_GROUP_ID`, `PUBLIC_SERVICES_GROUP_ID`) populated with placeholder data.
+- [x] 9. Modify `landing/astro.config.mjs` to use `dotenv` to explicitly parse `.env` and retrieve `ENV`.
+- [x] 10. Update `landing/astro.config.mjs` to dynamically load `.env.${ENV}` based on the parsed value, passing these into the Vite/Astro context.
+- [x] 11. **Implement Booking App Strategy:** Create `booking/.env.example` containing only `ENV=dev`.
+- [x] 12. Create `booking/.env.dev.example` and `booking/.env.prod.example` defining all required UI variables (e.g., `PUBLIC_API_URL`, `PUBLIC_RETURN_URL`, `PUBLIC_SUCCESS_URL`, `PUBLIC_STRIPE_API_URL`, `PUBLIC_STRIPE_USER`, `PUBLIC_STRIPE_IMAGE_URL`) using placeholders.
+- [x] 13. Modify `booking/astro.config.mjs` to apply the same `dotenv` custom loading logic for `ENV` as the landing app.
+- [x] 14. **Sanitize Ignore Rules:** Verify that `.env`, `.env.dev`, and `.env.prod` are explicitly ignored in the root `.gitignore` and/or service-level `.gitignore` files to prevent credential leakage.

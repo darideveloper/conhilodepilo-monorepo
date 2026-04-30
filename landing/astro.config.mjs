@@ -2,14 +2,19 @@
 import { defineConfig } from 'astro/config';
 
 import sitemap from '@astrojs/sitemap';
-
 import react from '@astrojs/react';
-
 import tailwindcss from '@tailwindcss/vite';
-import { loadEnv } from 'vite';
+import dotenv from 'dotenv';
+import path from 'path';
 
-const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
-const apiUrl = env.PUBLIC_API_URL || 'http://localhost:8000';
+// 1. Load base .env to determine ENV
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+const envMode = process.env.ENV || 'dev';
+
+// 2. Load context-specific .env
+dotenv.config({ path: path.resolve(process.cwd(), `.env.${envMode}`), override: true });
+
+const apiUrl = process.env.PUBLIC_API_URL || 'http://localhost:8000';
 let apiHostname = 'localhost';
 try {
   apiHostname = new URL(apiUrl).hostname;
@@ -22,6 +27,13 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // Ensure Vite passes the explicitly loaded PUBLIC_ variables to the client
+    define: Object.keys(process.env)
+      .filter(key => key.startsWith('PUBLIC_'))
+      .reduce((acc, key) => {
+        acc[`import.meta.env.${key}`] = JSON.stringify(process.env[key]);
+        return acc;
+      }, {})
   },
 
   image: {
