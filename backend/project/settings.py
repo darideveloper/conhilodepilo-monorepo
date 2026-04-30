@@ -10,11 +10,11 @@ from django.utils.translation import gettext_lazy as _
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load .env first to get ENV value
-load_dotenv(BASE_DIR / '.env')
-ENV = os.getenv('ENV', 'dev')
+load_dotenv(BASE_DIR / ".env")
+ENV = os.getenv("ENV", "dev")
 
 # Load environment-specific file
-load_dotenv(BASE_DIR / f'.env.{ENV}')
+load_dotenv(BASE_DIR / f".env.{ENV}")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -24,6 +24,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
+print(f"DEBUG: {DEBUG}")
+print(f"ENV: {ENV}")
 
 # Application definition
 
@@ -96,7 +98,7 @@ else:
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8mb4",
         }
-    
+
     DATABASES = {
         "default": {
             "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.sqlite3"),
@@ -165,19 +167,30 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 STORAGE_AWS = os.getenv("STORAGE_AWS") == "True"
+print(f"STORAGE_AWS: {STORAGE_AWS}")
 
 if STORAGE_AWS:
+    # 1. Credentials
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
-    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
-    AWS_PROJECT_FOLDER = os.getenv("AWS_PROJECT_FOLDER")
-    
-    STATIC_LOCATION = "static"
-    PUBLIC_MEDIA_LOCATION = "media"
-    PRIVATE_MEDIA_LOCATION = "private"
 
+    # 2. Regional Settings
+    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+
+    # 3. Domain/CDN settings
+    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
+
+    # 4. Folder isolation
+    AWS_PROJECT_FOLDER = os.getenv("AWS_PROJECT_FOLDER")
+
+    # 5. File Locations
+    STATIC_LOCATION = f"{AWS_PROJECT_FOLDER}/static"
+    PUBLIC_MEDIA_LOCATION = f"{AWS_PROJECT_FOLDER}/media"
+    PRIVATE_MEDIA_LOCATION = f"{AWS_PROJECT_FOLDER}/private"
+
+    # 6. Django-Storages Engine Mapping
     STORAGES = {
         "default": {
             "BACKEND": "project.storage_backends.PublicMediaStorage",
@@ -189,6 +202,10 @@ if STORAGE_AWS:
             "BACKEND": "project.storage_backends.PrivateMediaStorage",
         },
     }
+
+    # 7. Optimization & Security
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_DEFAULT_ACL = None
 else:
     STORAGES = {
         "default": {
@@ -205,13 +222,17 @@ CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
 cors_allowed = os.getenv("CORS_ALLOWED_ORIGINS")
 if cors_allowed and cors_allowed != "None":
     CORS_ALLOWED_ORIGINS = [
-        origin.strip().rstrip("/") for origin in cors_allowed.split(",") if origin.strip()
+        origin.strip().rstrip("/")
+        for origin in cors_allowed.split(",")
+        if origin.strip()
     ]
 
 csrf_trusted = os.getenv("CSRF_TRUSTED_ORIGINS")
 if csrf_trusted and csrf_trusted != "None":
     CSRF_TRUSTED_ORIGINS = [
-        origin.strip().rstrip("/") for origin in csrf_trusted.split(",") if origin.strip()
+        origin.strip().rstrip("/")
+        for origin in csrf_trusted.split(",")
+        if origin.strip()
     ]
 
 # Django REST Framework Setup
