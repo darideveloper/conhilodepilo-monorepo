@@ -31,3 +31,7 @@ docs/
 # skip playwright
 .playwright-cli
 bruno/.env
+
+# Database dumps
+*.bak
+*.sql
