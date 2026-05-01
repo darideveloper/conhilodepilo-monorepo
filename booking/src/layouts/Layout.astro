@@ -34,14 +34,15 @@ const brandColor = config?.brand_color || "#a01313";
 
 		<script is:inline>
 			// Zoom initialization
-			const applyZoom = () => {
+			(() => {
 				const urlParams = new URLSearchParams(window.location.search);
 				const zoom = urlParams.get('zoom');
 				if (zoom) {
-					document.body.style.zoom = zoom + '%';
+					const style = document.createElement('style');
+					style.textContent = `body { zoom: ${zoom}%; }`;
+					document.head.appendChild(style);
 				}
-			};
-			applyZoom();
+			})();
 
 			// Theme initialization
 			const theme = (() => {
