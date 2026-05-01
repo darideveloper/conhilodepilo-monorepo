@@ -12,7 +12,6 @@ try {
 
 const pageTitle = config?.company_name || "Booking System";
 const brandColor = config?.brand_color || "#a01313";
-const zoom = Astro.url.searchParams.get('zoom');
 ---
 
 <!doctype html>
@@ -33,11 +32,17 @@ const zoom = Astro.url.searchParams.get('zoom');
 			}
 		</style>
 
-		{zoom && (
-			<style is:global set:html={`body { zoom: ${zoom}%; }`} />
-		)}
-
 		<script is:inline>
+			// Zoom initialization
+			const applyZoom = () => {
+				const urlParams = new URLSearchParams(window.location.search);
+				const zoom = urlParams.get('zoom');
+				if (zoom) {
+					document.body.style.zoom = zoom + '%';
+				}
+			};
+			applyZoom();
+
 			// Theme initialization
 			const theme = (() => {
 				const urlParams = new URLSearchParams(window.location.search);

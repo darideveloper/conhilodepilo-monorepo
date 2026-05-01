@@ -2,7 +2,6 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
-import node from '@astrojs/node';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -15,16 +14,14 @@ dotenv.config({ path: path.resolve(process.cwd(), `.env.${envMode}`), override: 
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'server',
-  adapter: node({
-    mode: 'standalone',
-  }),
+  output: 'static',
   vite: {
     plugins: [tailwindcss()],
     // Ensure Vite passes the explicitly loaded PUBLIC_ variables to the client
     define: Object.keys(process.env)
       .filter(key => key.startsWith('PUBLIC_'))
       .reduce((acc, key) => {
+        // @ts-ignore
         acc[`import.meta.env.${key}`] = JSON.stringify(process.env[key]);
         return acc;
       }, {})
