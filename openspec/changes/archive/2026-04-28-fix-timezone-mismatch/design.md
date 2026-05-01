@@ -1,7 +1,7 @@
 # Design: Timezone Alignment and Date Parsing Correction
 
-## Backend Configuration
-The `TIME_ZONE` environment variable in `backend/.env` (and other `.env` files) will be updated from `America/Mexico_City` to `Europe/Madrid`. Since `backend/project/settings.py` already uses `os.getenv("TIME_ZONE", "America/Mexico_City")`, no code changes are required in the backend settings file itself, only configuration updates.
+## Dashboard Configuration
+The `TIME_ZONE` environment variable in `dashboard/.env` (and other `.env` files) will be updated from `America/Mexico_City` to `Europe/Madrid`. Since `dashboard/project/settings.py` already uses `os.getenv("TIME_ZONE", "America/Mexico_City")`, no code changes are required in the dashboard settings file itself, only configuration updates.
 
 ## Frontend Date Handling
 The current implementation of `fetchAvailability` in `booking/src/lib/api/availability.ts` uses:
@@ -24,7 +24,7 @@ This constructor uses local time and prevents any shift.
 ## Alignment of "Today" Logic
 To ensure the frontend "shows the same dashboard timezone", we will remove the redundant `dateObj > today` check in `BookingCalendar.tsx`. 
 - **Current problem:** The frontend disables dates based on the user's local browser time, which may conflict with the business's Madrid time (e.g., it's already Monday in Madrid but still Sunday in Mexico).
-- **Solution:** Rely exclusively on the `availability.available` array returned by the backend. Since the backend already filters out past dates and times using the correct `Europe/Madrid` context, the frontend should trust this list as the source of truth.
+- **Solution:** Rely exclusively on the `availability.available` array returned by the dashboard. Since the dashboard already filters out past dates and times using the correct `Europe/Madrid` context, the frontend should trust this list as the source of truth.
 
 ## State Persistence (Zustand Rehydration)
 ...

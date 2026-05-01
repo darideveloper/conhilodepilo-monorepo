@@ -1,6 +1,6 @@
 ## 1. API Integration Setup
 - [x] 1.1 Create `src/lib/api/endpoints/services.ts` implementing `fetchServices` utilizing the existing `apiClient` from `src/lib/api/client.ts` (e.g., `apiClient<ServiceCategory[]>("services/")`).
-- [x] 1.2 Map the backend `ServiceCategory[]` schema safely within the fetching function:
+- [x] 1.2 Map the dashboard `ServiceCategory[]` schema safely within the fetching function:
   - Enforce empty `{ limited: [], booked: [] }` defaults for the `dates` property to prevent UI crashes.
   - Coerce all numeric `id` fields (for both categories and services) into `string` values to maintain compatibility with the frontend's strict equality checks.
 

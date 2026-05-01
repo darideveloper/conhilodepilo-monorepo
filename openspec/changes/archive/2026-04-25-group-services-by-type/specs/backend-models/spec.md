@@ -1,4 +1,4 @@
-# Spec Delta: Backend Models for Service Grouping
+# Spec Delta: Dashboard Models for Service Grouping
 
 ## ADDED Requirements
 ### Requirement: Service Categorization

@@ -8,7 +8,7 @@ The system uses Stripe Checkout (hosted payment page) to minimize PCI compliance
 
 1.  **Selection**: User selects services in the Booking App.
 2.  **Submission**: User submits the form.
-3.  **Backend Validation**:
+3.  **Dashboard Validation**:
     - `CreateBookingView` checks availability.
     - It calculates the total price by summing `Event.price` for all selected services.
     - It retrieves the `currency` from the `CompanyProfile` (singleton).
@@ -20,11 +20,11 @@ The system uses Stripe Checkout (hosted payment page) to minimize PCI compliance
         - Frontend shows success message.
     - **Path B (Pre-Paid)**:
         - `Booking.status` set to `PENDING`.
-        - Backend creates a Stripe Checkout Session:
+        - Dashboard creates a Stripe Checkout Session:
             - `amount`: Total price in cents (converted based on currency).
             - `currency`: From `CompanyProfile`.
             - `metadata`: `{"booking_id": booking.id}`.
-            - `success_url`: `${LANDING_URL}/success?session_id={CHECKOUT_SESSION_ID}` (where `LANDING_URL` is a backend setting).
+            - `success_url`: `${LANDING_URL}/success?session_id={CHECKOUT_SESSION_ID}` (where `LANDING_URL` is a dashboard setting).
             - `cancel_url`: `${LANDING_URL}/cancel`.
         - API returns `{ "payment_required": true, "checkout_url": session.url }`.
         - Frontend (within iframe) clears `useBookingStore` and then redirects the parent window or current context via `window.location.href`.

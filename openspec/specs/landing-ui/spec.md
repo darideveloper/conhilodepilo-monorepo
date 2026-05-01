@@ -13,7 +13,7 @@ The Course Card component on the Landing page MUST limit its displayed descripti
 - **And** no HTML elements should be left unclosed or broken due to the truncation
 
 ### Requirement: Service Category Filtering
-The landing page MUST identify and separate "Courses" from "Salon Services" using the `group_id` field provided by the backend API. The specific IDs used for filtering MUST be configurable via environment variables.
+The landing page MUST identify and separate "Courses" from "Salon Services" using the `group_id` field provided by the dashboard API. The specific IDs used for filtering MUST be configurable via environment variables.
 
 #### Scenario: Identifying Courses
 - **Given** a list of service categories from the API

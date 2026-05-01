@@ -9,15 +9,15 @@ The system SHALL determine if a booking requires immediate payment based on the 
 #### Scenario: All services are POST-PAID
 - **GIVEN** a user selects only services with `payment_model="POST-PAID"`
 - **WHEN** the booking is submitted
-- **THEN** the backend SHALL set the booking status to `CONFIRMED`
+- **THEN** the dashboard SHALL set the booking status to `CONFIRMED`
 - **AND** the API SHALL return `payment_required: false`
 - **AND** the frontend SHALL display the local success message
 
 #### Scenario: At least one service is PRE-PAID
 - **GIVEN** a user selects at least one service with `payment_model="PRE-PAID"`
 - **WHEN** the booking is submitted
-- **THEN** the backend SHALL set the booking status to `PENDING`
-- **AND** the backend SHALL create a Stripe Checkout Session
+- **THEN** the dashboard SHALL set the booking status to `PENDING`
+- **AND** the dashboard SHALL create a Stripe Checkout Session
 - **AND** the API SHALL return `payment_required: true` and a `checkout_url`
 - **AND** the frontend SHALL redirect the user to the `checkout_url`
 

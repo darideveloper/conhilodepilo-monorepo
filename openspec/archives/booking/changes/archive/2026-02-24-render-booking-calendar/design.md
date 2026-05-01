@@ -41,5 +41,5 @@ New theme variables will be added to `src/styles/global.css` to handle status co
 - High contrast for readability.
 
 ## Trade-offs
-- **Mocked Data**: The current proposal uses mock data for availability. This simplifies the initial UI implementation but will require integration with a backend or static data source later.
+- **Mocked Data**: The current proposal uses mock data for availability. This simplifies the initial UI implementation but will require integration with a dashboard or static data source later.
 - **Client-side Rendering**: Using a React island increases the JS bundle size slightly for this component, but is necessary for the interactivity required by a calendar.

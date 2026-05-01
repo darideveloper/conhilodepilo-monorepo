@@ -1,7 +1,7 @@
 # Design: Landing Data Filtering Refactor
 
 ## Data Model Update
-The `ServiceCategory` interface in the landing application needs to match the actual API response from the backend.
+The `ServiceCategory` interface in the landing application needs to match the actual API response from the dashboard.
 
 ```typescript
 export interface ServiceCategory {

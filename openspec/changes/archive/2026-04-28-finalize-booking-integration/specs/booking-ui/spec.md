@@ -18,7 +18,7 @@ The system MUST link to the dynamically configured privacy policy URL in the boo
 
 #### Scenario: Accepting privacy policy
 - **WHEN** the privacy policy checkbox is displayed
-- **THEN** the accompanying text MUST link to the URL provided by the backend configuration.
+- **THEN** the accompanying text MUST link to the URL provided by the dashboard configuration.
 
 ### Requirement: Full Confirmation Summary
 The system MUST display a final confirmation summary after a successful booking.

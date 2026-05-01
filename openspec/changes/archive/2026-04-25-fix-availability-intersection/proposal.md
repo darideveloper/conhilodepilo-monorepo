@@ -1,7 +1,7 @@
 # Proposal: Fix Availability Intersection and Query Performance
 
 ## Problem Statement
-The current logic in `backend/utils/availability.py` for calculating available booking dates (`get_available_dates`) has two major issues:
+The current logic in `dashboard/utils/availability.py` for calculating available booking dates (`get_available_dates`) has two major issues:
 1.  **Logical Flaw in Intersection:** The algorithm attempts to find the intersection of available dates for multiple selected services. However, if a service has a specific `DateOverride` making it available on a certain day, the logic immediately returns `True` and short-circuits. This skips evaluating the other services in the request, incorrectly marking the day as available for the entire intersection, even if another selected service is explicitly unavailable on that day.
 2.  **Performance Bottleneck (N+1 Queries):** The `get_available_dates` function loops over a 30-day window and checks availability for each service per day, performing multiple database queries within each iteration. This results in dozens to hundreds of queries for a single API request, severely degrading performance.
 

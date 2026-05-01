@@ -1,7 +1,7 @@
 # Design: Booking Page Architecture
 
 ## Overview
-The booking page will be a server-rendered (or statically generated) Astro page that consumes the existing backend API.
+The booking page will be a server-rendered (or statically generated) Astro page that consumes the existing dashboard API.
 
 ## Data Flow
 1. User navigates to `/booking/123`.

@@ -4,7 +4,7 @@
 This specification ensures that all API documentation correctly reflects the system's architecture and behavioral requirements.
 ## Requirements
 ### Requirement: API Specification Alignment
-The documentation in `docs/apis.md` SHALL reflect a single-tenant backend architecture.
+The documentation in `docs/apis.md` SHALL reflect a single-tenant dashboard architecture.
 
 #### Scenario: Update Documentation Content
 - **GIVEN** the existing `docs/apis.md`.

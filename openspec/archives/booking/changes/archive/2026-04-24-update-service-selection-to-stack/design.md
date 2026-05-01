@@ -10,17 +10,17 @@ The application needs to support booking multiple services in a single transacti
   We will calculate the available dates for the calendar based on the *intersection* of availability across all selected services. If Service A is only available on Mondays and Service B is only available on Tuesdays, selecting both will yield zero available dates.
   - *Alternatives considered*: Union (allowing booking if *any* service is available). This was rejected because users expect all stacked services to be provided on the date they choose.
 - **Decision: Array Payload**
-  The `BookingPayload` will switch from `serviceId: string | null` to `serviceIds: string[]`. This requires a backend update but is the cleanest way to represent a multi-service booking.
+  The `BookingPayload` will switch from `serviceId: string | null` to `serviceIds: string[]`. This requires a dashboard update but is the cleanest way to represent a multi-service booking.
 
 ## Risks / Trade-offs
 - **Zero Available Dates Risk** -> Users might select incompatible services and see an empty calendar. Mitigation: The UX should be clear, and potentially display a warning if intersection yields 0 days.
-- **Backend Breaking Change** -> The Django backend will fail if it expects a single string and receives an array. Mitigation: Backend updates must be deployed simultaneously.
+- **Dashboard Breaking Change** -> The Django dashboard will fail if it expects a single string and receives an array. Mitigation: Dashboard updates must be deployed simultaneously.
 
 ## Migration Plan
 1. Update frontend state to support arrays, maintaining backward compatibility if possible during rehydration.
 2. Update UI components.
 3. Update API payload.
-4. Update Django backend (requires coordination).
+4. Update Django dashboard (requires coordination).
 
 ## Open Questions
 - Should we actively warn users in Step 1 if the services they added have incompatible schedules before they proceed to Step 2?

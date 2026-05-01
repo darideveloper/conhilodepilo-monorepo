@@ -5,10 +5,10 @@ The `conhilorepilo` monorepo lacks concrete technical specifications despite hav
 
 ## Objectives
 1. Create global and service-level specification structures.
-2. Initialize foundational API contracts based on the current state of the Backend.
+2. Initialize foundational API contracts based on the current state of the Dashboard.
 3. Establish a task tracking workflow for upcoming development.
 
 ## Proposed Changes
 - **Global:** Populate `openspec/specs/` with base architectural and contract templates.
-- **Backend:** Populate `backend/openspec/` with an initial API contract document mapped to the current Bruno collection.
+- **Dashboard:** Populate `dashboard/openspec/` with an initial API contract document mapped to the current Bruno collection.
 - **Landing & Booking:** Populate their respective `openspec/` folders with a baseline feature/task roadmap based on current source code.

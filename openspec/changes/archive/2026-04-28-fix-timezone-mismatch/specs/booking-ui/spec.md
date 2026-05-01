@@ -5,8 +5,8 @@
 ### Requirement: Timezone Consistency
 The system MUST use `Europe/Madrid` as the primary timezone for business logic and data display.
 
-#### Scenario: Backend Timezone Configuration
-- GIVEN the backend application environment variables
+#### Scenario: Dashboard Timezone Configuration
+- GIVEN the dashboard application environment variables
 - THEN the `TIME_ZONE` MUST be configured as `Europe/Madrid`.
 
 ### Requirement: Accurate Availability Display

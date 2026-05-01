@@ -7,7 +7,7 @@ The current system has the data models for payment models but lacks the actual i
 
 ## Proposed Solution
 
-### 1. Backend: Payment Logic & Webhooks
+### 1. Dashboard: Payment Logic & Webhooks
 - **Dependency**: Add `stripe` to `requirements.txt`.
 - **Checkout Logic**: Update `CreateBookingView` to:
     - Identify if any selected service belongs to an `EventType` with `payment_model="PRE-PAID"`.
@@ -29,7 +29,7 @@ The current system has the data models for payment models but lacks the actual i
     - `landing/src/pages/cancel.astro`: Display a cancellation message and a link back to the booking section.
 
 ### 3. Configuration
-- All Stripe keys (`STRIPE_PUBLIC_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) and the `LANDING_URL` will be managed via environment variables in `backend/project/settings.py`.
+- All Stripe keys (`STRIPE_PUBLIC_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) and the `LANDING_URL` will be managed via environment variables in `dashboard/project/settings.py`.
 
 ## Impact
 - **Database**: `Booking` status will correctly reflect the payment state.

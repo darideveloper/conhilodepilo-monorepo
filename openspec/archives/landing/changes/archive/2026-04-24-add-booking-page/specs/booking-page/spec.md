@@ -6,7 +6,7 @@
 The system SHALL provide a dedicated page for service/course booking with dynamic content.
 
 #### Scenario: Navigating to a service booking page
-- **Given** a service ID "42" exists in the backend
+- **Given** a service ID "42" exists in the dashboard
 - **When** I navigate to `/booking/42`
 - **Then** I should see the service title "Service Name" as a big heading
 - **And** I should see the service description on the left

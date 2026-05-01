@@ -22,7 +22,7 @@ The system SHALL provide a dedicated service to fetch tenant-specific configurat
 - **THEN** it MUST return a configuration object containing `brand_color`, `logo`, `company_name`, and metadata labels.
 
 ### Requirement: Standardized Booking Submission
-The system SHALL provide a dedicated service to submit booking details to the backend API.
+The system SHALL provide a dedicated service to submit booking details to the dashboard API.
 
 #### Scenario: Successful Booking Submission
 - **GIVEN** a completed booking form payload.

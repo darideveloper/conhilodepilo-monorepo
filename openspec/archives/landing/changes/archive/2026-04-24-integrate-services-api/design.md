@@ -1,7 +1,7 @@
 # Design: Services API Integration
 
 ## Context
-The backend exposes `/api/services/` returning a list of `ServiceCategory` objects. The frontend needs to split this single response into Courses (index 0) and Services (index 1+).
+The dashboard exposes `/api/services/` returning a list of `ServiceCategory` objects. The frontend needs to split this single response into Courses (index 0) and Services (index 1+).
 
 ## Architecture Decisions
 

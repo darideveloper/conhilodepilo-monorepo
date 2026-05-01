@@ -1,28 +1,28 @@
 ## Tasks: add-google-calendar-sync
 
 ### 1. Dependencies & Configuration
-- [x] 1.1 Add `google-api-python-client`, `google-auth-httplib2`, `google-auth-oauthlib` to `backend/requirements.txt`
-- [x] 1.2 Add `GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")` to `backend/project/settings.py` (next to the existing `GOOGLE_CALENDAR_ID` line)
+- [x] 1.1 Add `google-api-python-client`, `google-auth-httplib2`, `google-auth-oauthlib` to `dashboard/requirements.txt`
+- [x] 1.2 Add `GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")` to `dashboard/project/settings.py` (next to the existing `GOOGLE_CALENDAR_ID` line)
 
 ### 2. Service Layer
-- [x] 2.1 Create `backend/utils/google_calendar.py` with:
+- [x] 2.1 Create `dashboard/utils/google_calendar.py` with:
   - `get_google_calendar_service()` — parses `GOOGLE_SERVICE_ACCOUNT_JSON` (JSON string), builds and returns an authorized `googleapiclient` service object; returns `None` if credentials not configured
   - `booking_to_event_body(booking)` — maps `Booking` fields to a Google Calendar event dict; always includes `sendUpdates='none'` behavior (set at call-site, not in body)
   - `sync_booking_to_google(booking)` — insert or patch; handles 404 self-healing; updates `google_sync_status`, `google_sync_error`, `last_synced_at` on the booking; returns early with `DISABLED` if credentials missing
   - `delete_google_calendar_event(booking)` — deletes event if `google_event_id` present; no-ops silently if missing
 
 ### 3. Model Migration
-- [x] 3.1 Add three fields to `Booking` in `backend/booking/models.py`:
+- [x] 3.1 Add three fields to `Booking` in `dashboard/booking/models.py`:
   - `google_sync_status` (CharField, choices, default `"PENDING"`)
   - `google_sync_error` (TextField, null, blank)
   - `last_synced_at` (DateTimeField, null, blank)
 - [x] 3.2 Generate and apply migration: `python manage.py makemigrations booking && python manage.py migrate`
 
 ### 4. Signals
-- [x] 4.1 Create `backend/booking/signals.py` with `post_save` and `post_delete` receivers on `Booking`
+- [x] 4.1 Create `dashboard/booking/signals.py` with `post_save` and `post_delete` receivers on `Booking`
   - `post_save`: call `sync_booking_to_google(instance)` — guard against infinite recursion by using `update_fields` on the nested save inside the service
   - `post_delete`: call `delete_google_calendar_event(instance)`
-- [x] 4.2 Connect signals in `BookingConfig.ready()` inside `backend/booking/apps.py`
+- [x] 4.2 Connect signals in `BookingConfig.ready()` inside `dashboard/booking/apps.py`
 
 ### 5. Admin Dashboard
 - [x] 5.1 Add `google_sync_status`, `google_sync_error`, `last_synced_at` to `readonly_fields` in `BookingAdmin`

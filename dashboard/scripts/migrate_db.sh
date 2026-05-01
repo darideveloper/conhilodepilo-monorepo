@@ -11,10 +11,10 @@ NC='\033[0m' # No Color
 
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKEND_DIR="$(dirname "$SCRIPT_DIR")"
+DASHBOARD_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Ensure PYTHONPATH includes the venv packages to handle moved venvs
-export PYTHONPATH=$PYTHONPATH:$BACKEND_DIR/venv/lib/python3.12/site-packages
+export PYTHONPATH=$PYTHONPATH:$DASHBOARD_DIR/venv/lib/python3.12/site-packages
 
 # Function to log messages
 log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
@@ -108,7 +108,7 @@ fi
 
 # 5. Post-Migration: Run Migrations and Reset Sequences
 log_info "Running Django migrations and resetting sequences in production..."
-cd "$BACKEND_DIR"
+cd "$DASHBOARD_DIR"
 python3 manage.py migrate --noinput
 log_info "Resetting sequences..."
 # We need to pipe the output of sqlsequencereset to psql

@@ -1,6 +1,6 @@
 import { apiClient } from "../client";
 
-export interface BackendService {
+export interface DashboardService {
   id: number;
   title: string;
   description: string;
@@ -9,12 +9,12 @@ export interface BackendService {
   image: string;
 }
 
-export interface BackendServiceCategory {
+export interface DashboardServiceCategory {
   id: number;
   name: string;
   description: string;
   image: string;
-  services: BackendService[];
+  services: DashboardService[];
   group_id: number | null;
 }
 
@@ -43,7 +43,7 @@ export interface ServiceCategory {
 }
 
 export async function fetchServices(): Promise<ServiceCategory[]> {
-  const data = await apiClient<BackendServiceCategory[]>("services/");
+  const data = await apiClient<DashboardServiceCategory[]>("services/");
   
   return data.map((category) => ({
     ...category,

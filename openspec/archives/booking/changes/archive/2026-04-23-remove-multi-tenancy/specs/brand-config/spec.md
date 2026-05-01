@@ -2,7 +2,7 @@
 
 ## MODIFIED Requirements
 ### Requirement: Static Configuration Initialization
-The application SHALL fetch and store its branding and business configuration from the `GET /config/` API endpoint on initial load from the primary backend host.
+The application SHALL fetch and store its branding and business configuration from the `GET /config/` API endpoint on initial load from the primary dashboard host.
 
 #### Scenario: Successful Configuration Load
 - **GIVEN** the application is mounting.

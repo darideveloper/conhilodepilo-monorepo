@@ -12,7 +12,7 @@ Currently, configuration is fetched using a `client` identifier.
 - **Old Path:** `fetchConfig(client) -> GET http://<client>.<domain>/api/config/`
 - **New Path:** `fetchConfig() -> GET http://<domain>/api/config/` (No client identifier).
 
-The backend will serve a single configuration object for the entire deployment.
+The dashboard will serve a single configuration object for the entire deployment.
 
 ### 2. Static API URL Generation
 The `getApiUrl` utility will no longer manipulate the hostname based on a client ID.

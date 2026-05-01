@@ -8,5 +8,5 @@ The application MUST encapsulate external data retrieval in dedicated API script
 #### Scenario: Fetching domain data
 - **WHEN** the application requires data for services
 - **THEN** it retrieves this data by invoking `fetchServices()` which utilizes the centralized `apiClient` to perform a GET request to the `services/` endpoint.
-- AND the raw data is safely mapped to provide fallback structures (like empty `dates` for availability) if missing from the backend response.
+- AND the raw data is safely mapped to provide fallback structures (like empty `dates` for availability) if missing from the dashboard response.
 - AND the UI components reactively read the `services` list from the `useBookingStore` rather than relying on synchronous static JSON imports.

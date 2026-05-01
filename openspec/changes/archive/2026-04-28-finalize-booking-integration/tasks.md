@@ -1,8 +1,8 @@
-## 1. Backend API & Models
+## 1. Dashboard API & Models
 - [x] 1.1 Add `privacy_policy_url` to `CompanyProfile` model and `CompanyProfileSerializer`.
 - [x] 1.2 Add `special_requests` field to `Booking` model.
-- [x] 1.3 Create `CreateBookingView` POST endpoint in `backend/booking/views.py` with validation and time calculations.
-- [x] 1.4 Add URL route for `CreateBookingView` to `backend/project/urls.py` (e.g., `api/bookings/`).
+- [x] 1.3 Create `CreateBookingView` POST endpoint in `dashboard/booking/views.py` with validation and time calculations.
+- [x] 1.4 Add URL route for `CreateBookingView` to `dashboard/project/urls.py` (e.g., `api/bookings/`).
 - [x] 1.5 Add unit tests for `CreateBookingView` to verify successful booking creation and validation errors.
 
 ## 2. Frontend State & API

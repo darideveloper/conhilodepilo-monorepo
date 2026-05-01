@@ -6,8 +6,8 @@ TBD - created by archiving change fix-timezone-mismatch. Update Purpose after ar
 ### Requirement: Timezone Consistency
 The system MUST use `Europe/Madrid` as the primary timezone for business logic and data display.
 
-#### Scenario: Backend Timezone Configuration
-- GIVEN the backend application environment variables
+#### Scenario: Dashboard Timezone Configuration
+- GIVEN the dashboard application environment variables
 - THEN the `TIME_ZONE` MUST be configured as `Europe/Madrid`.
 
 ### Requirement: Accurate Availability Display
@@ -45,7 +45,7 @@ The system MUST link to the dynamically configured privacy policy URL in the boo
 
 #### Scenario: Accepting privacy policy
 - **WHEN** the privacy policy checkbox is displayed
-- **THEN** the accompanying text MUST link to the URL provided by the backend configuration.
+- **THEN** the accompanying text MUST link to the URL provided by the dashboard configuration.
 
 ### Requirement: Full Confirmation Summary
 The system MUST display a final confirmation summary after a successful booking.

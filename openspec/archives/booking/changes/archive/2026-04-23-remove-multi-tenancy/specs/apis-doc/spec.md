@@ -2,7 +2,7 @@
 
 ## MODIFIED Requirements
 ### Requirement: API Specification Alignment
-The documentation in `docs/apis.md` SHALL reflect a single-tenant backend architecture.
+The documentation in `docs/apis.md` SHALL reflect a single-tenant dashboard architecture.
 
 #### Scenario: Update Documentation Content
 - **GIVEN** the existing `docs/apis.md`.

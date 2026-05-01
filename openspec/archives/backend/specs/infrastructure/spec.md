@@ -17,8 +17,8 @@ The API SHALL return standardized error responses for all exceptions.
 - When an error occurs during an API request.
 - Then the response contains `status: "error"`, a `message`, and `data`.
 
-### Requirement: Custom Storage Backends
-The project SHALL include custom storage backends for S3 to handle static and media files separately.
+### Requirement: Custom Storage Dashboards
+The project SHALL include custom storage dashboards for S3 to handle static and media files separately.
 
 #### Scenario: Static Files on S3
 - When `STORAGE_AWS=True`.

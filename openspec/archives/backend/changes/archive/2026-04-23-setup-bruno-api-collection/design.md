@@ -20,7 +20,7 @@ bruno/
 - **Root Level:** Makes the collection highly discoverable and separates it from the Django application logic.
 - **OpenCollection YAML Format:** As of Bruno v3, the `.yml` format is the modern, open-standard alternative to `.bru`. It is more Git-friendly and compatible with standard YAML tooling.
 - **Environment Separation:** Environments allow switching between local development and hosted instances without modifying individual requests.
-- **Feature-based Folders:** Organizing requests by Django app (e.g., `Booking/`) mirrors the backend structure.
+- **Feature-based Folders:** Organizing requests by Django app (e.g., `Booking/`) mirrors the dashboard structure.
 
 ## Environment Variables
 Bruno environments will use the following standard variables:

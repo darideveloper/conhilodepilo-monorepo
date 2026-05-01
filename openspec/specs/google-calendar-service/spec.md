@@ -4,7 +4,7 @@
 TBD - created by archiving change add-google-calendar-sync. Update Purpose after archive.
 ## Requirements
 ### Requirement: Google Calendar Service Layer
-The system MUST provide a `backend/utils/google_calendar.py` module that authenticates with the Google Calendar API using a Service Account and exposes three public functions: `sync_booking_to_google`, `delete_google_calendar_event`, and `get_google_calendar_service`.
+The system MUST provide a `dashboard/utils/google_calendar.py` module that authenticates with the Google Calendar API using a Service Account and exposes three public functions: `sync_booking_to_google`, `delete_google_calendar_event`, and `get_google_calendar_service`.
 
 #### Scenario: Successful event creation
 - **GIVEN** `GOOGLE_CALENDAR_ID` and `GOOGLE_SERVICE_ACCOUNT_JSON` are set in settings
@@ -45,7 +45,7 @@ Every Google Calendar API call (insert, patch, delete) MUST include `sendUpdates
 - **AND** no email notification is dispatched by Google
 
 ### Requirement: Google API Dependencies
-The `backend/requirements.txt` MUST include `google-api-python-client`, `google-auth-httplib2`, and `google-auth-oauthlib`.
+The `dashboard/requirements.txt` MUST include `google-api-python-client`, `google-auth-httplib2`, and `google-auth-oauthlib`.
 
 #### Scenario: Fresh install
 - **WHEN** `pip install -r requirements.txt` is run

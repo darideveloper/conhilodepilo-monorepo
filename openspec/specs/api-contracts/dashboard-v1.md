@@ -1,7 +1,7 @@
-# API Contract: Backend (v1)
+# API Contract: Dashboard (v1)
 
 ## Overview
-This contract defines the core API surface of the `backend` service, based on the current Bruno collection (`backend/bruno/`).
+This contract defines the core API surface of the `dashboard` service, based on the current Bruno collection (`dashboard/bruno/`).
 
 ## Endpoints
 

@@ -18,7 +18,7 @@ Google Calendar sync is essential for operational efficiency, allowing the busin
 ## Scope
 
 ### In scope
-- New `backend/utils/google_calendar.py` service layer (auth, event mapping, insert/patch/delete)
+- New `dashboard/utils/google_calendar.py` service layer (auth, event mapping, insert/patch/delete)
 - Three new `Booking` model fields: `google_sync_status`, `google_sync_error`, `last_synced_at`
 - Django `post_save` / `post_delete` signals on `Booking` to trigger sync automatically
 - **Automatic End Time Recalculation:** `Booking.save()` override to keep `end_time` in sync with `start_time`.

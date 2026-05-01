@@ -48,7 +48,7 @@ Stripe Checkout requires valid legal links to be visible:
 
 ## 5. Environment Variables Summary
 
-Ensure the following variables are set in your backend environment (`.env` file):
+Ensure the following variables are set in your dashboard environment (`.env` file):
 
 | Variable | Description | Source |
 | :--- | :--- | :--- |
@@ -68,7 +68,7 @@ To test webhooks on your local machine:
     stripe listen --forward-to localhost:8000/api/stripe/webhook/
     ```
 4.  The CLI will output a local webhook signing secret (starts with `whsec_`).
-5.  Update your `backend/.env.dev` with this local secret.
+5.  Update your `dashboard/.env.dev` with this local secret.
 6.  Perform a booking in the frontend; the CLI will log the events as they are received.
 
 ### Test Cards

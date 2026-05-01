@@ -1,13 +1,13 @@
 # Design: Single Host Configuration
 
 ## Overview
-The goal is to move from a dual-variable setup (`HOST` and `SITE_URL`) to a single `HOST` variable in the backend.
+The goal is to move from a dual-variable setup (`HOST` and `SITE_URL`) to a single `HOST` variable in the dashboard.
 
 ## Architectural Changes
 
 ### 1. Environment Variable Mapping
 - **Input**: `HOST` (e.g., `https://api.example.com` or `http://localhost:8000`)
-- **Mapping**: In `backend/project/settings.py`, `HOST` will be read using `os.getenv("HOST")`.
+- **Mapping**: In `dashboard/project/settings.py`, `HOST` will be read using `os.getenv("HOST")`.
 
 ### 2. Setting Consolidation
 The `SITE_URL` setting will be deprecated and removed in favor of `HOST`. Any code previously relying on `settings.SITE_URL` will be updated to use `settings.HOST`.
@@ -32,18 +32,18 @@ The `HOST` variable will be added as an `ARG` and `ENV` in the `Dockerfile` to a
 
 ### 5. File Updates
 
-#### `backend/project/settings.py`
+#### `dashboard/project/settings.py`
 - Replace `SITE_URL = os.getenv("SITE_URL")` with `HOST = os.getenv("HOST")`.
 - Implement automatic `ALLOWED_HOSTS` logic.
 
-#### `backend/utils/stripe_utils.py`
+#### `dashboard/utils/stripe_utils.py`
 - Replace `settings.SITE_URL` with `settings.HOST`.
 
-#### `backend/Dockerfile`
+#### `dashboard/Dockerfile`
 - Add `ARG HOST` and `ENV HOST=${HOST}`.
 
 ### 6. Compatibility
-Since `SITE_URL` is a common variable name, we will ensure that `settings.HOST` is the single source of truth for the backend's external-facing URL. If other settings (like `UNFOLD["SITE_URL"]`) need absolute paths, they will continue to use their specific configurations (which are currently relative `/` for Unfold).
+Since `SITE_URL` is a common variable name, we will ensure that `settings.HOST` is the single source of truth for the dashboard's external-facing URL. If other settings (like `UNFOLD["SITE_URL"]`) need absolute paths, they will continue to use their specific configurations (which are currently relative `/` for Unfold).
 
 ## Implementation Strategy
 1.  Update `settings.py` to include `HOST` and `ALLOWED_HOSTS` logic.

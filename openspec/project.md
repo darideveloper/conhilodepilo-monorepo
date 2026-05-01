@@ -1,12 +1,12 @@
 # Project Context
 
 ## Purpose
-The `conhilorepilo` ecosystem is a multi-service platform consisting of a Django-based management dashboard/API, a Con Hilo Depilo beauty-services landing page, and a booking application. The booking app (originally scaffolded as "granada-go-tours") is the shared appointment-booking UI that connects to the Django backend.
+The `conhilorepilo` ecosystem is a multi-service platform consisting of a Django-based management dashboard/API, a Con Hilo Depilo beauty-services landing page, and a booking application. The booking app (originally scaffolded as "granada-go-tours") is the shared appointment-booking UI that connects to the Django dashboard.
 
 ## Shared Architecture
-- **Backend:** Python/Django (Dashboard & API)
+- **Dashboard:** Python/Django (Dashboard & API)
 - **Frontend:** Astro (SSG/SSR) with React integration
-- **Versioning/CI:** Monorepo with service-level directories (`backend/`, `landing/`, `booking/`)
+- **Versioning/CI:** Monorepo with service-level directories (`dashboard/`, `landing/`, `booking/`)
 
 ## Global Conventions
 
@@ -16,7 +16,7 @@ The `conhilorepilo` ecosystem is a multi-service platform consisting of a Django
 
 ### Environment Management
 - Two-level `.env` system: `.env` sets the `ENV` variable (`dev` or `prod`); `.env.{dev|prod}` holds environment-specific secrets.
-- All services use `python-dotenv` (backend) or Vite `loadEnv` (frontend) to load env vars.
+- All services use `python-dotenv` (dashboard) or Vite `loadEnv` (frontend) to load env vars.
 - Example files (`.env.example`, `.env.dev.example`, `.env.prod.example`) are committed; actual secret files are not.
 
 ### Timezone & i18n
@@ -29,13 +29,13 @@ The `conhilorepilo` ecosystem is a multi-service platform consisting of a Django
 
 ---
 
-# Service: Backend (Dashboard & API)
+# Service: Dashboard (Dashboard & API)
 
 ## Purpose
 A Django-based administration dashboard and REST API that manages the entire ecosystem: service catalog, bookings, availability, company configuration, and external integrations.
 
 ## Directory
-`backend/`
+`dashboard/`
 
 ## Tech Stack
 - **Framework:** Python 3.12, Django 5.2+
@@ -43,10 +43,10 @@ A Django-based administration dashboard and REST API that manages the entire eco
 - **Admin UI:** Django Unfold (Tailwind-based, fully translated to Spanish)
 - **Database:** PostgreSQL (production), SQLite (development/testing)
 - **ORM extras:** `django-solo` for singleton models, `django-filter` for dynamic API filtering
-- **Storage:** Local filesystem (dev) / AWS S3 via `django-storages` + `boto3` (prod). Three storage backends: `PublicMediaStorage`, `StaticStorage`, `PrivateMediaStorage`.
+- **Storage:** Local filesystem (dev) / AWS S3 via `django-storages` + `boto3` (prod). Three storage dashboards: `PublicMediaStorage`, `StaticStorage`, `PrivateMediaStorage`.
 - **Static files:** WhiteNoise for production static serving
 - **Images:** Pillow for image processing
-- **Email:** SMTP backend (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, etc.)
+- **Email:** SMTP dashboard (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, etc.)
 - **External integrations:** Stripe (payments), Google Calendar (booking sync)
 
 ## Data Model Overview
@@ -57,7 +57,7 @@ A Django-based administration dashboard and REST API that manages the entire eco
 - `Booking` — appointments; linked to services (M2M), stores Stripe payment ID and Google Calendar event ID
 
 ## Key Conventions
-- **Configuration:** Strictly environment-variable-first (`python-dotenv`). Two-level `.env` system. Consolidates base URL in a single `HOST` variable (see `openspec/specs/backend-host/spec.md`).
+- **Configuration:** Strictly environment-variable-first (`python-dotenv`). Two-level `.env` system. Consolidates base URL in a single `HOST` variable (see `openspec/specs/dashboard-host/spec.md`).
 - **API Standards:** Centralized error handling (`project/handlers.py`) and metadata-rich pagination (`project/pagination.py`).
 - **Auth:** DRF Token authentication (primary) + Session authentication (admin).
 - **Testing:** Django test framework with SQLite test DB. Selenium for E2E/browser tests. Test files follow `tests*.py` naming per app.
@@ -98,7 +98,7 @@ The marketing and landing page for the Con Hilo Depilo beauty services business 
 - **Testing:** Vitest
 - **Sitemap:** `@astrojs/sitemap` integration
 - **Site URL:** `https://conhilodepilo.com`
-- **API:** Fetches images and media from the Django backend (`PUBLIC_API_URL` env var)
+- **API:** Fetches images and media from the Django dashboard (`PUBLIC_API_URL` env var)
 
 ## Service-Specific Conventions
 - **Language:** Spanish (es) is the only UI language.
@@ -111,7 +111,7 @@ The marketing and landing page for the Con Hilo Depilo beauty services business 
 # Service: Booking Application
 
 ## Purpose
-An SSR booking application for scheduling appointments. Handles service selection, date/time selection, customer form submission, and real-time availability checking against the Django backend.
+An SSR booking application for scheduling appointments. Handles service selection, date/time selection, customer form submission, and real-time availability checking against the Django dashboard.
 
 ## Directory
 `booking/` (package name: `granada-go-tours`; dev port alias: `booking`)

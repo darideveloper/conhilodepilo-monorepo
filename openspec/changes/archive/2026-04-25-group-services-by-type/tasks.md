@@ -1,11 +1,11 @@
 # Tasks: Group Services by Type
 
-## 1. Backend Implementation
-- [x] 1.1 Create `EventTypeGroup` model and update `EventType` relationship in `backend/booking/models.py`.
+## 1. Dashboard Implementation
+- [x] 1.1 Create `EventTypeGroup` model and update `EventType` relationship in `dashboard/booking/models.py`.
 - [x] 1.2 Generate and apply Django migrations.
 - [x] 1.3 Create a data migration script to initialize groups and assign existing types.
-- [x] 1.4 Update `EventTypeSerializer` in `backend/booking/serializers.py` to include `group_id`.
-- [x] 1.5 Register `EventTypeGroup` in `backend/booking/admin.py` and update `EventTypeAdmin`.
+- [x] 1.4 Update `EventTypeSerializer` in `dashboard/booking/serializers.py` to include `group_id`.
+- [x] 1.5 Register `EventTypeGroup` in `dashboard/booking/admin.py` and update `EventTypeAdmin`.
 
 ## 2. Frontend Implementation
 - [x] 2.1 Update types and store in `booking/src/store/useBookingStore.ts` to include `lockedGroupId`.

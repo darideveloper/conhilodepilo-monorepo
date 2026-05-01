@@ -1,7 +1,7 @@
 # Design: Integrate Services API
 
 ## Architectural Shift
-Moving from `src/data/booking.json` to a dynamic backend API (`/api/services/`) introduces architectural challenges regarding state initialization, data availability, and data typing.
+Moving from `src/data/booking.json` to a dynamic dashboard API (`/api/services/`) introduces architectural challenges regarding state initialization, data availability, and data typing.
 
 ### Synchronous vs Asynchronous
 - **Current State:** The application expects `booking.json` to be available immediately upon application load. Functions like `getInitialAvailability` within `useBookingStore.ts` execute synchronously.
@@ -17,5 +17,5 @@ Moving from `src/data/booking.json` to a dynamic backend API (`/api/services/`) 
   - All category and service `id` fields will be explicitly coerced to strings (`String(id)`). This eliminates the need to recursively update types and strict equality checks across all React components.
 
 ### I18n Compatibility
-- **Observation:** The backend returns flat strings for `name` and `title`, whereas the UI mock data used localized objects (e.g., `{ es: "...", en: "..." }`).
-- **Decision:** No action required. The UI codebase already safely handles this via fallbacks (`typeof category.name === 'string' ? category.name : ...`), meaning the backend strings will naturally and safely replace the localized mock objects without any component changes.
+- **Observation:** The dashboard returns flat strings for `name` and `title`, whereas the UI mock data used localized objects (e.g., `{ es: "...", en: "..." }`).
+- **Decision:** No action required. The UI codebase already safely handles this via fallbacks (`typeof category.name === 'string' ? category.name : ...`), meaning the dashboard strings will naturally and safely replace the localized mock objects without any component changes.

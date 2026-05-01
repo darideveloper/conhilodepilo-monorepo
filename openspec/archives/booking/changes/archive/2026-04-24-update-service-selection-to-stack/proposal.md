@@ -9,7 +9,7 @@ Currently, the application strictly limits users to booking a single service at 
 - Update the availability logic to calculate the intersection of available dates for all selected services.
 - Display a summary of all selected services in the final checkout form.
 - Update the API payload to submit `serviceIds` instead of a single `serviceId`.
-- **BREAKING**: The backend endpoint must be modified to accept and process an array of `serviceIds`.
+- **BREAKING**: The dashboard endpoint must be modified to accept and process an array of `serviceIds`.
 
 ## Impact
 - Affected specs: `booking-flow`, `state-management`, `booking-form`, `booking-submission`

@@ -12,7 +12,7 @@ We will scaffold a Django 5.2 project with a "booking" application, integrate `d
 - Initial project scaffolding and dependency management.
 - Environment infrastructure (.env, .env.dev, .env.prod).
 - Refactored `settings.py` for dynamic behavior.
-- Core project wiring (pagination, storage backends, exception handlers).
+- Core project wiring (pagination, storage dashboards, exception handlers).
 - Modern Admin UI with `django-unfold` and custom enhancements.
 - Deployment configuration (Dockerfile, start.sh).
 

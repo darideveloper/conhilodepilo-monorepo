@@ -1,7 +1,7 @@
 # Map Booking Config Labels
 
 ## Summary
-Updates the `booking` application frontend to accurately map configuration API responses to internal i18n labels. Currently, "Pocas plazas" is incorrectly mapped to `standard` instead of `limited`, and `extras_label` from the API is completely ignored. This proposal corrects these bindings so the UI displays the correct text from the backend configuration.
+Updates the `booking` application frontend to accurately map configuration API responses to internal i18n labels. Currently, "Pocas plazas" is incorrectly mapped to `standard` instead of `limited`, and `extras_label` from the API is completely ignored. This proposal corrects these bindings so the UI displays the correct text from the dashboard configuration.
 
 ## Scope
 - Correct the mapping of `availability_regular_label` to the `limited` status.

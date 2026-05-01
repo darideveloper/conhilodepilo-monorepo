@@ -25,7 +25,7 @@ These complement the existing `google_event_id` field already present on the mod
 - **AND** the booking save is NOT rolled back (calendar errors must not block booking creation)
 
 ### Requirement: Automatic Sync via Django Signals
-A `post_save` signal on `Booking` MUST automatically call `sync_booking_to_google` after every create or update. A `post_delete` signal MUST call `delete_google_calendar_event` when a booking is removed. Signals MUST be registered in `backend/booking/signals.py` and connected in `BookingConfig.ready()`.
+A `post_save` signal on `Booking` MUST automatically call `sync_booking_to_google` after every create or update. A `post_delete` signal MUST call `delete_google_calendar_event` when a booking is removed. Signals MUST be registered in `dashboard/booking/signals.py` and connected in `BookingConfig.ready()`.
 
 #### Scenario: Booking created from admin
 - **WHEN** a new booking is saved via the Django admin

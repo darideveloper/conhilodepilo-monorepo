@@ -1,7 +1,7 @@
 # Proposal: Dynamic Branding and Configuration
 
 ## Summary
-Transition the project from hardcoded branding and static translations to a dynamic configuration system powered by the `GET /config/` API endpoint. This enables tenant-aware branding, including colors, logos, and custom labels, directly from the backend.
+Transition the project from hardcoded branding and static translations to a dynamic configuration system powered by the `GET /config/` API endpoint. This enables tenant-aware branding, including colors, logos, and custom labels, directly from the dashboard.
 
 ## Problem
 Currently, the project's visual identity (colors, logo) and specific UI labels (tour labels, availability statuses) are hardcoded or defined in static translation files. This makes it difficult to reuse the frontend for different tour providers (tenants) without manual code changes for each instance.

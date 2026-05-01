@@ -1,12 +1,12 @@
 # Design: add-google-calendar-sync
 
 ## Context
-The project is a single-company Django admin dashboard (`backend/booking/`). There are no tenants; `CompanyProfile` is a `SingletonModel`. The `Booking` model already stores `google_event_id` (CharField). Settings already reads `GOOGLE_CALENDAR_ID` from env. No Google API libraries are installed yet and no service layer exists.
+The project is a single-company Django admin dashboard (`dashboard/booking/`). There are no tenants; `CompanyProfile` is a `SingletonModel`. The `Booking` model already stores `google_event_id` (CharField). Settings already reads `GOOGLE_CALENDAR_ID` from env. No Google API libraries are installed yet and no service layer exists.
 
 ## Architecture
 
 ### Authentication
-A Google Service Account (server-to-server OAuth2) is used. The JSON credentials are stored in `GOOGLE_SERVICE_ACCOUNT_JSON` as either a raw JSON string or a file path. At startup, `get_google_calendar_service()` in `backend/utils/google_calendar.py` parses the credential and builds an authorized `googleapiclient.discovery` service object scoped to `https://www.googleapis.com/auth/calendar`.
+A Google Service Account (server-to-server OAuth2) is used. The JSON credentials are stored in `GOOGLE_SERVICE_ACCOUNT_JSON` as either a raw JSON string or a file path. At startup, `get_google_calendar_service()` in `dashboard/utils/google_calendar.py` parses the credential and builds an authorized `googleapiclient.discovery` service object scoped to `https://www.googleapis.com/auth/calendar`.
 
 ### Event Mapping
 `booking_to_event_body(booking)` converts a `Booking` instance into a Google Calendar event dict:
@@ -27,7 +27,7 @@ Booking.post_delete ──► delete_google_calendar_event(booking)
                           └── events().delete() if google_event_id present
 ```
 
-Signals are defined in `backend/booking/signals.py` and wired up in `BookingConfig.ready()` inside `backend/booking/apps.py`.
+Signals are defined in `dashboard/booking/signals.py` and wired up in `BookingConfig.ready()` inside `dashboard/booking/apps.py`.
 
 ### Notification Suppression
 `sendUpdates='none'` is hardcoded on every `insert`, `patch`, and `delete` API call. This is the only mechanism needed — no additional configuration.

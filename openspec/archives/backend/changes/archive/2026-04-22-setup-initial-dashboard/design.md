@@ -18,7 +18,7 @@ This ensures that the same code can run in different environments by simply chan
 - Integrating `SimpleMDE` for markdown support in text fields.
 
 ### Storage Strategy
-The `project/storage_backends.py` file centralizes S3-compatible storage logic. We use conditional logic in `settings.py` to switch between local file storage (dev) and AWS S3/DigitalOcean Spaces (prod) based on the `STORAGE_AWS` flag.
+The `project/storage_dashboards.py` file centralizes S3-compatible storage logic. We use conditional logic in `settings.py` to switch between local file storage (dev) and AWS S3/DigitalOcean Spaces (prod) based on the `STORAGE_AWS` flag.
 
 ### API Standards
 - **Pagination**: `CustomPageNumberPagination` provides metadata-rich responses (count, next, previous, page, page_size, total_pages).

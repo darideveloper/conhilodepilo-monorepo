@@ -32,4 +32,4 @@ Instead of complex prop drilling, components will independently call the cached 
 
 ## Trade-offs
 *   **Latency:** Fetching config on every page load (if SSR) or at build time. Given it's a small JSON, the impact is negligible.
-*   **Static vs Dynamic:** If the site is purely static (`output: 'static'`), a rebuild is required when the phone changes in the backend. If SSR, it's real-time. We will assume the current project configuration (likely static with some islands).
+*   **Static vs Dynamic:** If the site is purely static (`output: 'static'`), a rebuild is required when the phone changes in the dashboard. If SSR, it's real-time. We will assume the current project configuration (likely static with some islands).

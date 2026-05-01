@@ -12,7 +12,7 @@
     - Remove `useEffect` logic that handles the `client` query parameter.
     - Trigger `fetchConfig()` without arguments on mount.
 - [x] 1.4 Configuration Environment Check:
-    - Verify that `PUBLIC_API_URL` (if set) points to the correct single-tenant backend endpoint.
+    - Verify that `PUBLIC_API_URL` (if set) points to the correct single-tenant dashboard endpoint.
 
 ## Phase 2: Specification Updates
 - [x] 2.1 Modify `openspec/specs/brand-config/spec.md`:

@@ -11,11 +11,11 @@ The `settings.py` SHALL initialize `python-dotenv` and load the appropriate envi
 - Then `.env.dev` is loaded and `DEBUG` is set based on its content.
 
 ### Requirement: Dynamic Database Selection
-The database backend SHALL switch between PostgreSQL (production/dev) and SQLite (testing) automatically.
+The database dashboard SHALL switch between PostgreSQL (production/dev) and SQLite (testing) automatically.
 
 #### Scenario: SQLite for Testing
 - When running `python manage.py test`.
-- Then the `DATABASES` setting uses the SQLite backend.
+- Then the `DATABASES` setting uses the SQLite dashboard.
 
 ### Requirement: Conditional Storage
 The project SHALL support switching between local file storage and AWS S3 based on the `STORAGE_AWS` environment variable.

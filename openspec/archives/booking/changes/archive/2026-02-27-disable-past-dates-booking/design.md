@@ -12,4 +12,4 @@ We will use the `disabled` prop of the `react-day-picker` (via our `Calendar` at
 3. **Status Consistency**: The `getStatus` helper will also check if a date is in the future before returning a specific availability status.
 
 ## Alternative Considerations
-- **Server-side check**: While this change is UI-only, any real backend implementation should also validate the date. For this prototype, the UI constraint is sufficient.
+- **Server-side check**: While this change is UI-only, any real dashboard implementation should also validate the date. For this prototype, the UI constraint is sufficient.

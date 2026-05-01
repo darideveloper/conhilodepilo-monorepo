@@ -4,10 +4,10 @@
 TBD - created by archiving change unify-phone-configuration. Update Purpose after archive.
 ## Requirements
 ### Requirement: Global Configuration Fetching
-The system MUST provide a way to fetch the global company configuration from the backend API.
+The system MUST provide a way to fetch the global company configuration from the dashboard API.
 
 #### Scenario: Fetch configuration from API
-1.  **Given** the backend API is available at `/api/config/`.
+1.  **Given** the dashboard API is available at `/api/config/`.
 2.  **When** the `getConfig` utility is called.
 3.  **Then** it should return an object containing `contact_phone`, `contact_email`, and other branding details.
 

@@ -11,5 +11,5 @@ The system SHALL provide a showcase section for Academy Courses, displaying the 
 
 #### Scenario: Course details
 - **WHEN** observing a single course card
-- **THEN** the duration is displayed dynamically based on the numeric minutes provided by the backend (e.g., formatted to hours or days).
+- **THEN** the duration is displayed dynamically based on the numeric minutes provided by the dashboard (e.g., formatted to hours or days).
 - AND the description is parsed from markdown to standard HTML.

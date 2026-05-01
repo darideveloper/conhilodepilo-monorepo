@@ -1,12 +1,12 @@
-# Backend Host Specification
+# Dashboard Host Specification
 
 ## Purpose
-Ensure a single, consistent configuration for the backend's base URL and host-related security settings.
+Ensure a single, consistent configuration for the dashboard's base URL and host-related security settings.
 
 ## ADDED Requirements
 
 ### Requirement: Single Host Setting
-The backend SHALL use a single `HOST` environment variable to define its base URL.
+The dashboard SHALL use a single `HOST` environment variable to define its base URL.
 
 #### Scenario: Media URL Generation
 - **GIVEN** `HOST` is set to `http://localhost:8000`
@@ -19,15 +19,15 @@ The backend SHALL use a single `HOST` environment variable to define its base UR
 - **THEN** the `success_url` and `cancel_url` SHALL be prefixed with `https://api.example.com` (or the configured fallback)
 
 ### Requirement: Removal of Redundant SITE_URL
-The backend SHALL NOT rely on a `SITE_URL` environment variable.
+The dashboard SHALL NOT rely on a `SITE_URL` environment variable.
 
 #### Scenario: Environment Validation
 - **GIVEN** a `.env` file containing both `HOST` and `SITE_URL`
-- **WHEN** the backend starts
+- **WHEN** the dashboard starts
 - **THEN** it SHALL only use the `HOST` value for its base URL configuration
 
 ### Requirement: Automatic ALLOWED_HOSTS Inclusion
-The backend SHALL automatically include the hostname derived from the `HOST` variable in the `ALLOWED_HOSTS` list.
+The dashboard SHALL automatically include the hostname derived from the `HOST` variable in the `ALLOWED_HOSTS` list.
 
 #### Scenario: Hostname Extraction
 - **GIVEN** `HOST` is set to `https://dashboard.example.com`

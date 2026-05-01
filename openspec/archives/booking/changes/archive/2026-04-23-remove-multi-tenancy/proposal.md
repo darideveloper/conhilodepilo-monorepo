@@ -8,7 +8,7 @@ The system currently supports multiple clients via complex subdomain and query p
 ## Proposed Solution
 1.  **Remove Client Identification:** Eliminate the `client` parameter from the store, API URL generation, and the `BookingFlow` component.
 2.  **Simplify API Calls:** Standardize on a single base URL for all API interactions without tenant-specific headers or subdomain manipulation.
-3.  **Refactor Documentation:** Update `docs/apis.md` and related specs to reflect a single-tenant backend.
+3.  **Refactor Documentation:** Update `docs/apis.md` and related specs to reflect a single-tenant dashboard.
 
 ## Expected Impact
 -   **Codebase:** Simpler logic in `useBookingStore.ts`, `Layout.astro`, and `BookingFlow.tsx`.

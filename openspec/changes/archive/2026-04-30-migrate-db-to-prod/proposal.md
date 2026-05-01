@@ -26,5 +26,5 @@ This proposal outlines the steps and commands required to migrate the PostgreSQL
 - Temporary dump files should be deleted after successful migration.
 
 ## Proposed Changes
-- Create a migration script `backend/scripts/migrate_db.sh` to automate the process using environment variables.
+- Create a migration script `dashboard/scripts/migrate_db.sh` to automate the process using environment variables.
 - Document manual commands for reference.

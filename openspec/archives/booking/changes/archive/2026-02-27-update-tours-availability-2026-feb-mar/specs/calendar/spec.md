@@ -3,7 +3,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Data Structure Compatibility
-The component SHALL consume a standardized availability data structure that aligns with the backend/JSON schema.
+The component SHALL consume a standardized availability data structure that aligns with the dashboard/JSON schema.
 
 #### Scenario: Mock Data Integration
 - **GIVEN** a `bookingData` structure (e.g. from `useBookingStore`)

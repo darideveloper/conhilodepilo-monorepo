@@ -11,7 +11,7 @@ The Django admin interface MUST be fully translated into Spanish to provide a lo
 - **Then** all field names (e.g., "Nombre", "Fecha de inicio"), model names (e.g., "Reservas", "Perfil de Empresa"), and section headers (e.g., "Configuración de UI") MUST be displayed in Spanish.
 
 ### Requirement: Translation File Completeness
-The Spanish translation catalog (`django.po`) MUST contain valid translations for all strings wrapped in translation functions within the backend codebase.
+The Spanish translation catalog (`django.po`) MUST contain valid translations for all strings wrapped in translation functions within the dashboard codebase.
 
 #### Scenario: Compiling Translations
 - **Given** the updated `django.po` file.

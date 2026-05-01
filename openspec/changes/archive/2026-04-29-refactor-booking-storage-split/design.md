@@ -32,7 +32,7 @@ Instead of splitting the store into two (which would require massive refactoring
 ### Decision: Data Routing Map
 We will define a map to ensure consistent routing during `setItem` and `getItem`.
 
-| Property | Storage Backend |
+| Property | Storage Dashboard |
 |---|---|
 | `language` | `localStorage` |
 | `theme` | `localStorage` |

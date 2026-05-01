@@ -4,7 +4,7 @@
 The translation process follows standard Django internationalization practices:
 1.  **Source Language**: English remains the primary source language in the code. This ensures compatibility with common development tools and allows for future translations into other languages (e.g., Portuguese, French) if needed.
 2.  **Extraction**: `makemessages` is used to extract all strings wrapped in `_()` from the `.py` files.
-3.  **Localization**: The extracted strings are translated into Spanish in `backend/locale/es/LC_MESSAGES/django.po`.
+3.  **Localization**: The extracted strings are translated into Spanish in `dashboard/locale/es/LC_MESSAGES/django.po`.
 4.  **Compilation**: `compilemessages` converts the `.po` file into a binary `.mo` file used by Django at runtime.
 
 ## Key Decisions

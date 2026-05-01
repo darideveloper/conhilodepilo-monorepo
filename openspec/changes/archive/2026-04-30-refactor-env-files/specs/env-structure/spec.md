@@ -4,7 +4,7 @@
 The environment files MUST separate the declaration of the environment from the environment's configuration values. The root `.env` MUST be restricted to defining the environment context, while `.env.{dev|prod}` provides the actual key-value pairs.
 
 #### Scenario: Developer clones the repository
-**Given** a developer sets up any application (`backend`, `landing`, or `booking`)
+**Given** a developer sets up any application (`dashboard`, `landing`, or `booking`)
 **When** they initialize their environment files
 **Then** the `.env` file MUST ONLY contain the `ENV` declaration (e.g., `ENV=dev`).
 

@@ -1,9 +1,9 @@
-- [x] 1. **Migrate Real Local Environment Files:** For `backend`, `booking`, and `landing`: Backup existing `.env` files.
+- [x] 1. **Migrate Real Local Environment Files:** For `dashboard`, `booking`, and `landing`: Backup existing `.env` files.
 - [x] 2. Move all variables (except `ENV`) from the existing `.env` files into `.env.dev` and `.env.prod` across all three apps.
 - [x] 3. Modify the root `.env` files in all three apps to contain ONLY `ENV=dev` (or `prod`).
-- [x] 4. **Update Backend Templates:** Update `backend/.env.example` to ONLY contain `ENV=dev`.
-- [x] 5. Ensure `backend/.env.dev.example` and `backend/.env.prod.example` are fully populated with required keys but contain NO sensitive values (use placeholders).
-- [x] 6. Verify `backend/project/settings.py` gracefully handles the environment cascade as expected without relying on variables in the root `.env` beyond `ENV`.
+- [x] 4. **Update Dashboard Templates:** Update `dashboard/.env.example` to ONLY contain `ENV=dev`.
+- [x] 5. Ensure `dashboard/.env.dev.example` and `dashboard/.env.prod.example` are fully populated with required keys but contain NO sensitive values (use placeholders).
+- [x] 6. Verify `dashboard/project/settings.py` gracefully handles the environment cascade as expected without relying on variables in the root `.env` beyond `ENV`.
 - [x] 7. **Implement Landing App Strategy:** Create `landing/.env.example` containing only `ENV=dev`.
 - [x] 8. Create `landing/.env.dev.example` and `landing/.env.prod.example` with existing Vite keys (e.g., `PUBLIC_API_URL`, `PUBLIC_BOOKING_URL`, `PUBLIC_COURSES_GROUP_ID`, `PUBLIC_SERVICES_GROUP_ID`) populated with placeholder data.
 - [x] 9. Modify `landing/astro.config.mjs` to use `dotenv` to explicitly parse `.env` and retrieve `ENV`.

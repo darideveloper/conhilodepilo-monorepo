@@ -29,7 +29,7 @@ PGPASSWORD=$TARGET_DB_PASSWORD pg_restore -h $TARGET_DB_HOST -p $TARGET_DB_PORT 
 Production databases often require SSL. The script should support `PGSSLMODE=require` if detected or needed.
 
 ### 5. Media Files Synchronization
-Database migration only moves the pointers to media files. If `STORAGE_AWS=True` is used in production, media files must be uploaded to the S3 bucket. If production uses local storage, files in `backend/media/` must be transferred.
+Database migration only moves the pointers to media files. If `STORAGE_AWS=True` is used in production, media files must be uploaded to the S3 bucket. If production uses local storage, files in `dashboard/media/` must be transferred.
 
 ### 6. Sequence Synchronization
 Django's `sqlsequencereset` is used to ensure that the ID sequences in PostgreSQL are updated to prevent "duplicate key" errors on future inserts.

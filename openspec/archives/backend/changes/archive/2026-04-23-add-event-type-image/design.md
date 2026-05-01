@@ -18,7 +18,7 @@ Add a `models.ImageField` to the `EventType` model.
 - Add the `image` field to the `fieldsets` in `EventTypeAdmin`.
 
 ### Storage
-The project seems to be using standard Django media storage (based on the presence of a `media/` directory and `storage_backends.py`).
+The project seems to be using standard Django media storage (based on the presence of a `media/` directory and `storage_dashboards.py`).
 
 ## Trade-offs
 - **Complexity:** Low. Standard Django model field addition.

@@ -1,7 +1,7 @@
 # Proposal: Unify Phone Configuration
 
 ## Why
-The `landing` project currently has hardcoded phone numbers and WhatsApp links scattered across multiple components (`Footer.astro`, `WhatsAppButton.astro`, and `booking/[id].astro`). These numbers are inconsistent and do not match the source of truth managed in the backend `CompanyProfile`.
+The `landing` project currently has hardcoded phone numbers and WhatsApp links scattered across multiple components (`Footer.astro`, `WhatsAppButton.astro`, and `booking/[id].astro`). These numbers are inconsistent and do not match the source of truth managed in the dashboard `CompanyProfile`.
 
 ## What Changes
 Refactor the landing project to fetch the company configuration from the `/api/config/` endpoint and use the `contact_phone` field for all phone-related UI elements. This ensures consistency and allows the company to update their contact information via the Django admin without code changes.
@@ -19,5 +19,5 @@ Refactor the landing project to fetch the company configuration from the `/api/c
 
 ## Impact
 *   **Consistency:** All contact points will show the same number.
-*   **Maintainability:** Contact info is managed in one place (backend).
+*   **Maintainability:** Contact info is managed in one place (dashboard).
 *   **Accuracy:** Users will always reach the correct contact.

@@ -1,17 +1,8 @@
-# backend-models Specification
+# dashboard-models Specification
 
 ## Purpose
 TBD - created by archiving change group-services-by-type. Update Purpose after archive.
 ## Requirements
-### Requirement: Service Categorization
-The system MUST allow grouping service categories (Event Types) into broader groups to facilitate filtering and specialization of the booking flow.
-
-#### Scenario: Assign Group to Event Type
-- **Given** an existing `EventType` "Depilación con hilo".
-- **And** a group "Salon Services" with ID 1.
-- **When** the admin assigns "Salon Services" to "Depilación con hilo".
-- **Then** the API MUST return `group_id: 1` for that event type.
-
 ### Requirement: Privacy Policy Configuration
 The system MUST allow an administrator to configure a privacy policy URL for the company.
 
@@ -32,4 +23,13 @@ The system MUST allow an administrator to define a global "cool down" period (in
 #### Scenario: Configuring cooldown
 - **WHEN** the administrator updates the Company Profile with a `booking_cooldown_minutes` value of `15`.
 - **THEN** all subsequent availability calculations MUST ensure at least a 15-minute gap exists between the end of one booking and the start of the next.
+
+### Requirement: Dashboard Service Categorization
+The dashboard system MUST allow grouping service categories (Event Types) into broader groups to facilitate filtering and specialization of the booking flow.
+
+#### Scenario: Assign Group to Event Type
+- **Given** an existing `EventType` "Depilación con hilo".
+- **And** a group "Salon Services" with ID 1.
+- **When** the admin assigns "Salon Services" to "Depilación con hilo".
+- **Then** the API MUST return `group_id: 1` for that event type.
 

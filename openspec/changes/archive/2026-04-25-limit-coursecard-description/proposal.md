@@ -11,7 +11,7 @@ Use Tailwind CSS's `line-clamp` utility on the wrapper element that renders the 
 
 ## Impact
 - **Frontend (Landing):** The Course Card description text will be constrained to a maximum of 3 lines.
-- **Backend / APIs:** No change.
+- **Dashboard / APIs:** No change.
 - **Data:** No change.
 
 ## Alternatives Considered

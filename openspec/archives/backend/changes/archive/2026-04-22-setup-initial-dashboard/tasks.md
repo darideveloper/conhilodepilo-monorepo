@@ -9,7 +9,7 @@
 - [x] Configure `TIME_ZONE = 'Europe/Madrid'` in `settings.py`
 - [x] Configure `DATABASES` in `settings.py` with dynamic switching for testing
 - [x] Configure `STORAGES` in `settings.py` with conditional AWS/Local logic
-- [x] Create `project/storage_backends.py` for S3 custom backends
+- [x] Create `project/storage_dashboards.py` for S3 custom dashboards
 - [x] Create `project/pagination.py` for metadata-rich API responses
 - [x] Create `project/handlers.py` for standardized API exception handling
 - [x] Create `project/admin.py` with Unfold customizations for User and Group

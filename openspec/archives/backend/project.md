@@ -4,7 +4,7 @@
 The `leochan.sh.dashboard` project is a modern Django-based dashboard and administration system designed to manage content and media for the leochan.sh ecosystem. It prioritizes a clean administrative experience using the Unfold theme and provides a robust API for external consumption.
 
 ## Tech Stack
-- **Backend:** Python 3.12, Django 5.2+
+- **Dashboard:** Python 3.12, Django 5.2+
 - **Database:** PostgreSQL (via `psycopg` 3)
 - **API:** Django REST Framework (DRF)
 - **Admin UI:** Django Unfold (Modern Tailwind-based theme)
@@ -24,8 +24,8 @@ The `leochan.sh.dashboard` project is a modern Django-based dashboard and admini
 
 ### Architecture Patterns
 - **Environment Isolation:** Uses `.env`, `.env.dev`, and `.env.prod` to manage configurations.
-- **Dynamic Backends:** Database and Storage backends switch automatically based on the `ENV` and `STORAGE_AWS` flags.
-- **Custom Backends:** Storage logic is centralized in `project/storage_backends.py`.
+- **Dynamic Dashboards:** Database and Storage dashboards switch automatically based on the `ENV` and `STORAGE_AWS` flags.
+- **Custom Dashboards:** Storage logic is centralized in `project/storage_dashboards.py`.
 - **API Standards:** Standardized error responses via `project/handlers.py` and metadata-rich pagination via `project/pagination.py`.
 - **API Synchronization:** Any modification, creation, or deletion of an API endpoint must be accompanied by corresponding updates to the automated tests AND the Bruno OpenCollection files (`bruno/**/*.yml`) in the same development cycle.
 - **Utility Helpers:** Logic is organized into modular utility files (e.g., `utils/media.py`, `utils/admin_helpers.py`).

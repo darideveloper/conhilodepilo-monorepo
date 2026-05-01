@@ -6,11 +6,11 @@ This proposal introduces a new dynamic page `/booking/[id]` that allows users to
 Currently, users can only see services and courses in sliders or lists on the home page. There is no dedicated page for a specific service where they can see more details and book directly.
 
 ## Solution
-Create a new Astro page at `src/pages/booking/[id].astro` that fetches service or course data by ID from the backend and displays it in a premium, branded layout.
+Create a new Astro page at `src/pages/booking/[id].astro` that fetches service or course data by ID from the dashboard and displays it in a premium, branded layout.
 
 ### Key Features
 - **Dynamic Routing**: Use `[id].astro` to handle various services and courses.
-- **Backend Integration**: Reuse existing API clients to fetch data.
+- **Dashboard Integration**: Reuse existing API clients to fetch data.
 - **Two-Column Layout**: 
   - Left: Service details (Title, Description, Image, CTAs).
   - Right: Booking iframe with `pre-selected` parameter.

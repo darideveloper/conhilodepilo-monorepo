@@ -6,12 +6,12 @@ The Django admin interface currently displays many strings in English, including
 ## Proposed Solution
 We will systematically identify and translate all English strings visible in the admin interface. This involves:
 1.  Ensuring all user-facing strings in `models.py`, `admin.py`, `apps.py`, and `settings.py` are properly wrapped in `gettext_lazy` (`_()`).
-2.  Updating the `backend/locale/es/LC_MESSAGES/django.po` file with the correct Spanish translations for all identified strings.
+2.  Updating the `dashboard/locale/es/LC_MESSAGES/django.po` file with the correct Spanish translations for all identified strings.
 3.  Compiling the translation files to ensure they are active in the application.
 4.  Standardizing "verbose names" and UI labels to follow a consistent Spanish terminology.
 
 ## Impact
-- **Backend**: No functional changes, only UI text updates and translation file modifications.
+- **Dashboard**: No functional changes, only UI text updates and translation file modifications.
 - **Admin**: Full Spanish experience for administrators.
 - **Translations**: Improved coverage in `django.po`.
 

@@ -7,7 +7,7 @@ Migrate the `@booking` application from Server-Side Rendering (SSR) to a single-
 The `@booking` app currently maintains two ways of selecting services: path-based routing (`/[id]`) and query parameters (`?service=ID`). 
 1. **SSR Overhead:** Current SSR mode requires a Node.js server.
 2. **Redundancy:** The Landing page primarily embeds the booking app via an iframe using query parameters, making the `/[id]` routes in the booking app redundant.
-3. **Maintenance Burden:** Path-based SSG routes require a rebuild every time a new service is added to the backend.
+3. **Maintenance Burden:** Path-based SSG routes require a rebuild every time a new service is added to the dashboard.
 
 ## Proposed Solution
 - Change Astro output to `static`.
