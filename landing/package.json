@@ -13,6 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@astrojs/mdx": "^5.0.4",
     "@astrojs/react": "^5.0.1",
     "@astrojs/sitemap": "^3.7.1",
     "@fontsource-variable/inter": "^5.2.8",

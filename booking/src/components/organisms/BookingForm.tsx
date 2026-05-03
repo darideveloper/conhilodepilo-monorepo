@@ -269,16 +269,22 @@ export function BookingForm() {
                   className="text-xs font-medium leading-normal text-muted-foreground cursor-pointer"
                 >
                   {(() => {
-                    const policyText = language === 'es' ? 'política de privacidad' : 'privacy policy';
-                    const parts = t.form.privacyPolicy.split(policyText);
+                    const privacyText = language === 'es' ? 'política de privacidad' : 'privacy policy';
+                    const termsText = t.form.termsAndConditions;
                     const privacyUrl = config?.privacy_policy_url || "/privacy";
+                    const termsUrl = config?.terms_and_conditions_url || "/terms";
+                    
                     return (
                       <>
-                        {parts[0]}
+                        {t.form.legalAcceptance}{' '}
                         <a href={privacyUrl} className="text-primary hover:underline font-bold" target="_blank" rel="noopener noreferrer">
-                          {policyText}
+                          {privacyText}
                         </a>
-                        {parts[1]}
+                        {' '}{t.form.and}{' '}
+                        <a href={termsUrl} className="text-primary hover:underline font-bold" target="_blank" rel="noopener noreferrer">
+                          {termsText}
+                        </a>
+                        .
                       </>
                     );
                   })()}

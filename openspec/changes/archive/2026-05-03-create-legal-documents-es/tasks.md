@@ -1,0 +1,20 @@
+- [x] Dashboard: Add `terms_and_conditions_url` to `CompanyProfile` <!-- id: 1 -->
+    - [x] Update `dashboard/booking/models.py` <!-- id: 2 -->
+    - [x] Run migrations <!-- id: 3 -->
+    - [x] Update `dashboard/booking/serializers.py` to expose `terms_and_conditions_url` <!-- id: 4 -->
+- [x] Setup MDX and Content Collections in `landing` app <!-- id: 5 -->
+    - [x] Install `@astrojs/mdx` and update `astro.config.mjs` <!-- id: 6 -->
+    - [x] Create `src/content/config.ts` with `legal` collection <!-- id: 7 -->
+- [x] Draft content in MDX files <!-- id: 8 -->
+    - [x] Create `src/content/legal/politica-de-privacidad.mdx` <!-- id: 9 -->
+    - [x] Create `src/content/legal/terminos-y-condiciones.mdx` <!-- id: 10 -->
+- [x] Implement dynamic rendering in `landing` app <!-- id: 11 -->
+    - [x] Create `src/pages/legal/[slug].astro` using `getStaticPaths` <!-- id: 12 -->
+- [x] Update `landing` app footer with links to `/legal/politica-de-privacidad` and `/legal/terminos-y-condiciones` <!-- id: 14 -->
+- [x] Update `booking` app configuration <!-- id: 15 -->
+    - [x] Update `AppConfig` interface in `booking/src/store/useBookingStore.ts` <!-- id: 16 -->
+    - [x] Update `translations.ts` with keys for terms and "and" connector <!-- id: 17 -->
+- [x] Update `booking` app `BookingForm.tsx` <!-- id: 18 -->
+    - [x] Implement dual-link checkbox label logic <!-- id: 19 -->
+    - [x] Update footer links to `/legal/politica-de-privacidad` and `/legal/terminos-y-condiciones` <!-- id: 20 -->
+- [x] Validation: Verify pages render MDX content correctly and checkbox works in both languages <!-- id: 21 -->

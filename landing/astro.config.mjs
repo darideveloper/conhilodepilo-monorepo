@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -23,7 +24,7 @@ try {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://conhilodepilo.com',
-  integrations: [sitemap(), react()],
+  integrations: [sitemap(), react(), mdx()],
 
   vite: {
     plugins: [tailwindcss()],
