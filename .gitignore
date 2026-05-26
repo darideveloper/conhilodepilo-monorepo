@@ -61,3 +61,5 @@ user_data/
 stagehand.log
 logs/
 .cursorrules
+.opencode/
+.agent/
