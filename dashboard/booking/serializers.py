@@ -23,6 +23,8 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             'extras_label',
             'privacy_policy_url',
             'terms_and_conditions_url',
+            'instagram_url',
+            'tiktok_url',
             'booking_cooldown_minutes',
         ]
 

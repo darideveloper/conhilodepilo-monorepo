@@ -99,6 +99,8 @@ class CompanyProfile(SingletonModel):
     extras_label = models.CharField(_("Extras label"), max_length=50, default=_("Add-ons"))
     privacy_policy_url = models.URLField(_("Privacy policy URL"), null=True, blank=True)
     terms_and_conditions_url = models.URLField(_("Terms and conditions URL"), null=True, blank=True)
+    instagram_url = models.URLField(_("Instagram URL"), null=True, blank=True)
+    tiktok_url = models.URLField(_("TikTok URL"), null=True, blank=True)
     booking_cooldown_minutes = models.PositiveIntegerField(_("Booking cooldown (minutes)"), default=0)
 
     def __str__(self):

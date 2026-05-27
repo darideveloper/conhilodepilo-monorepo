@@ -13,4 +13,17 @@ const { name, size = 24, class: className, ...rest } = Astro.props;
 const LucideIcon = LucideIcons[name] as any;
 ---
 
-{LucideIcon && <LucideIcon size={size} class={className} {...rest} />}
+{LucideIcon ? (
+  <LucideIcon size={size} class={className} {...rest} />
+) : name === "TikTok" ? (
+  <svg
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="currentColor"
+    class={className}
+    {...rest}
+  >
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13 3.44-.3 6.88-.45 10.32-.08 1.83-.87 3.63-2.3 4.74-1.43 1.11-3.32 1.56-5.11 1.25-1.79-.31-3.41-1.41-4.38-2.98-1-1.61-1.14-3.69-.37-5.39.77-1.7 2.45-2.93 4.31-3.19.12 0 .24-.01.36-.01v4.03c-1.16.14-2.2.82-2.7 1.87-.5 1.05-.33 2.39.43 3.25.76.86 1.99 1.17 3.06.77 1.07-.4 1.8-1.48 1.8-2.63l-.01-14.8c-.1-.01-.2-.02-.3-.02Z" />
+  </svg>
+) : null}

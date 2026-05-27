@@ -132,6 +132,8 @@ class CompanyProfileAdmin(SingletonModelAdmin, ModelAdminUnfoldBase):
             "fields": (
                 "contact_email",
                 "contact_phone",
+                "instagram_url",
+                "tiktok_url",
             )
         }),
         (_("Scheduling Configuration"), {

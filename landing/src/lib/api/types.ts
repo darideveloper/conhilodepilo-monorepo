@@ -39,5 +39,7 @@ export interface AppConfig {
   availability_regular_label: string;
   availability_no_free_label: string;
   extras_label: string;
+  instagram_url: string | null;
+  tiktok_url: string | null;
   timezone: string;
 }

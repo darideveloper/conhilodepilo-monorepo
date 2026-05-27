@@ -48,6 +48,8 @@ interface Props {
 const config = await getConfig();
 const contactPhone = config?.contact_phone || DEFAULT_CONTACT.phone;
 const contactEmail = config?.contact_email || DEFAULT_CONTACT.email;
+const instagramUrl = config?.instagram_url || DEFAULT_CONTACT.instagram_url;
+const tiktokUrl = config?.tiktok_url || DEFAULT_CONTACT.tiktok_url;
 
 const defaultFooterData: FooterData = {
   brand: {
@@ -58,8 +60,9 @@ const defaultFooterData: FooterData = {
   },
   socialLinks: [
     { icon: "Globe", url: "#" },
+    { icon: "Instagram", url: instagramUrl },
+    { icon: "TikTok", url: tiktokUrl },
     { icon: "Mail", url: `mailto:${contactEmail}` },
-    { icon: "Instagram", url: "#" },
   ],
   location: {
     title: "Ubicación",
@@ -124,6 +127,8 @@ const { data = defaultFooterData } = Astro.props;
             <a
               class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-secondary hover:text-ui-bg-dark transition-colors"
               href={link.url}
+              target={link.url.startsWith("http") ? "_blank" : undefined}
+              rel={link.url.startsWith("http") ? "noopener noreferrer" : undefined}
             >
               <Icon name={link.icon as any} size={18} />
             </a>
