@@ -78,7 +78,7 @@ export function BookingServiceSelection() {
       <CardContent className="flex flex-col gap-6 pt-4 pb-8 px-6">
         
         {/* Selection Area */}
-        <div className="w-full space-y-4 p-4 bg-muted/30 rounded-2xl border border-border/50">
+        <div className="w-full space-y-4 p-4 bg-muted/30 rounded-2xl border border-border/50 order-2">
           <div className="grid gap-1.5">
             <Label htmlFor="serviceTypeId" className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
               {config?.event_type_label || "Tipo de Servicio"}
@@ -136,7 +136,7 @@ export function BookingServiceSelection() {
         </div>
 
         {/* Stack / Cart Area */}
-        <div className="w-full space-y-3">
+        <div className="w-full space-y-3 order-1">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
             <Layers className="w-3.5 h-3.5" />
             <span>{language === 'es' ? 'Servicios seleccionados' : 'Selected Services'} ({formData.selectedServices.length})</span>
@@ -173,7 +173,7 @@ export function BookingServiceSelection() {
           </div>
         </div>
 
-        <div className="w-full pt-2">
+        <div className="w-full pt-2 order-3">
           <Button 
             className="w-full py-6 text-lg font-serif rounded-2xl shadow-lg shadow-primary/10"
             disabled={formData.selectedServices.length === 0}
