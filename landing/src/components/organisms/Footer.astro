@@ -1,5 +1,6 @@
 ---
-import Icon from "../atoms/Icon.astro";
+import SocialIcons from "../molecules/SocialIcons.tsx";
+import FooterIcon from "../atoms/FooterIcon.tsx";
 import { getConfig } from "../../lib/api/getConfig";
 import { formatPhoneForDisplay, formatPhoneForWhatsApp } from "../../utils/phone";
 import { DEFAULT_CONTACT } from "../../lib/constants";
@@ -107,8 +108,8 @@ const { data = defaultFooterData } = Astro.props;
           ) : (
             <>
               {data.brand.icon && (
-                <Icon
-                  name={data.brand.icon as any}
+                <FooterIcon
+                  name={data.brand.icon}
                   class="text-brand-secondary"
                   size={32}
                 />
@@ -121,20 +122,7 @@ const { data = defaultFooterData } = Astro.props;
         }
       </div>
       <p class="text-sm text-white/50 max-w-xs">{data.brand.description}</p>
-      <div class="flex gap-4">
-        {
-          data.socialLinks.map((link) => (
-            <a
-              class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-secondary hover:text-ui-bg-dark transition-colors"
-              href={link.url}
-              target={link.url.startsWith("http") ? "_blank" : undefined}
-              rel={link.url.startsWith("http") ? "noopener noreferrer" : undefined}
-            >
-              <Icon name={link.icon as any} size={18} />
-            </a>
-          ))
-        }
-      </div>
+      <SocialIcons links={data.socialLinks} />
     </div>
 
     <!-- Location -->
@@ -146,7 +134,7 @@ const { data = defaultFooterData } = Astro.props;
       </h4>
       <div class="space-y-4">
         <div class="flex items-start gap-3">
-          <Icon name="MapPin" class="text-brand-primary" size={20} />
+          <FooterIcon name="MapPin" class="text-brand-primary" size={20} />
           <p class="text-sm text-white/70">
             {data.location.addressLine1}
             <br />{data.location.addressLine2}
@@ -180,7 +168,7 @@ const { data = defaultFooterData } = Astro.props;
           class="inline-flex items-center gap-3 bg-brand-accent text-ui-bg-dark px-6 py-3 rounded-full font-bold text-sm hover:scale-105 transition-transform"
           href={data.contact.whatsappUrl}
         >
-          <Icon name="MessageCircle" size={20} />
+          <FooterIcon name="MessageCircle" size={20} />
           {data.contact.whatsappText}
         </a>
         <div class="pt-4 space-y-1">
