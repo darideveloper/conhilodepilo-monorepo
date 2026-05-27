@@ -81,7 +81,7 @@ export function BookingForm() {
     return (
       <Card className="w-full max-w-md shadow-2xl border-none bg-background rounded-3xl overflow-hidden animate-in fade-in zoom-in duration-500">
         <BookingHeader />
-        <CardContent className="flex flex-col items-center justify-center py-12 px-8 text-center space-y-6">
+        <CardContent className="flex flex-col items-center py-12 px-8 text-center space-y-6">
           <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-2">
             <CheckCircle2 className="w-10 h-10 text-primary" />
           </div>
@@ -141,7 +141,7 @@ export function BookingForm() {
   }
 
   return (
-    <Card className="w-full max-w-md shadow-2xl border-none bg-background rounded-3xl overflow-hidden relative">
+    <Card className="w-full max-w-md shadow-2xl border-none bg-background rounded-3xl relative">
       <BookingHeader 
         showBack={true} 
         onBack={prevStep} 
@@ -302,7 +302,7 @@ export function BookingForm() {
 
           <Button 
             type="submit" 
-            className="w-full py-7 text-lg font-serif rounded-2xl shadow-lg shadow-primary/20 relative overflow-hidden group"
+            className="w-full py-7 text-lg font-serif rounded-2xl shadow-lg shadow-primary/20 relative overflow-hidden group text-balance px-4"
             disabled={isSubmitting || !formData.privacyAccepted}
           >
             {isSubmitting ? (

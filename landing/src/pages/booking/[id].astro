@@ -137,7 +137,7 @@ const bookingUrl = `${import.meta.env.PUBLIC_BOOKING_URL}/?service=${id}&lang=es
         <iframe
           id='booking-iframe'
           src={bookingUrl}
-          class='w-full h-full border-none z-10 min-h-[680px] md:min-h-[750px] sticky top-8 group/iframe rounded-3xl overflow-y-hidden'
+          class='w-full border-none z-10 sticky top-8 group/iframe rounded-3xl min-h-[680px] max-h-[1000px]'
           title='Sistema de Reservas - Con Hilo Depilo'
           loading='lazy'
         ></iframe>
@@ -145,6 +145,24 @@ const bookingUrl = `${import.meta.env.PUBLIC_BOOKING_URL}/?service=${id}&lang=es
           const iframe = document.getElementById(
             'booking-iframe',
           ) as HTMLIFrameElement
+
+          // Dynamic iframe height via postMessage from booking widget
+          window.addEventListener('message', (e) => {
+            if (e.data?.type === 'booking-resize' && iframe) {
+              iframe.style.height = e.data.height + 'px'
+            }
+          })
+
+          // Fallback: set default height if no message received within 3s
+          if (iframe) {
+            setTimeout(() => {
+              if (!iframe.style.height) {
+                iframe.style.height = '700px'
+              }
+            }, 3000)
+          }
+
+          // Zoom calculation and injection
           const width = window.innerWidth
           let zoom = 100
           if (width < 768) {

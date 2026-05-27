@@ -33,13 +33,13 @@ const brandColor = config?.brand_color || "#a01313";
 		</style>
 
 		<script is:inline>
-			// Zoom initialization
+			// Zoom initialization (uses font-size instead of zoom for cross-browser compatibility)
 			(() => {
 				const urlParams = new URLSearchParams(window.location.search);
 				const zoom = urlParams.get('zoom');
-				if (zoom) {
+				if (zoom && zoom !== '100') {
 					const style = document.createElement('style');
-					style.textContent = `body { zoom: ${zoom}%; }`;
+					style.textContent = `html { font-size: ${zoom}%; }`;
 					document.head.appendChild(style);
 				}
 			})();
@@ -100,6 +100,29 @@ const brandColor = config?.brand_color || "#a01313";
 	<body class="font-sans relative overflow-x-hidden">
 		<AppLoader title={pageTitle} />
 		<slot />
+		<script is:inline>
+			// Iframe height communication
+			function sendHeight() {
+				const height = document.documentElement.scrollHeight;
+				window.parent.postMessage({ type: 'booking-resize', height }, '*');
+			}
+
+			// Fallback for browsers without ResizeObserver (Safari 13.0 and below)
+			if (typeof ResizeObserver !== 'undefined') {
+				const resizeObserver = new ResizeObserver(sendHeight);
+				resizeObserver.observe(document.body);
+			}
+
+			// Observe DOM mutations for step changes (date selection, service changes)
+			const mutationObserver = new MutationObserver(sendHeight);
+			mutationObserver.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+			// Send initial height after load
+			window.addEventListener('load', () => setTimeout(sendHeight, 100));
+
+			// Fallback: send height after a delay for older browsers
+			setTimeout(sendHeight, 500);
+		</script>
 	</body>
 </html>
 

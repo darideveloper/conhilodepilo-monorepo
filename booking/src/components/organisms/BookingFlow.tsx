@@ -93,7 +93,7 @@ export default function BookingFlow({ initialServiceId }: { initialServiceId?: s
   }, [config])
 
   return (
-    <div className="w-full h-full mx-auto flex flex-col items-center relative z-10 p-4 bg-muted/30 space-y-4 rounded-3xl border border-border h-full">
+    <div className="w-full mx-auto flex flex-col items-center relative z-10 p-4 bg-muted/30 gap-4 rounded-3xl border border-border min-h-0 overflow-y-auto">
       {currentStep === 1 && <BookingServiceSelection />}
       {currentStep === 2 && <BookingCalendar />}
       {currentStep === 3 && <BookingForm />}

@@ -87,14 +87,14 @@ export function BookingCalendar() {
 
   return (
     <>
-      <Card className="w-full max-w-md shadow-xl border-none bg-background relative overflow-hidden">
+      <Card className="w-full max-w-md shadow-xl border-none bg-background relative">
         <BookingHeader 
           showBack={true}
           onBack={prevStep}
           showStep={true} 
           stepText={t.form?.step2Of3 || "Step 2 of 3"} 
         />
-        <CardContent className="flex flex-col items-center gap-4 h-full justify-center">
+        <CardContent className="flex flex-col items-center gap-4 min-h-0">
 
           <StatusLegend />
 
@@ -116,7 +116,7 @@ export function BookingCalendar() {
             </div>
           )}
 
-          <div className="p-2 bg-background rounded-xl border border-border shadow-sm w-full relative">
+          <div className="p-2 bg-background rounded-xl border border-border shadow-sm w-full relative shrink-0">
             {isAvailabilityLoading && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-xl">
                 <p className="text-xs">{language === 'es' ? 'Cargando disponibilidad...' : 'Loading availability...'}</p>
@@ -155,7 +155,7 @@ export function BookingCalendar() {
           </div>
 
           {selectedDate && (
-            <div className="w-full space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="w-full space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300 shrink-0">
               <div className="flex items-center gap-2 px-1">
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <Label className="text-sm font-medium">
@@ -193,7 +193,7 @@ export function BookingCalendar() {
             </div>
           )}
 
-          <div className="w-full space-y-4 pt-2">
+          <div className="w-full space-y-4 pt-2 shrink-0">
             {selectedDate && !selectedTime && availableSlots.length > 0 && (
                <p className="text-center text-[10px] text-amber-600 font-medium">
                 {language === 'es' ? 'Por favor, selecciona una hora para continuar' : 'Please select a time to continue'}
@@ -203,7 +203,7 @@ export function BookingCalendar() {
             {selectedDate && <StatusDetails date={selectedDate} statusKey={statusKey} />}
             
             <Button 
-              className="w-full py-6 text-lg font-serif rounded-xl"
+              className="w-full py-6 text-lg font-serif rounded-xl overflow-hidden text-balance px-4"
               disabled={!selectedDate || !selectedTime || formData.selectedServices.length === 0}
               onClick={nextStep}
             >

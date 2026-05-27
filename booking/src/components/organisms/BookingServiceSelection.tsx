@@ -70,7 +70,7 @@ export function BookingServiceSelection() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-xl border-none bg-background relative overflow-hidden rounded-3xl">
+    <Card className="w-full max-w-md shadow-xl border-none bg-background relative rounded-3xl">
       <BookingHeader 
         showStep={true} 
         stepText={t.form?.step1Of3 || "Step 1 of 3"} 
