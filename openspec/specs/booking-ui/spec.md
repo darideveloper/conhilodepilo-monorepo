@@ -118,3 +118,11 @@ The application MUST support dynamic scaling via the `zoom` query parameter to e
 - **THEN** the system MUST dynamically apply the zoom percentage to the document body via client-side CSS injection
 - **AND** the scaling MUST be applied as early as possible to minimize layout shifts.
 
+### Requirement: Cross-Browser Calendar Compatibility
+The booking calendar MUST maintain a consistent and functional grid layout across all supported browsers, specifically ensuring that interactive elements are correctly rendered on macOS Safari without layout collapse or overflow.
+
+#### Scenario: Calendar Layout Stability in Safari
+- **WHEN** the user views the booking calendar in Safari on macOS
+- **THEN** the month container MUST be rendered as a grid with proper cell alignment to prevent rendering bugs
+- **AND** the layout MUST NOT collapse or overflow.
+
