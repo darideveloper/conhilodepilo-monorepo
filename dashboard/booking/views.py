@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.conf import settings
+from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import datetime, time
 import stripe
@@ -12,6 +13,7 @@ from .serializers import CompanyProfileSerializer, BusinessHoursSerializer, Even
 from utils.availability import get_available_dates, get_available_slots
 from utils.stripe_utils import create_checkout_session
 from utils.google_calendar import sync_booking_to_google
+from utils.email import send_confirmation_email
 
 class CreateBookingView(APIView):
     """
@@ -72,6 +74,7 @@ class CreateBookingView(APIView):
 
                 if status == "CONFIRMED":
                     transaction.on_commit(lambda: sync_booking_to_google(booking))
+                    transaction.on_commit(lambda b=booking: send_confirmation_email(b))
                 
                 response_data = {
                     "message": "Booking created successfully",
@@ -226,9 +229,65 @@ class StripeWebhookView(APIView):
                         booking.status = 'PAID'
                         booking.stripe_payment_id = session.payment_intent or session.id
                         booking.save(update_fields=['status', 'stripe_payment_id'])
+                        transaction.on_commit(lambda b=booking: send_confirmation_email(b))
                         
                         # Note: Google Calendar sync will be triggered by a signal
                 except Booking.DoesNotExist:
                     pass
 
         return Response(status=200)
+
+
+class TestEmailView(APIView):
+    """
+    Debug endpoint to verify SMTP credentials are working.
+
+    Sends a plain-text test email using the SMTP configuration defined in
+    environment variables (EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, etc.).
+
+    GET Parameters:
+        to (str, required): Comma-separated list of recipient email addresses.
+
+    Responses:
+        200: {"message": "Test email sent successfully", "to": [...]}
+        400: {"error": "Missing 'to' query parameter..."}
+        500: {"error": "Failed to send email: <SMTP error detail>"}
+
+    Usage:
+        GET /api/test-email/?to=user@example.com
+        GET /api/test-email/?to=alice@test.com,bob@test.com
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        to_emails = request.query_params.get("to", "")
+        if not to_emails:
+            return Response(
+                {"error": "Missing 'to' query parameter with comma-separated emails"},
+                status=400
+            )
+
+        email_list = [e.strip() for e in to_emails.split(",") if e.strip()]
+        if not email_list:
+            return Response({"error": "No valid email addresses provided"}, status=400)
+
+        try:
+            send_mail(
+                subject="Test Email from Con Hilo Depilo",
+                message=(
+                    "This is a test email to verify SMTP configuration.\n\n"
+                    "If you received this, the email system is working correctly."
+                ),
+                from_email=settings.EMAIL_FROM,
+                recipient_list=email_list,
+                fail_silently=False,
+            )
+            return Response({
+                "message": "Test email sent successfully",
+                "to": email_list,
+            })
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to send email: {str(e)}"},
+                status=500
+            )

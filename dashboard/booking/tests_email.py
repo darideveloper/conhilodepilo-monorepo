@@ -1,0 +1,284 @@
+from django.test import TestCase, override_settings
+from unittest.mock import patch, MagicMock
+from decimal import Decimal
+from datetime import date, time, timedelta
+from django.utils import timezone
+from django.urls import reverse
+from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
+import stripe
+from .models import CompanyProfile, EventType, Event, Booking
+from utils.email import _clean_phone, _build_whatsapp_url, _build_logo_url, send_confirmation_email
+
+
+class CleanPhoneTest(TestCase):
+    def test_removes_non_digits(self):
+        self.assertEqual(_clean_phone("+34 915 23 14 06"), "34915231406")
+
+    def test_removes_dashes_and_parentheses(self):
+        self.assertEqual(_clean_phone("(34) 915-23-14-06"), "34915231406")
+
+    def test_returns_empty_for_none(self):
+        self.assertEqual(_clean_phone(None), "")
+
+    def test_returns_empty_for_empty_string(self):
+        self.assertEqual(_clean_phone(""), "")
+
+    def test_preserves_digits_only(self):
+        self.assertEqual(_clean_phone("915231406"), "915231406")
+
+
+class BuildWhatsAppUrlTest(TestCase):
+    def test_returns_url_for_valid_phone(self):
+        url = _build_whatsapp_url("+34 915 23 14 06")
+        self.assertEqual(url, "https://wa.me/34915231406")
+
+    def test_returns_none_for_none(self):
+        self.assertIsNone(_build_whatsapp_url(None))
+
+    def test_returns_none_for_empty(self):
+        self.assertIsNone(_build_whatsapp_url(""))
+
+
+class BuildLogoUrlTest(TestCase):
+    @override_settings(HOST="https://dashboard.conhilodepilo.localhost")
+    def test_returns_absolute_url_when_logo_exists(self):
+        company = MagicMock(spec=CompanyProfile)
+        company.logo.url = "/media/branding/logo.png"
+        company.logo.__bool__ = lambda self: True
+        url = _build_logo_url(company)
+        self.assertEqual(url, "https://dashboard.conhilodepilo.localhost/media/branding/logo.png")
+
+    @override_settings(HOST="https://dashboard.conhilodepilo.localhost/")
+    def test_strips_trailing_slash_from_host(self):
+        company = MagicMock(spec=CompanyProfile)
+        company.logo.url = "/media/branding/logo.png"
+        company.logo.__bool__ = lambda self: True
+        url = _build_logo_url(company)
+        self.assertEqual(url, "https://dashboard.conhilodepilo.localhost/media/branding/logo.png")
+
+    def test_returns_none_when_no_logo(self):
+        company = MagicMock(spec=CompanyProfile)
+        company.logo = None
+        url = _build_logo_url(company)
+        self.assertIsNone(url)
+
+    @override_settings(HOST="")
+    def test_returns_none_when_no_host(self):
+        company = MagicMock(spec=CompanyProfile)
+        company.logo.url = "/media/branding/logo.png"
+        company.logo.__bool__ = lambda self: True
+        url = _build_logo_url(company)
+        self.assertIsNone(url)
+
+
+@override_settings(
+    EMAIL_FROM="test@conhilodepilo.com",
+    EMAILS_NOTIFICATIONS=["admin@conhilodepilo.com", "notifications@conhilodepilo.com"],
+    HOST="https://dashboard.conhilodepilo.localhost",
+)
+class SendConfirmationEmailTest(TestCase):
+    def setUp(self):
+        self.event_type = EventType.objects.create(name="Test Type")
+        self.event = Event.objects.create(
+            event_type=self.event_type,
+            name="Depilación Cejas",
+            price=Decimal("15.00"),
+            duration_minutes=20,
+        )
+        self.booking = Booking.objects.create(
+            client_name="Cliente Test",
+            client_email="cliente@example.com",
+            client_phone="+34 666 123 456",
+            status="CONFIRMED",
+            start_time=timezone.make_aware(
+                timezone.datetime(2026, 6, 10, 10, 0)
+            ),
+        )
+        self.booking.services.add(self.event)
+
+    def test_sends_email_to_client_with_bcc_to_admins(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+
+            send_confirmation_email(self.booking)
+
+            mock_email_cls.assert_called_once()
+            call_kwargs = mock_email_cls.call_args.kwargs
+            self.assertEqual(call_kwargs["to"], ["cliente@example.com"])
+            self.assertEqual(
+                call_kwargs["bcc"],
+                ["admin@conhilodepilo.com", "notifications@conhilodepilo.com"],
+            )
+            self.assertIn("Confirmación de tu cita", call_kwargs["subject"])
+            self.assertIn("Con Hilo Depilo", call_kwargs["subject"])
+            mock_instance.attach_alternative.assert_called_once()
+            html_arg = mock_instance.attach_alternative.call_args[0][0]
+            self.assertIn("cliente@example.com", call_kwargs["to"])
+
+    def test_plain_text_body_contains_booking_details(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+
+            send_confirmation_email(self.booking)
+
+            call_kwargs = mock_email_cls.call_args.kwargs
+            body = call_kwargs["body"]
+            self.assertIn("Cliente Test", body)
+            self.assertIn("Depilación Cejas", body)
+            self.assertIn("10/06/2026", body)
+            self.assertIn("10:00", body)
+
+    def test_html_alternative_is_attached(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+
+            send_confirmation_email(self.booking)
+
+            mock_instance.attach_alternative.assert_called_once()
+            args, kwargs = mock_instance.attach_alternative.call_args
+            self.assertEqual(kwargs.get("mimetype"), "text/html")
+            self.assertIn("Hola, Cliente Test", args[0])
+
+    @override_settings(EMAILS_NOTIFICATIONS=["", "admin@test.com", "  "])
+    def test_filters_empty_bcc_emails(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+
+            send_confirmation_email(self.booking)
+
+            call_kwargs = mock_email_cls.call_args.kwargs
+            self.assertEqual(call_kwargs["bcc"], ["admin@test.com"])
+
+    def test_failure_is_caught_and_logged(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_instance.send.side_effect = Exception("SMTP connection refused")
+            mock_email_cls.return_value = mock_instance
+
+            with patch("utils.email.logger") as mock_logger:
+                # Should not raise
+                send_confirmation_email(self.booking)
+
+                mock_logger.exception.assert_called_once()
+
+
+@override_settings(
+    STRIPE_SECRET_KEY="sk_test_123",
+    STRIPE_WEBHOOK_SECRET="whsec_test",
+    LANDING_URL="http://test-landing.com",
+    EMAIL_FROM="test@conhilodepilo.com",
+    EMAILS_NOTIFICATIONS=[],
+    HOST="https://dashboard.conhilodepilo.localhost",
+)
+class EmailSentOnCreateBookingViewTest(APITestCase):
+    def setUp(self):
+        CompanyProfile.get_solo()
+        self.event_type = EventType.objects.create(
+            name="Test Type", payment_model="POST-PAID"
+        )
+        self.event = Event.objects.create(
+            event_type=self.event_type,
+            name="Depilación Cejas",
+            price=Decimal("15.00"),
+            duration_minutes=20,
+        )
+
+    @patch("utils.email.send_confirmation_email")
+    def test_email_sent_when_booking_created_as_confirmed(self, mock_send_email):
+        response = self.client.post(
+            reverse("api-bookings"),
+            {
+                "service_ids": [self.event.id],
+                "date": "2026-06-15",
+                "startTime": "10:00",
+                "clientName": "Test Client",
+                "clientEmail": "test@example.com",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        mock_send_email.assert_called_once()
+        booking = mock_send_email.call_args[0][0]
+        self.assertEqual(booking.client_name, "Test Client")
+        self.assertEqual(booking.client_email, "test@example.com")
+
+    @patch("utils.email.send_confirmation_email", side_effect=Exception("SMTP error"))
+    def test_email_failure_does_not_block_booking_creation(self, mock_send_email):
+        response = self.client.post(
+            reverse("api-bookings"),
+            {
+                "service_ids": [self.event.id],
+                "date": "2026-06-15",
+                "startTime": "10:00",
+                "clientName": "Test Client",
+                "clientEmail": "test@example.com",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        booking_id = response.json()["booking_id"]
+        booking = Booking.objects.get(id=booking_id)
+        self.assertEqual(booking.status, "CONFIRMED")
+
+
+@override_settings(
+    STRIPE_SECRET_KEY="sk_test_123",
+    STRIPE_WEBHOOK_SECRET="whsec_test",
+    LANDING_URL="http://test-landing.com",
+    EMAIL_FROM="test@conhilodepilo.com",
+    EMAILS_NOTIFICATIONS=[],
+    HOST="https://dashboard.conhilodepilo.localhost",
+)
+class EmailSentOnStripeWebhookTest(APITestCase):
+    def setUp(self):
+        CompanyProfile.get_solo()
+        self.event_type = EventType.objects.create(
+            name="Test Type", payment_model="PRE-PAID"
+        )
+        self.event = Event.objects.create(
+            event_type=self.event_type,
+            name="Depilación Cejas",
+            price=Decimal("15.00"),
+            duration_minutes=20,
+        )
+
+    @patch("utils.email.send_confirmation_email")
+    @patch("stripe.Webhook.construct_event")
+    def test_email_sent_when_booking_transitions_to_paid(
+        self, mock_construct_event, mock_send_email
+    ):
+        booking = Booking.objects.create(
+            client_name="Stripe Client",
+            client_email="stripe@example.com",
+            status="PENDING",
+            start_time=timezone.make_aware(
+                timezone.datetime(2026, 6, 15, 10, 0)
+            ),
+        )
+        booking.services.add(self.event)
+
+        mock_event = MagicMock()
+        mock_event.type = "checkout.session.completed"
+        mock_event.data.object.metadata = {"booking_id": str(booking.id)}
+        mock_event.data.object.payment_intent = "pi_test_123"
+        mock_event.data.object.id = "cs_test_123"
+        mock_construct_event.return_value = mock_event
+
+        response = self.client.post(
+            reverse("stripe-webhook"),
+            data="{}",
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        booking.refresh_from_db()
+        self.assertEqual(booking.status, "PAID")
+        mock_send_email.assert_called_once()
+        called_booking = mock_send_email.call_args[0][0]
+        self.assertEqual(called_booking.id, booking.id)
