@@ -11,12 +11,16 @@ export function CategoryShowcase({ categories, className }: Props) {
   return (
     <div
       className={cn(
-        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full px-4",
+        "grid grid-cols-1 md:grid-cols-2 gap-8 w-full px-4",
         className
       )}
     >
-      {categories.map((category) => (
-        <CategoryCard key={category.id} category={category} />
+      {categories.map((category, index) => (
+        <CategoryCard
+          key={category.id}
+          category={category}
+          isLast={index === categories.length - 1}
+        />
       ))}
     </div>
   );
