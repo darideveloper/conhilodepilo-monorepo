@@ -51,6 +51,7 @@ const contactPhone = config?.contact_phone || DEFAULT_CONTACT.phone;
 const contactEmail = config?.contact_email || DEFAULT_CONTACT.email;
 const instagramUrl = config?.instagram_url || DEFAULT_CONTACT.instagram_url;
 const tiktokUrl = config?.tiktok_url || DEFAULT_CONTACT.tiktok_url;
+const facebookUrl = config?.facebook_url || DEFAULT_CONTACT.facebook_url;
 
 const defaultFooterData: FooterData = {
   brand: {
@@ -62,6 +63,7 @@ const defaultFooterData: FooterData = {
   socialLinks: [
     { icon: "Globe", url: "#" },
     { icon: "Instagram", url: instagramUrl },
+    { icon: "Facebook", url: facebookUrl },
     { icon: "TikTok", url: tiktokUrl },
     { icon: "Mail", url: `mailto:${contactEmail}` },
   ],

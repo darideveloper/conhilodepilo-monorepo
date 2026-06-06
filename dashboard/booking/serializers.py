@@ -25,6 +25,7 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             'terms_and_conditions_url',
             'instagram_url',
             'tiktok_url',
+            'facebook_url',
             'booking_cooldown_minutes',
         ]
 

@@ -1,5 +1,5 @@
 import { FiGlobe, FiInstagram, FiMail } from "react-icons/fi"
-import { SiTiktok } from "react-icons/si"
+import { SiTiktok, SiFacebook } from "react-icons/si"
 
 interface SocialLink {
   icon: string
@@ -9,6 +9,7 @@ interface SocialLink {
 const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   Globe: FiGlobe,
   Instagram: FiInstagram,
+  Facebook: SiFacebook,
   TikTok: SiTiktok,
   Mail: FiMail,
 }

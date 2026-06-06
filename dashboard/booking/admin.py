@@ -134,6 +134,7 @@ class CompanyProfileAdmin(SingletonModelAdmin, ModelAdminUnfoldBase):
                 "contact_phone",
                 "instagram_url",
                 "tiktok_url",
+                "facebook_url",
             )
         }),
         (_("Scheduling Configuration"), {

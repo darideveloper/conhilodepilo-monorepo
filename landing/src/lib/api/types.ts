@@ -41,5 +41,6 @@ export interface AppConfig {
   extras_label: string;
   instagram_url: string | null;
   tiktok_url: string | null;
+  facebook_url: string | null;
   timezone: string;
 }
