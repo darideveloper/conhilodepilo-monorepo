@@ -287,8 +287,7 @@ UNFOLD = {
         {
             "rel": "icon",
             "sizes": "32x32",
-            "type": "image/png",
-            "href": lambda request: static("favicon.png"),
+            "href": "https://conhilodepilo.com/favicon.ico",
         },
     ],
     "SHOW_HISTORY": True,

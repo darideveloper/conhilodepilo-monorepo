@@ -1,7 +1,6 @@
 import os
 import re
 import colorsys
-from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 from booking.models import CompanyProfile
 
@@ -28,7 +27,7 @@ def site_icon_callback(request):
     company = get_company()
     if company.logo:
         return company.logo.url
-    return static("favicon.png")
+    return "https://conhilodepilo.com/favicon.ico"
 
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
