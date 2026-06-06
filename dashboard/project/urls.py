@@ -19,6 +19,7 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     # Admin Interface
+    path("admin/", RedirectView.as_view(url="/admin/booking/booking/", permanent=True), name="admin-redirect"),
     path("admin/", admin.site.urls),
     
     # Root Redirect to Admin
