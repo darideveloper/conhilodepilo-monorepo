@@ -257,7 +257,7 @@ class EventDateOverrideAdmin(ModelAdminUnfoldBase):
 
 @admin.register(Booking)
 class BookingAdmin(ModelAdminUnfoldBase):
-    list_display = ("client_name", "start_time", "end_time", "status", "google_sync_status_badge")
+    list_display = ("get_client_name", "get_status", "get_services", "get_price", "get_created_at", "get_start_time")
     list_filter = ("status", "start_time")
     search_fields = ("client_name", "client_email")
     filter_horizontal = ("services",)
@@ -289,21 +289,33 @@ class BookingAdmin(ModelAdminUnfoldBase):
         (_("Google Calendar"), ["fieldsets:4"]),
     ]
 
-    @admin.display(description=_("Google Sync"))
-    def google_sync_status_badge(self, obj):
-        colors = {
-            "SUCCESS": ("bg-green-100 text-green-800", "✓"),
-            "FAILURE": ("bg-red-100 text-red-800", "✗"),
-            "PENDING": ("bg-yellow-100 text-yellow-800", "…"),
-            "DISABLED": ("bg-gray-100 text-gray-500", "—"),
-        }
-        css, symbol = colors.get(obj.google_sync_status, ("bg-gray-100 text-gray-500", "?"))
-        return format_html(
-            '<span class="font-medium px-2 py-0.5 rounded text-xs {}">{} {}</span>',
-            css,
-            symbol,
-            obj.get_google_sync_status_display(),
-        )
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("services")
+
+    @admin.display(description=_("Cliente"))
+    def get_client_name(self, obj):
+        return obj.client_name
+
+    @admin.display(description=_("Estado"))
+    def get_status(self, obj):
+        return obj.get_status_display()
+
+    @admin.display(description=_("Servicios"))
+    def get_services(self, obj):
+        return ", ".join(obj.services.all().values_list("name", flat=True))
+
+    @admin.display(description=_("Precio"))
+    def get_price(self, obj):
+        total = sum(service.price for service in obj.services.all())
+        return f"{total:.2f}"
+
+    @admin.display(description=_("Fecha de compra"))
+    def get_created_at(self, obj):
+        return obj.created_at
+
+    @admin.display(description=_("Fecha del servicio"))
+    def get_start_time(self, obj):
+        return obj.start_time
 
     @admin.action(description=_("Retry Google Calendar Sync"))
     def retry_google_calendar_sync(self, request, queryset):
