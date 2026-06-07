@@ -86,15 +86,12 @@ The email SHALL include a WhatsApp link as a call-to-action in the footer with t
 - **THEN** the WhatsApp section is omitted from the email
 
 ### Requirement: Email uses company branding from CompanyProfile
-The email SHALL use the company name, logo, brand color, and social media URLs from `CompanyProfile`.
+The email SHALL use the company name, brand color, and social media URLs from `CompanyProfile`. The company logo SHALL NOT be displayed in the email template.
 
-#### Scenario: Company name and logo appear in email header
+#### Scenario: Company name appears in email header
 - **WHEN** a confirmation email is sent
-- **THEN** the email header displays the company name and logo from `CompanyProfile`
-
-#### Scenario: Logo URL is absolute
-- **WHEN** the email template renders the logo image
-- **THEN** the `src` attribute is an absolute URL (not a relative path)
+- **THEN** the email header displays the company name from `CompanyProfile`
+- **AND** the company logo is not included or rendered
 
 #### Scenario: Social links rendered in email footer
 - **WHEN** a confirmation email is sent
