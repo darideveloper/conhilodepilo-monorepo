@@ -77,3 +77,33 @@ class AvailabilityConstraintTest(TestCase):
                     start_time=time(9, 0),
                     end_time=time(10, 0)
                 )
+
+
+class GiftModelMigrationTest(TestCase):
+    def test_new_booking_defaults_to_non_gift(self):
+        booking = Booking.objects.create(
+            client_name="Test Client",
+            client_email="test@example.com",
+            buyer_name="Test Client",
+            buyer_email="test@example.com",
+            start_time=timezone.now(),
+        )
+        self.assertFalse(booking.is_gift)
+        self.assertEqual(booking.buyer_name, "Test Client")
+        self.assertEqual(booking.buyer_email, "test@example.com")
+
+    def test_gift_booking_stores_buyer_and_recipient_correctly(self):
+        booking = Booking.objects.create(
+            client_name="Bob Recipient",
+            client_email="bob@example.com",
+            is_gift=True,
+            buyer_name="Alice Buyer",
+            buyer_email="alice@example.com",
+            recipient_name="Bob Recipient",
+            recipient_email="bob@example.com",
+            start_time=timezone.now(),
+        )
+        self.assertTrue(booking.is_gift)
+        self.assertEqual(booking.client_name, "Bob Recipient")
+        self.assertEqual(booking.buyer_name, "Alice Buyer")
+        self.assertEqual(booking.recipient_name, "Bob Recipient")

@@ -260,6 +260,13 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     stripe_payment_id = models.CharField(_("Stripe payment ID"), max_length=255, null=True, blank=True)
 
+    # Gift fields
+    is_gift = models.BooleanField(_("Is gift"), default=False)
+    buyer_name = models.CharField(_("Buyer name"), max_length=255, null=True, blank=True)
+    buyer_email = models.EmailField(_("Buyer email"), null=True, blank=True)
+    recipient_name = models.CharField(_("Recipient name"), max_length=255, null=True, blank=True)
+    recipient_email = models.EmailField(_("Recipient email"), null=True, blank=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initial_status = self.status

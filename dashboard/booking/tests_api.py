@@ -1,8 +1,8 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
-from datetime import time
-from .models import CompanyProfile, CompanyWeekdaySlot, EventType, Event, CompanyAvailability, EventDateOverride
+from datetime import time, date, timedelta
+from .models import CompanyProfile, CompanyWeekdaySlot, EventType, Event, CompanyAvailability, EventDateOverride, Booking
 
 class ConfigAPITest(APITestCase):
     def setUp(self):
@@ -204,3 +204,153 @@ class BookingAPITest(APITestCase):
         response = self.client.post(self.url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("Missing required fields", response.json()['error'])
+
+
+class GiftBookingApiTest(APITestCase):
+    def setUp(self):
+        self.url = reverse('api-bookings')
+        self.profile = CompanyProfile.get_solo()
+        self.event_type = EventType.objects.create(name="Tours")
+        self.service = Event.objects.create(
+            event_type=self.event_type,
+            name="Tour",
+            price="100.00",
+            duration_minutes=60
+        )
+        self.tomorrow = date.today() + timedelta(days=1)
+        CompanyAvailability.objects.create(
+            company=self.profile,
+            start_date=self.tomorrow,
+            end_date=self.tomorrow + timedelta(days=1)
+        )
+        CompanyWeekdaySlot.objects.create(
+            company=self.profile,
+            weekday=self.tomorrow.weekday(),
+            start_time=time(10, 0),
+            end_time=time(12, 0)
+        )
+
+    def test_gift_booking_creates_with_correct_fields(self):
+        payload = {
+            "services": [{"service_id": self.service.id, "quantity": 1}],
+            "date": self.tomorrow.strftime('%Y-%m-%d'),
+            "startTime": "10:00",
+            "clientName": "Bob Recipient",
+            "clientEmail": "bob@example.com",
+            "clientPhone": "123456789",
+            "isGift": True,
+            "buyerName": "Alice Buyer",
+            "buyerEmail": "alice@example.com",
+            "recipientName": "Bob Recipient",
+            "recipientEmail": "bob@example.com",
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        data = response.json()
+        self.assertTrue(data['is_gift'])
+        self.assertEqual(data['buyer_name'], "Alice Buyer")
+        self.assertEqual(data['buyer_email'], "alice@example.com")
+        self.assertEqual(data['client_name'], "Bob Recipient")
+
+        booking = Booking.objects.get(id=data['booking_id'])
+        self.assertTrue(booking.is_gift)
+        self.assertEqual(booking.buyer_name, "Alice Buyer")
+        self.assertEqual(booking.buyer_email, "alice@example.com")
+        self.assertEqual(booking.client_name, "Bob Recipient")
+        self.assertEqual(booking.client_email, "bob@example.com")
+        self.assertEqual(booking.recipient_name, "Bob Recipient")
+        self.assertEqual(booking.recipient_email, "bob@example.com")
+
+
+class GiftBookingValidationTest(APITestCase):
+    def setUp(self):
+        self.url = reverse('api-bookings')
+        self.profile = CompanyProfile.get_solo()
+        self.event_type = EventType.objects.create(name="Tours")
+        self.service = Event.objects.create(
+            event_type=self.event_type,
+            name="Tour",
+            price="100.00",
+            duration_minutes=60
+        )
+        self.tomorrow = date.today() + timedelta(days=1)
+        CompanyAvailability.objects.create(
+            company=self.profile,
+            start_date=self.tomorrow,
+            end_date=self.tomorrow + timedelta(days=1)
+        )
+        CompanyWeekdaySlot.objects.create(
+            company=self.profile,
+            weekday=self.tomorrow.weekday(),
+            start_time=time(10, 0),
+            end_time=time(12, 0)
+        )
+
+    def test_gift_booking_rejected_without_buyer_name(self):
+        payload = {
+            "services": [{"service_id": self.service.id, "quantity": 1}],
+            "date": self.tomorrow.strftime('%Y-%m-%d'),
+            "startTime": "10:00",
+            "clientName": "Bob",
+            "clientEmail": "bob@example.com",
+            "isGift": True,
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_gift_booking_rejected_without_buyer_email(self):
+        payload = {
+            "services": [{"service_id": self.service.id, "quantity": 1}],
+            "date": self.tomorrow.strftime('%Y-%m-%d'),
+            "startTime": "10:00",
+            "clientName": "Bob",
+            "clientEmail": "bob@example.com",
+            "isGift": True,
+            "buyerName": "Alice",
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class GiftBookingBackwardCompatTest(APITestCase):
+    def setUp(self):
+        self.url = reverse('api-bookings')
+        self.profile = CompanyProfile.get_solo()
+        self.event_type = EventType.objects.create(name="Tours")
+        self.service = Event.objects.create(
+            event_type=self.event_type,
+            name="Tour",
+            price="100.00",
+            duration_minutes=60
+        )
+        self.tomorrow = date.today() + timedelta(days=1)
+        CompanyAvailability.objects.create(
+            company=self.profile,
+            start_date=self.tomorrow,
+            end_date=self.tomorrow + timedelta(days=1)
+        )
+        CompanyWeekdaySlot.objects.create(
+            company=self.profile,
+            weekday=self.tomorrow.weekday(),
+            start_time=time(10, 0),
+            end_time=time(12, 0)
+        )
+
+    def test_booking_without_gift_fields_creates_defaults(self):
+        payload = {
+            "services": [{"service_id": self.service.id, "quantity": 1}],
+            "date": self.tomorrow.strftime('%Y-%m-%d'),
+            "startTime": "10:00",
+            "clientName": "John Doe",
+            "clientEmail": "john@example.com",
+            "clientPhone": "123456789",
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        data = response.json()
+        self.assertFalse(data['is_gift'])
+
+        booking = Booking.objects.get(client_email="john@example.com")
+        self.assertFalse(booking.is_gift)
+        self.assertEqual(booking.buyer_name, "John Doe")
+        self.assertEqual(booking.buyer_email, "john@example.com")

@@ -1,16 +1,16 @@
-from django.test import TestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings
 from unittest.mock import patch, MagicMock
 from decimal import Decimal
 from datetime import date, time, timedelta
 from django.utils import timezone
 from django.urls import reverse
-from django.test import override_settings
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
 from io import StringIO
 from datetime import timedelta
 from django.core.management import call_command
 import stripe
-from .models import CompanyProfile, EventType, Event, Booking
+from .models import CompanyProfile, EventType, Event, Booking, BookingServiceThrough
 
 @override_settings(STRIPE_SECRET_KEY="sk_test_123", STRIPE_WEBHOOK_SECRET="whsec_123", LANDING_URL="http://test-landing.com")
 class CleanupAbandonedBookingsTest(TestCase):
@@ -303,3 +303,59 @@ class StripeIntegrationTest(TestCase):
         booking.refresh_from_db()
         # Should still be PENDING because the webhook short-circuited due to idempotency
         self.assertEqual(booking.status, "PENDING")
+
+
+@override_settings(STRIPE_SECRET_KEY="sk_test_123", STRIPE_WEBHOOK_SECRET="whsec_123",
+                   LANDING_URL="http://test-landing.com",
+                   EMAIL_FROM="test@conhilodepilo.com", EMAILS_NOTIFICATIONS=[])
+class GiftStripeWebhookTest(TransactionTestCase):
+    client_class = APIClient
+
+    def setUp(self):
+        self.event_type = EventType.objects.create(name="Test Type", payment_model="PRE-PAID")
+        self.event = Event.objects.create(
+            event_type=self.event_type,
+            name="Depilación Cejas",
+            price=Decimal("15.00"),
+            duration_minutes=20,
+        )
+
+    @patch("booking.views.send_gift_confirmation_emails")
+    @patch("stripe.Webhook.construct_event")
+    def test_gift_webhook_calls_gift_email_function(self, mock_construct_event, mock_send_gift):
+        booking = Booking.objects.create(
+            client_name="Bob Recipient",
+            client_email="bob@example.com",
+            is_gift=True,
+            buyer_name="Alice Buyer",
+            buyer_email="alice@example.com",
+            status="PENDING",
+            start_time=timezone.make_aware(
+                timezone.datetime(2026, 6, 15, 10, 0)
+            ),
+        )
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.event, quantity=1, unit_price=self.event.price
+        )
+        mock_event = MagicMock()
+        mock_event.id = "evt_test_gift"
+        mock_event.type = "checkout.session.completed"
+        mock_event.data.object.metadata = MagicMock()
+        mock_event.data.object.metadata.booking_id = str(booking.id)
+        mock_event.data.object.payment_intent = "pi_test_gift"
+        mock_event.data.object.id = "cs_test_gift"
+        mock_construct_event.return_value = mock_event
+
+        response = self.client.post(
+            reverse("stripe-webhook"),
+            data="{}",
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        booking.refresh_from_db()
+        self.assertEqual(booking.status, "PAID")
+        mock_send_gift.assert_called_once()
+        called_booking = mock_send_gift.call_args[0][0]
+        self.assertEqual(called_booking.id, booking.id)

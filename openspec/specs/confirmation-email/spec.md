@@ -4,20 +4,64 @@
 TBD - created by archiving change bogo-global-promotion. Update Purpose after archive.
 ## Requirements
 ### Requirement: Send branded HTML confirmation email upon booking confirmation
-The system SHALL send a branded HTML email to the client when a booking is confirmed (post-paid) or marked as paid (pre-paid). The email SHALL use the SMTP configuration from environment variables and branding from CompanyProfile.
+The system SHALL send branded HTML email(s) when a booking is confirmed (post-paid) or marked as paid (pre-paid). For gift bookings, two emails SHALL be sent: one to the buyer and one to the recipient. For non-gift bookings, one email SHALL be sent to the client. The email SHALL use the SMTP configuration from environment variables and branding from CompanyProfile.
 
-#### Scenario: Email sent on post-paid booking creation
-- **WHEN** a booking is created with `status=CONFIRMED` in `CreateBookingView`
-- **THEN** the system sends an HTML email to `booking.client_email`
+#### Scenario: Single email sent on non-gift booking
+- **WHEN** a non-gift booking is created with `status=CONFIRMED` in `CreateBookingView`
+- **THEN** the system sends exactly one HTML email to `booking.client_email`
 
-#### Scenario: Email sent on pre-paid payment completion
-- **WHEN** the Stripe webhook transitions a booking from `PENDING` to `PAID`
-- **THEN** the system sends an HTML email to `booking.client_email`
+#### Scenario: Two emails sent on gift booking creation
+- **WHEN** a gift booking is created with `status=CONFIRMED` in `CreateBookingView`
+- **THEN** the system sends one HTML email to `booking.buyer_email` (buyer confirmation)
+- **AND** one HTML email to `booking.client_email` (recipient notification)
+
+#### Scenario: Two emails sent on gift payment completion
+- **WHEN** the Stripe webhook transitions a gift booking from `PENDING` to `PAID`
+- **THEN** the system sends one HTML email to `booking.buyer_email`
+- **AND** one HTML email to `booking.client_email`
 
 #### Scenario: Email failure does not block booking flow
 - **WHEN** the SMTP server is unreachable during email sending
 - **THEN** the booking is still confirmed and the response is returned normally
 - **AND** the error is logged
+
+### Requirement: Admin notification via BCC
+The system SHALL BCC a copy of BOTH emails to all addresses in `settings.EMAILS_NOTIFICATIONS` whenever client emails are sent.
+
+#### Scenario: Admin BCC on gift booking
+- **WHEN** two emails are sent for a gift booking
+- **THEN** both emails SHALL include BCC to `settings.EMAILS_NOTIFICATIONS`
+
+### Requirement: Buyer email clearly identifies gift purchase
+The buyer's confirmation email SHALL state that the booking was purchased as a gift and SHALL include the recipient's name.
+
+#### Scenario: Buyer email shows gift context
+- **WHEN** a buyer confirmation email is sent for a gift booking
+- **THEN** the subject or body SHALL clearly indicate "Has regalado una cita a [recipient_name]"
+- **AND** the email SHALL include the recipient's name and appointment details
+
+### Requirement: Recipient email clearly identifies gift receipt
+The recipient's notification email SHALL state that they received a gift and SHALL include the buyer's name.
+
+#### Scenario: Recipient email shows gifter context
+- **WHEN** a recipient notification email is sent for a gift booking
+- **THEN** the subject or body SHALL clearly indicate "Has recibido un regalo de [buyer_name]"
+- **AND** the email SHALL include the buyer's name and appointment details
+
+### Requirement: Email content differs by role (buyer vs recipient)
+The email template SHALL accept a `role` parameter (`"buyer"` or `"recipient"`) to render role-specific copy while sharing the same booking details (services, date, time, location).
+
+#### Scenario: Buyer email includes purchase confirmation language
+- **WHEN** rendering the buyer's email
+- **THEN** the greeting SHALL address the buyer
+- **AND** the body SHALL confirm the gift purchase
+- **AND** the WhatsApp CTA SHALL be for the buyer's needs
+
+#### Scenario: Recipient email includes gift surprise language
+- **WHEN** rendering the recipient's email
+- **THEN** the greeting SHALL address the recipient
+- **AND** the body SHALL announce the gift
+- **AND** the WhatsApp CTA SHALL offer rescheduling assistance
 
 ### Requirement: Email contains service details and appointment info
 The email SHALL include client name, service names with quantities, appointment date, start time, end time, and any special requests. Service names SHALL be rendered with quantity (e.g., "Eyebrow Threading ×3") and shown alongside their subtotal (unit price × quantity).
@@ -55,17 +99,6 @@ The email SHALL use the company name, logo, brand color, and social media URLs f
 #### Scenario: Social links rendered in email footer
 - **WHEN** a confirmation email is sent
 - **THEN** the email footer contains links to Instagram, TikTok, and Facebook from `CompanyProfile`
-
-### Requirement: Admin notification via BCC
-The system SHALL BCC a copy of the confirmation email to all emails in `settings.EMAILS_NOTIFICATIONS` whenever a client confirmation email is sent.
-
-#### Scenario: Admin BCC sent alongside client email
-- **WHEN** a confirmation email is sent to `booking.client_email`
-- **THEN** the same email SHALL also be BCC'd to every address in `settings.EMAILS_NOTIFICATIONS`
-
-#### Scenario: No admin BCC when EMAILS_NOTIFICATIONS is empty
-- **WHEN** `settings.EMAILS_NOTIFICATIONS` is empty or contains only empty strings
-- **THEN** no BCC SHALL be added to the email
 
 ### Requirement: Email shows pricing breakdown with discount
 The email SHALL display a price summary section showing the original subtotal, any promotional discount, and the final total. When no discount applies, only the total is shown.

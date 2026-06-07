@@ -8,6 +8,9 @@ export interface BookingPayload {
   date: string;
   startTime: string;
   specialRequests: string;
+  isGift?: boolean;
+  buyerName?: string;
+  buyerEmail?: string;
 }
 
 export async function submitBooking(payload: BookingPayload): Promise<any> {

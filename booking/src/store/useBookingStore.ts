@@ -59,6 +59,9 @@ interface BookingState {
     lockedGroupId: string | null;
     specialRequests: string;
     privacyAccepted: boolean;
+    isGift: boolean;
+    giftTargetName: string;
+    giftTargetEmail: string;
   };
   visibility: {
     lang: boolean;
@@ -175,6 +178,9 @@ export const useBookingStore = create<BookingState>()(
         lockedGroupId: null,
         specialRequests: '',
         privacyAccepted: false,
+        isGift: false,
+        giftTargetName: '',
+        giftTargetEmail: '',
       },
       visibility: {
         lang: true,
@@ -252,6 +258,9 @@ export const useBookingStore = create<BookingState>()(
           lockedGroupId: null,
           specialRequests: '',
           privacyAccepted: false,
+          isGift: false,
+          giftTargetName: '',
+          giftTargetEmail: '',
         },
         visibility: {
           lang: true,

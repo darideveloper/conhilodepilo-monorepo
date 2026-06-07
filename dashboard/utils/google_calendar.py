@@ -80,6 +80,8 @@ def booking_to_event_body(booking):
         description_parts.append(f"Teléfono: {booking.client_phone}")
     if booking.special_requests:
         description_parts.append(f"Solicitudes especiales: {booking.special_requests}")
+    if booking.is_gift:
+        description_parts.append(f"Comprado por: {booking.buyer_name} ({booking.buyer_email})")
     description_parts.append(f"Estado: {booking.get_status_display()}")
 
     local_start = timezone.localtime(booking.start_time)

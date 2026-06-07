@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Confirmación de tu cita</title>
+<title>{% if is_gift and email_role == "buyer" %}Has regalado una cita{% elif is_gift %}Has recibido un regalo{% else %}Confirmación de tu cita{% endif %}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:24px 0;">
@@ -24,8 +24,16 @@
 <!-- Greeting -->
 <tr>
 <td style="padding:32px 24px 8px;">
+{% if is_gift and email_role == "buyer" %}
+<h2 style="margin:0;color:#333333;font-size:20px;">Hola, {{ gift_buyer_name }}</h2>
+<p style="margin:8px 0 0;color:#555555;font-size:16px;">Has regalado una cita a {{ client_name }}. Abajo tienes todos los detalles.</p>
+{% elif is_gift and email_role == "recipient" %}
+<h2 style="margin:0;color:#333333;font-size:20px;">Hola, {{ client_name }}</h2>
+<p style="margin:8px 0 0;color:#555555;font-size:16px;">{{ gift_buyer_name }} te ha regalado una cita. Aquí tienes los detalles:</p>
+{% else %}
 <h2 style="margin:0;color:#333333;font-size:20px;">Hola, {{ client_name }}</h2>
 <p style="margin:8px 0 0;color:#555555;font-size:16px;">Tu cita ha sido confirmada. Aquí tienes los detalles:</p>
+{% endif %}
 </td>
 </tr>
 
@@ -81,6 +89,19 @@
 <tr>
 <td style="padding:0 16px 16px;color:#555555;font-size:14px;">
 <strong>Notas:</strong> {{ special_requests }}
+</td>
+</tr>
+{% endif %}
+{% if is_gift and email_role == "buyer" %}
+<tr>
+<td style="padding:0 16px 16px;color:#555555;font-size:14px;">
+<strong>Destinatario:</strong> {{ recipient_name }} ({{ recipient_email }})
+</td>
+</tr>
+{% elif is_gift and email_role == "recipient" %}
+<tr>
+<td style="padding:0 16px 16px;color:#555555;font-size:14px;">
+<strong>Comprado por:</strong> {{ gift_buyer_name }} ({{ gift_buyer_email }})
 </td>
 </tr>
 {% endif %}

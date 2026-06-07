@@ -9,7 +9,7 @@ from rest_framework import status
 import stripe
 from django.test import TransactionTestCase
 from .models import CompanyProfile, EventType, Event, Booking, BookingServiceThrough, AvailabilitySlot
-from utils.email import _clean_phone, _build_whatsapp_url, _build_logo_url, send_confirmation_email
+from utils.email import _clean_phone, _build_whatsapp_url, _build_logo_url, send_confirmation_email, send_gift_confirmation_emails
 
 
 class CleanPhoneTest(TestCase):
@@ -310,3 +310,90 @@ class EmailSentOnStripeWebhookTest(TransactionTestCase):
         mock_send_email.assert_called_once()
         called_booking = mock_send_email.call_args[0][0]
         self.assertEqual(called_booking.id, booking.id)
+
+
+@override_settings(
+    EMAIL_FROM="test@conhilodepilo.com",
+    EMAILS_NOTIFICATIONS=["admin@conhilodepilo.com", "notifications@conhilodepilo.com"],
+    HOST="https://dashboard.conhilodepilo.localhost",
+)
+class GiftEmailTest(TestCase):
+    def setUp(self):
+        self.event_type = EventType.objects.create(name="Test Type")
+        self.event = Event.objects.create(
+            event_type=self.event_type,
+            name="Depilación Cejas",
+            price=Decimal("15.00"),
+            duration_minutes=20,
+        )
+        self.booking = Booking.objects.create(
+            client_name="Bob Recipient",
+            client_email="bob@example.com",
+            client_phone="+34 666 123 456",
+            is_gift=True,
+            buyer_name="Alice Buyer",
+            buyer_email="alice@example.com",
+            recipient_name="Bob Recipient",
+            recipient_email="bob@example.com",
+            status="CONFIRMED",
+            start_time=timezone.make_aware(
+                timezone.datetime(2026, 6, 10, 10, 0)
+            ),
+        )
+        BookingServiceThrough.objects.create(
+            booking=self.booking, event=self.event, quantity=1, unit_price=self.event.price
+        )
+
+    def test_sends_two_emails(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            self.assertEqual(mock_email_cls.call_count, 2)
+
+    def test_recipient_email_sent_first_with_gift_context(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            first_call = mock_email_cls.call_args_list[0]
+            kwargs = first_call.kwargs
+            self.assertEqual(kwargs["to"], ["bob@example.com"])
+            self.assertIn("Has recibido un regalo de Alice Buyer", kwargs["subject"])
+
+    def test_buyer_email_sent_second_with_gift_context(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            second_call = mock_email_cls.call_args_list[1]
+            kwargs = second_call.kwargs
+            self.assertEqual(kwargs["to"], ["alice@example.com"])
+            self.assertIn("Has regalado una cita a Bob Recipient", kwargs["subject"])
+
+    def test_both_emails_include_bcc_to_admins(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            for call_args in mock_email_cls.call_args_list:
+                kwargs = call_args.kwargs
+                self.assertIn("admin@conhilodepilo.com", kwargs["bcc"])
+                self.assertIn("notifications@conhilodepilo.com", kwargs["bcc"])
+
+    def test_html_alternative_attached_to_both_emails(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            self.assertEqual(mock_instance.attach_alternative.call_count, 2)
+
+    def test_failure_of_one_email_does_not_block_other(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_instance.send.side_effect = [Exception("SMTP error"), None]
+            mock_email_cls.return_value = mock_instance
+            with patch("utils.email.logger") as mock_logger:
+                send_gift_confirmation_emails(self.booking)
+                self.assertEqual(mock_logger.exception.call_count, 1)
+                self.assertEqual(mock_email_cls.call_count, 2)

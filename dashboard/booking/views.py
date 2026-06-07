@@ -14,7 +14,7 @@ from .serializers import CompanyProfileSerializer, BusinessHoursSerializer, Even
 from utils.availability import get_available_dates, get_available_slots
 from utils.stripe_utils import create_checkout_session
 from utils.google_calendar import sync_booking_to_google
-from utils.email import send_confirmation_email
+from utils.email import send_confirmation_email, send_gift_confirmation_emails
 from utils.pricing import calculate_booking_totals
 
 class CreateBookingView(APIView):
@@ -31,9 +31,21 @@ class CreateBookingView(APIView):
         client_email = request.data.get('clientEmail')
         client_phone = request.data.get('clientPhone')
         special_requests = request.data.get('specialRequests', "")
+        is_gift = request.data.get('isGift', False)
+        buyer_name = request.data.get('buyerName')
+        buyer_email = request.data.get('buyerEmail')
+        recipient_name = request.data.get('recipientName')
+        recipient_email = request.data.get('recipientEmail')
 
         if not all([services_input, date_str, start_time_str, client_name, client_email]):
             return Response({"error": "Missing required fields"}, status=400)
+
+        if is_gift:
+            if not all([buyer_name, buyer_email, recipient_name, recipient_email]):
+                return Response({"error": "Gift bookings require buyerName, buyerEmail, recipientName, and recipientEmail"}, status=400)
+        else:
+            buyer_name = client_name
+            buyer_email = client_email
 
         if not isinstance(services_input, list):
             return Response({"error": "services must be a list of {service_id, quantity}"}, status=400)
@@ -108,7 +120,12 @@ class CreateBookingView(APIView):
                     status=status,
                     original_amount=original_amount,
                     discount_amount=discount_amount,
-                    total_amount=total_amount
+                    total_amount=total_amount,
+                    is_gift=is_gift,
+                    buyer_name=buyer_name,
+                    buyer_email=buyer_email,
+                    recipient_name=client_name if is_gift else None,
+                    recipient_email=client_email if is_gift else None,
                 )
 
                 through_rows = []
@@ -124,7 +141,10 @@ class CreateBookingView(APIView):
 
                 if status == "CONFIRMED":
                     transaction.on_commit(lambda: sync_booking_to_google(booking))
-                    transaction.on_commit(lambda b=booking: send_confirmation_email(b))
+                    if is_gift:
+                        transaction.on_commit(lambda b=booking: send_gift_confirmation_emails(b))
+                    else:
+                        transaction.on_commit(lambda b=booking: send_confirmation_email(b))
 
                 response_data = {
                     "message": "Booking created successfully",
@@ -135,8 +155,12 @@ class CreateBookingView(APIView):
                     "payment_required": is_pre_paid,
                     "original_amount": str(original_amount),
                     "discount_amount": str(discount_amount),
-                    "total_amount": str(total_amount)
+                    "total_amount": str(total_amount),
+                    "is_gift": is_gift,
                 }
+                if is_gift:
+                    response_data["buyer_name"] = buyer_name
+                    response_data["buyer_email"] = buyer_email
 
                 if is_pre_paid:
                     if total_amount > 0:
@@ -310,7 +334,10 @@ class StripeWebhookView(APIView):
                         booking.status = 'PAID'
                         booking.stripe_payment_id = session.payment_intent or session.id
                         booking.save(update_fields=['status', 'stripe_payment_id'])
-                        transaction.on_commit(lambda b=booking: send_confirmation_email(b))
+                        if booking.is_gift:
+                            transaction.on_commit(lambda b=booking: send_gift_confirmation_emails(b))
+                        else:
+                            transaction.on_commit(lambda b=booking: send_confirmation_email(b))
                         
                         # Note: Google Calendar sync will be triggered by a signal
                 except Booking.DoesNotExist:

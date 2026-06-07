@@ -69,6 +69,12 @@ export function BookingForm() {
         return
     }
 
+    if (formData.isGift && (!formData.giftTargetName || !formData.giftTargetEmail)) {
+      setError(language === 'es' ? 'Completa los datos del destinatario' : 'Fill in recipient details')
+      setIsSubmitting(false)
+      return
+    }
+
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -76,8 +82,8 @@ export function BookingForm() {
 
     try {
       const response = await submitBooking({
-        clientName: formData.fullName,
-        clientEmail: formData.email,
+        clientName: formData.isGift ? formData.giftTargetName : formData.fullName,
+        clientEmail: formData.isGift ? formData.giftTargetEmail : formData.email,
         clientPhone: formData.phone,
         services: formData.selectedServices.map((s: any) => ({
           service_id: parseInt(s.serviceId),
@@ -86,6 +92,13 @@ export function BookingForm() {
         date: dateStr,
         startTime: selectedTime,
         specialRequests: formData.specialRequests,
+        isGift: formData.isGift || undefined,
+        ...(formData.isGift && {
+          buyerName: formData.fullName,
+          buyerEmail: formData.email,
+          recipientName: formData.giftTargetName,
+          recipientEmail: formData.giftTargetEmail,
+        }),
       })
 
       if (response.payment_required && response.checkout_url) {
@@ -118,14 +131,23 @@ export function BookingForm() {
             <h2 className="text-3xl font-serif font-bold text-foreground">{t.form.successTitle}</h2>
             <p className="text-muted-foreground">{t.form.successMessage}</p>
           </div>
+          {formData.isGift && (
+            <div className="flex items-center gap-2 p-2 bg-amber-50 border border-amber-200 rounded-xl">
+              <span className="text-lg">🎁</span>
+              <p className="text-xs font-medium text-amber-800">{t.form.giftBadge}</p>
+            </div>
+          )}
+
           <div className="w-full p-4 bg-muted rounded-2xl text-left space-y-3 border border-border">
             <div className="flex items-center gap-3 text-sm">
               <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center border border-border">
                 <User className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">{t.form.fullName}</p>
-                <p className="font-medium">{formData.fullName}</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+                  {formData.isGift ? t.form.recipientLabel : t.form.fullName}
+                </p>
+                <p className="font-medium">{formData.isGift ? formData.giftTargetName : formData.fullName}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 text-sm">
@@ -273,6 +295,60 @@ export function BookingForm() {
                 <Phone className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
               </div>
             </div>
+
+            <div className="flex items-center space-x-3 p-4 bg-muted/20 rounded-2xl border border-border/50 transition-colors hover:bg-muted/30">
+              <Checkbox
+                id="isGift"
+                checked={formData.isGift}
+                onCheckedChange={(checked) => {
+                  updateFormData({ isGift: !!checked })
+                  if (!checked) {
+                    updateFormData({ giftTargetName: '', giftTargetEmail: '' })
+                  }
+                }}
+              />
+              <label htmlFor="isGift" className="text-xs font-medium leading-normal text-muted-foreground cursor-pointer">
+                {t.form.isGift}
+              </label>
+            </div>
+
+            {formData.isGift && (
+              <>
+                <div className="space-y-2 group">
+                  <Label htmlFor="giftTargetName" className="text-xs font-bold uppercase tracking-wider text-muted-foreground group-focus-within:text-primary transition-colors">
+                    {t.form.giftTargetName}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="giftTargetName"
+                      placeholder={t.form.giftTargetNamePlaceholder}
+                      value={formData.giftTargetName}
+                      onChange={(e) => updateFormData({ giftTargetName: e.target.value })}
+                      className="rounded-xl border-border bg-muted/30 focus:bg-background transition-all h-11 pl-10"
+                      required={formData.isGift}
+                    />
+                    <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  </div>
+                </div>
+                <div className="space-y-2 group">
+                  <Label htmlFor="giftTargetEmail" className="text-xs font-bold uppercase tracking-wider text-muted-foreground group-focus-within:text-primary transition-colors">
+                    {t.form.giftTargetEmail}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="giftTargetEmail"
+                      type="email"
+                      placeholder={t.form.giftTargetEmailPlaceholder}
+                      value={formData.giftTargetEmail}
+                      onChange={(e) => updateFormData({ giftTargetEmail: e.target.value })}
+                      className="rounded-xl border-border bg-muted/30 focus:bg-background transition-all h-11 pl-10"
+                      required={formData.isGift}
+                    />
+                    <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

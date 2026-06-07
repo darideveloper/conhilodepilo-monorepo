@@ -285,14 +285,14 @@ class BookingServiceThroughInline(BaseTabularInline):
 class BookingAdmin(ModelAdminUnfoldBase):
     list_display = ("get_client_name", "get_status", "get_services", "get_price", "get_created_at", "get_start_time")
     list_filter = ("status", "start_time")
-    search_fields = ("client_name", "client_email")
+    search_fields = ("client_name", "client_email", "buyer_name", "buyer_email", "recipient_name", "recipient_email")
     inlines = [BookingServiceThroughInline]
-    readonly_fields = ("end_time", "google_event_id", "google_sync_status", "google_sync_error", "last_synced_at", "original_amount", "discount_amount", "total_amount")
+    readonly_fields = ("end_time", "google_event_id", "google_sync_status", "google_sync_error", "last_synced_at", "original_amount", "discount_amount", "total_amount", "is_gift", "buyer_name", "buyer_email", "recipient_name", "recipient_email")
     actions = ["retry_google_calendar_sync", "reconcile_selected_bookings_with_google"]
 
     fieldsets = (
         (_("Client Information"), {
-            "fields": ("client_name", "client_email", "client_phone", "special_requests")
+            "fields": ("client_name", "client_email", "client_phone", "special_requests", "is_gift", "buyer_name", "buyer_email", "recipient_name", "recipient_email")
         }),
         (_("Scheduling"), {
             "fields": ("start_time", "end_time", "status")
@@ -320,7 +320,8 @@ class BookingAdmin(ModelAdminUnfoldBase):
 
     @admin.display(description=_("Cliente"))
     def get_client_name(self, obj):
-        return obj.client_name
+        badge = ' <span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;margin-left:8px;white-space:nowrap;">🎁 Regalo</span>' if obj.is_gift else ''
+        return format_html(f"{obj.client_name}{badge}")
 
     @admin.display(description=_("Estado"))
     def get_status(self, obj):
