@@ -42,7 +42,7 @@ msgstr "Estado"
 
 #: booking/admin.py:94
 msgid "Qty"
-msgstr ""
+msgstr "Cant."
 
 #: booking/admin.py:103
 msgid "Manage"
@@ -115,11 +115,9 @@ msgstr "Información del Cliente"
 msgid "Scheduling"
 msgstr "Programación"
 
-#: booking/admin.py:300
-#, fuzzy
-#| msgid "Price"
+#: booking/admin.py:297
 msgid "Pricing"
-msgstr "Precio"
+msgstr "Precios y pagos"
 
 #: booking/admin.py:303 booking/admin.py:314
 msgid "Integrations"
@@ -332,19 +330,19 @@ msgstr "URL de política de privacidad"
 
 #: booking/models.py:102
 msgid "Terms and conditions URL"
-msgstr ""
+msgstr "URL de términos y condiciones"
 
 #: booking/models.py:103
 msgid "Instagram URL"
-msgstr ""
+msgstr "URL de Instagram"
 
 #: booking/models.py:104
 msgid "TikTok URL"
-msgstr ""
+msgstr "URL de TikTok"
 
 #: booking/models.py:105
 msgid "Facebook URL"
-msgstr ""
+msgstr "URL de Facebook"
 
 #: booking/models.py:106
 msgid "Booking cooldown (minutes)"
@@ -473,23 +471,19 @@ msgstr "Excepción de Fecha de Servicio"
 
 #: booking/models.py:217
 msgid "Quantity"
-msgstr ""
+msgstr "Cantidad"
 
 #: booking/models.py:218
 msgid "Unit price"
-msgstr ""
+msgstr "Precio unitario"
 
 #: booking/models.py:221
-#, fuzzy
-#| msgid "Booking"
 msgid "Booking Service"
-msgstr "Reserva"
+msgstr "Servicio de reserva"
 
 #: booking/models.py:222
-#, fuzzy
-#| msgid "Services"
 msgid "Booking Services"
-msgstr "Servicios"
+msgstr "Servicios de reserva"
 
 #: booking/models.py:231 booking/models.py:248
 msgid "Pending"
@@ -525,47 +519,43 @@ msgstr "Peticiones especiales"
 
 #: booking/models.py:244
 msgid "Original amount"
-msgstr ""
+msgstr "Importe original"
 
 #: booking/models.py:245
 msgid "Discount amount"
-msgstr ""
+msgstr "Descuento"
 
 #: booking/models.py:246
 msgid "Total amount"
-msgstr ""
+msgstr "Importe total"
 
 #: booking/models.py:249
 msgid "Success"
-msgstr ""
+msgstr "Éxito"
 
 #: booking/models.py:250
 msgid "Failure"
-msgstr ""
+msgstr "Error"
 
 #: booking/models.py:251
 msgid "Disabled"
-msgstr ""
+msgstr "Desactivado"
 
 #: booking/models.py:253
 msgid "Google event ID"
 msgstr "ID de evento de Google"
 
 #: booking/models.py:255
-#, fuzzy
-#| msgid "Google Sync"
 msgid "Google sync status"
-msgstr "Sincronización con Google"
+msgstr "Estado de sincronización con Google"
 
 #: booking/models.py:257
-#, fuzzy
-#| msgid "Google Sync"
 msgid "Google sync error"
-msgstr "Sincronización con Google"
+msgstr "Error de sincronización con Google"
 
 #: booking/models.py:258
 msgid "Last synced at"
-msgstr ""
+msgstr "Última sincronización"
 
 #: booking/models.py:261
 msgid "Stripe payment ID"
@@ -573,33 +563,27 @@ msgstr "ID de pago de Stripe"
 
 #: booking/models.py:264
 msgid "Is gift"
-msgstr ""
+msgstr "Es un regalo"
 
 #: booking/models.py:265
 msgid "Buyer name"
-msgstr ""
+msgstr "Nombre del comprador"
 
 #: booking/models.py:266
-#, fuzzy
-#| msgid "Client email"
 msgid "Buyer email"
-msgstr "Correo del cliente"
+msgstr "Correo del comprador"
 
 #: booking/models.py:267
-#, fuzzy
-#| msgid "Client name"
 msgid "Recipient name"
-msgstr "Nombre del cliente"
+msgstr "Nombre del destinatario"
 
 #: booking/models.py:268
-#, fuzzy
-#| msgid "Client email"
 msgid "Recipient email"
-msgstr "Correo del cliente"
+msgstr "Correo del destinatario"
 
 #: project/admin.py:34
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: project/settings.py:150
 msgid "Spanish"
