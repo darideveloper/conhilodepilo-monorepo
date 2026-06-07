@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -148,6 +149,8 @@ class Event(models.Model):
     price = models.DecimalField(_("Price"), max_digits=10, decimal_places=2)
     duration_minutes = models.PositiveIntegerField(_("Duration (minutes)"))
     image = models.ImageField(_("Image"), upload_to="events/", null=True, blank=True)
+    buy_x = models.PositiveIntegerField(_("Buy X"), default=0, help_text=_("Buy X items to trigger promotion. Set to 0 to disable."))
+    get_y_free = models.PositiveIntegerField(_("Get Y Free"), default=0, help_text=_("Free items per threshold. Set to 0 to disable."))
 
     def __str__(self):
         return self.name
@@ -206,6 +209,21 @@ class EventDateOverride(BaseDateOverride):
 
 # --- Booking ---
 
+class BookingServiceThrough(models.Model):
+    booking = models.ForeignKey('Booking', on_delete=models.CASCADE, related_name="booking_services", verbose_name=_("Booking"))
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="booking_services", verbose_name=_("Service"))
+    quantity = models.PositiveIntegerField(_("Quantity"), default=1)
+    unit_price = models.DecimalField(_("Unit price"), max_digits=10, decimal_places=2)
+
+    class Meta:
+        verbose_name = _("Booking Service")
+        verbose_name_plural = _("Booking Services")
+        unique_together = ("booking", "event")
+
+    def __str__(self):
+        return f"{self.booking} - {self.event}"
+
+
 class Booking(models.Model):
     STATUS_CHOICES = [
         ("PENDING", _("Pending")),
@@ -213,7 +231,7 @@ class Booking(models.Model):
         ("PAID", _("Paid")),
         ("CANCELLED", _("Cancelled")),
     ]
-    services = models.ManyToManyField(Event, related_name="bookings", verbose_name=_("Services"))
+    services = models.ManyToManyField(Event, related_name="bookings", verbose_name=_("Services"), through=BookingServiceThrough)
     start_time = models.DateTimeField(_("Start time"), db_index=True)
     end_time = models.DateTimeField(_("End time"), db_index=True, null=True, blank=True)
     client_name = models.CharField(_("Client name"), max_length=255)
@@ -221,6 +239,9 @@ class Booking(models.Model):
     client_phone = models.CharField(_("Client phone"), max_length=20, null=True, blank=True)
     status = models.CharField(_("Status"), max_length=20, choices=STATUS_CHOICES, default="PENDING", db_index=True)
     special_requests = models.TextField(_("Special requests"), null=True, blank=True)
+    original_amount = models.DecimalField(_("Original amount"), max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    discount_amount = models.DecimalField(_("Discount amount"), max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    total_amount = models.DecimalField(_("Total amount"), max_digits=10, decimal_places=2, default=Decimal('0.00'))
     GOOGLE_SYNC_CHOICES = [
         ("PENDING", _("Pending")),
         ("SUCCESS", _("Success")),
@@ -259,8 +280,8 @@ class Booking(models.Model):
     def calculate_end_time(self):
         if not self.start_time:
             return None
-        
-        total_duration = sum(event.duration_minutes for event in self.services.all())
+
+        total_duration = sum(bs.quantity * bs.event.duration_minutes for bs in self.booking_services.all())
         from datetime import timedelta
         return self.start_time + timedelta(minutes=total_duration)
 

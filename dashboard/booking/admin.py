@@ -19,6 +19,7 @@ from .models import (
     AvailabilitySlot,
     EventDateOverride,
     Booking,
+    BookingServiceThrough,
 )
 
 class BaseTabularInline(TabularInline):
@@ -66,30 +67,34 @@ class EventDateOverrideInline(BaseTabularInline):
     model = EventDateOverride
 
 class BookingInline(BaseTabularInline):
-    model = Booking.services.through
+    model = BookingServiceThrough
     verbose_name = _("Booking")
     verbose_name_plural = _("Bookings")
-    fields = ("client_name", "start_time", "status", "manage_booking")
-    readonly_fields = fields
+    fields = ("client_name", "start_time", "status", "quantity", "manage_booking")
+    readonly_fields = ("client_name", "start_time", "status", "quantity", "manage_booking")
     can_delete = False
 
     def has_add_permission(self, request, obj=None):
         return False
 
     def client_name(self, obj):
-        return obj.booking.client_name
+        return obj.booking.client_name if obj and obj.booking else ""
     client_name.short_description = _("Client")
 
     def start_time(self, obj):
-        return obj.booking.start_time
+        return obj.booking.start_time if obj and obj.booking else ""
     start_time.short_description = _("Date/Time")
 
     def status(self, obj):
-        return obj.booking.get_status_display()
+        return obj.booking.get_status_display() if obj and obj.booking else ""
     status.short_description = _("Status")
 
+    def quantity(self, obj):
+        return obj.quantity if obj else ""
+    quantity.short_description = _("Qty")
+
     def manage_booking(self, obj):
-        if not obj.pk:
+        if not obj or not obj.pk:
             return ""
         url = reverse("admin:booking_booking_change", args=[obj.booking.pk])
         return format_html(
@@ -214,6 +219,8 @@ class EventAdmin(ModelAdminUnfoldBase):
                 "description",
                 "price",
                 "duration_minutes",
+                "buy_x",
+                "get_y_free",
                 "image",
             )
         }),
@@ -255,13 +262,28 @@ class EventDateOverrideAdmin(ModelAdminUnfoldBase):
     list_display = ("event", "date", "is_available", "start_time", "end_time")
     list_filter = ("event",)
 
+class BookingServiceThroughInline(BaseTabularInline):
+    model = BookingServiceThrough
+    extra = 0
+    fields = ("event", "quantity", "unit_price")
+    readonly_fields = ("unit_price",)
+    can_delete = True
+
+    def event(self, obj):
+        return obj.event.name if obj and obj.event else ""
+    event.short_description = _("Service")
+
+    def has_add_permission(self, request, obj=None):
+        return True
+
+
 @admin.register(Booking)
 class BookingAdmin(ModelAdminUnfoldBase):
     list_display = ("get_client_name", "get_status", "get_services", "get_price", "get_created_at", "get_start_time")
     list_filter = ("status", "start_time")
     search_fields = ("client_name", "client_email")
-    filter_horizontal = ("services",)
-    readonly_fields = ("end_time", "google_event_id", "google_sync_status", "google_sync_error", "last_synced_at")
+    inlines = [BookingServiceThroughInline]
+    readonly_fields = ("end_time", "google_event_id", "google_sync_status", "google_sync_error", "last_synced_at", "original_amount", "discount_amount", "total_amount")
     actions = ["retry_google_calendar_sync", "reconcile_selected_bookings_with_google"]
 
     fieldsets = (
@@ -271,8 +293,8 @@ class BookingAdmin(ModelAdminUnfoldBase):
         (_("Scheduling"), {
             "fields": ("start_time", "end_time", "status")
         }),
-        (_("Services"), {
-            "fields": ("services",)
+        (_("Pricing"), {
+            "fields": ("original_amount", "discount_amount", "total_amount")
         }),
         (_("Integrations"), {
             "fields": ("stripe_payment_id",),
@@ -290,7 +312,7 @@ class BookingAdmin(ModelAdminUnfoldBase):
     ]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).prefetch_related("services")
+        return super().get_queryset(request).prefetch_related("booking_services", "booking_services__event")
 
     @admin.display(description=_("Cliente"))
     def get_client_name(self, obj):
@@ -302,12 +324,15 @@ class BookingAdmin(ModelAdminUnfoldBase):
 
     @admin.display(description=_("Servicios"))
     def get_services(self, obj):
-        return ", ".join(obj.services.all().values_list("name", flat=True))
+        return ", ".join(f"{bs.event.name} ×{bs.quantity}" for bs in obj.booking_services.all())
 
     @admin.display(description=_("Precio"))
     def get_price(self, obj):
-        total = sum(service.price for service in obj.services.all())
-        return f"{total:.2f}"
+        if obj.total_amount > 0:
+            if obj.discount_amount > 0:
+                return f"{obj.total_amount} (-{obj.discount_amount})"
+            return f"{obj.total_amount}"
+        return "0.00"
 
     @admin.display(description=_("Fecha de compra"))
     def get_created_at(self, obj):

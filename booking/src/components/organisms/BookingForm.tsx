@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { useBookingStore } from "../../store/useBookingStore"
 import { useTranslation } from "@/lib/i18n/useTranslation"
 import { Button } from "@/components/atoms/ui/button"
@@ -7,7 +7,7 @@ import { Label } from "@/components/atoms/ui/label"
 import { Textarea } from "@/components/atoms/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/atoms/ui/card"
 import { BookingHeader } from "@/components/molecules/BookingHeader"
-import { Send, Calendar, MapPin, CheckCircle2, AlertCircle, Phone, User, Mail, Clock } from "lucide-react"
+import { Send, Calendar, MapPin, CheckCircle2, AlertCircle, Phone, User, Mail, Clock, Tag } from "lucide-react"
 
 import { Checkbox } from "@/components/atoms/ui/checkbox"
 import { submitBooking } from "@/lib/api/endpoints/booking"
@@ -31,12 +31,36 @@ export function BookingForm() {
     .flatMap((category: any) => category.services)
     .filter((s: any) => formData.selectedServices.some((ss: any) => ss.serviceId === s.id))
 
+  const priceSummary = useMemo(() => {
+    let original = 0;
+    let discount = 0;
+    formData.selectedServices.forEach((item: any) => {
+      const service = servicesData
+        .flatMap((cat: any) => cat.services)
+        .find((s: any) => s.id === item.serviceId);
+      if (!service) return;
+      const price = parseFloat(service.price) || 0;
+      const qty = item.quantity || 1;
+      original += price * qty;
+
+      if (service.buy_x > 0 && service.get_y_free > 0 && qty > service.buy_x) {
+        const freeCount = Math.min(Math.floor(qty / service.buy_x) * service.get_y_free, qty);
+        discount += price * freeCount;
+      }
+    });
+    const total = original - discount;
+    return { original, discount, total };
+  }, [formData.selectedServices, servicesData]);
+
+  const getServiceTitle = (service: any) => {
+    return typeof service.title === 'string' ? service.title : (service.title[language] || service.title.es);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
-    
+
     if (!selectedDate || !selectedTime) {
         setError(language === 'es' ? 'Falta fecha u hora' : 'Missing date or time')
         setIsSubmitting(false)
@@ -53,7 +77,10 @@ export function BookingForm() {
         clientName: formData.fullName,
         clientEmail: formData.email,
         clientPhone: formData.phone,
-        service_ids: formData.selectedServices.map((s: any) => parseInt(s.serviceId)),
+        services: formData.selectedServices.map((s: any) => ({
+          service_id: parseInt(s.serviceId),
+          quantity: s.quantity || 1
+        })),
         date: dateStr,
         startTime: selectedTime,
         specialRequests: formData.specialRequests,
@@ -115,18 +142,35 @@ export function BookingForm() {
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">{t.calendar.tourLabel}</p>
                 <div className="space-y-1">
-                  {selectedTours.length > 0 ? (
-                    selectedTours.map((tour: any) => (
-                      <p key={tour.id} className="font-medium leading-tight text-sm">
-                        • {typeof tour.title === 'string' ? tour.title : (tour.title[language] || tour.title.es)}
-                      </p>
-                    ))
+                  {formData.selectedServices.length > 0 ? (
+                    formData.selectedServices.map((item: any) => {
+                      const service = servicesData
+                        .flatMap((cat: any) => cat.services)
+                        .find((s: any) => s.id === item.serviceId);
+                      return (
+                        <p key={item.serviceId} className="font-medium leading-tight text-sm">
+                          • {service ? getServiceTitle(service) : item.serviceId}
+                          {item.quantity > 1 && ` ×${item.quantity}`}
+                        </p>
+                      );
+                    })
                   ) : (
                     <p className="font-medium">{config?.event_label || t.calendar.tourLabel}</p>
                   )}
                 </div>
               </div>
             </div>
+            {priceSummary.discount > 0 && (
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center border border-border">
+                  <Tag className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Total</p>
+                  <p className="font-medium text-green-600">€{priceSummary.total.toFixed(2)} (-€{priceSummary.discount.toFixed(2)} discount)</p>
+                </div>
+              </div>
+            )}
           </div>
           <Button 
             variant="outline" 
@@ -299,6 +343,28 @@ export function BookingForm() {
               {t.form.requiredFields}
             </p>
           </div>
+
+          {priceSummary.original > 0 && (
+            <div className="p-4 bg-muted/30 rounded-2xl border border-border/50 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-medium">€{priceSummary.original.toFixed(2)}</span>
+              </div>
+              {priceSummary.discount > 0 && (
+                <div className="flex items-center justify-between text-sm text-green-600">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
+                    Discount
+                  </span>
+                  <span className="font-medium">-€{priceSummary.discount.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-base font-bold border-t border-border pt-2 mt-2">
+                <span>Total</span>
+                <span>€{priceSummary.total.toFixed(2)}</span>
+              </div>
+            </div>
+          )}
 
           <Button 
             type="submit" 

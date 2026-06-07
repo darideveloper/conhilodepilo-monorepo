@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import transaction
 from django.db.utils import IntegrityError
 from rest_framework.views import APIView
@@ -8,12 +9,13 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import datetime, time
 import stripe
-from .models import CompanyProfile, CompanyWeekdaySlot, EventType, Event, Booking, ProcessedStripeEvent
+from .models import CompanyProfile, CompanyWeekdaySlot, EventType, Event, Booking, BookingServiceThrough, ProcessedStripeEvent
 from .serializers import CompanyProfileSerializer, BusinessHoursSerializer, EventTypeSerializer
 from utils.availability import get_available_dates, get_available_slots
 from utils.stripe_utils import create_checkout_session
 from utils.google_calendar import sync_booking_to_google
 from utils.email import send_confirmation_email
+from utils.pricing import calculate_booking_totals
 
 class CreateBookingView(APIView):
     """
@@ -22,7 +24,7 @@ class CreateBookingView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        service_ids = request.data.get('service_ids')
+        services_input = request.data.get('services')
         date_str = request.data.get('date')
         start_time_str = request.data.get('startTime')
         client_name = request.data.get('clientName')
@@ -30,33 +32,63 @@ class CreateBookingView(APIView):
         client_phone = request.data.get('clientPhone')
         special_requests = request.data.get('specialRequests', "")
 
-        if not all([service_ids, date_str, start_time_str, client_name, client_email]):
+        if not all([services_input, date_str, start_time_str, client_name, client_email]):
             return Response({"error": "Missing required fields"}, status=400)
 
+        if not isinstance(services_input, list):
+            return Response({"error": "services must be a list of {service_id, quantity}"}, status=400)
+
+        parsed_services = []
+        for s in services_input:
+            if not isinstance(s, dict):
+                return Response({"error": "Each service must be an object with service_id and quantity"}, status=400)
+            service_id = s.get('service_id')
+            quantity = s.get('quantity', 1)
+            if not service_id:
+                return Response({"error": "service_id is required for each service"}, status=400)
+            try:
+                sid = int(service_id)
+                qty = int(quantity)
+                if qty < 1:
+                    return Response({"error": "quantity must be at least 1"}, status=400)
+                parsed_services.append((sid, qty))
+            except (ValueError, TypeError):
+                return Response({"error": "Invalid service_id or quantity format"}, status=400)
+
         try:
-            ids = [int(sid) for sid in service_ids]
             target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
             start_time = datetime.strptime(start_time_str, '%H:%M').time()
         except (ValueError, TypeError):
-            return Response({"error": "Invalid format for service_ids, date, or startTime"}, status=400)
+            return Response({"error": "Invalid format for date or startTime"}, status=400)
 
-        # 1. Validate services exist
-        services = list(Event.objects.filter(id__in=ids))
-        if len(services) != len(ids):
+        service_ids = [s[0] for s in parsed_services]
+        quantities = {s[0]: s[1] for s in parsed_services}
+
+        events = {e.id: e for e in Event.objects.filter(id__in=service_ids)}
+        if len(events) != len(service_ids):
             return Response({"error": "One or more services not found"}, status=400)
 
-        # 2. Check availability
-        available_slots = get_available_slots(target_date, ids)
+        for sid in service_ids:
+            if sid not in events:
+                return Response({"error": f"Service {sid} not found"}, status=400)
+
+        available_slots = get_available_slots(target_date, service_ids, quantities)
         if start_time_str not in available_slots:
             return Response({"error": "Selected time slot is no longer available"}, status=400)
 
-        # 3. Create Booking
         start_dt = timezone.make_aware(datetime.combine(target_date, start_time))
-        total_duration = sum(s.duration_minutes for s in services)
+
+        booking_services_for_pricing = []
+        total_duration = 0
+        for sid, qty in parsed_services:
+            event = events[sid]
+            booking_services_for_pricing.append((event, qty, event.price))
+            total_duration += event.duration_minutes * qty
+
+        original_amount, discount_amount, total_amount, _ = calculate_booking_totals(booking_services_for_pricing)
         end_dt = start_dt + timezone.timedelta(minutes=total_duration)
 
-        # Check if any service requires pre-payment
-        is_pre_paid = any(s.event_type.payment_model == "PRE-PAID" for s in services)
+        is_pre_paid = any(events[sid].event_type.payment_model == "PRE-PAID" for sid in service_ids)
         status = "PENDING" if is_pre_paid else "CONFIRMED"
 
         try:
@@ -68,32 +100,49 @@ class CreateBookingView(APIView):
                     client_email=client_email,
                     client_phone=client_phone,
                     special_requests=special_requests,
-                    status=status
+                    status=status,
+                    original_amount=original_amount,
+                    discount_amount=discount_amount,
+                    total_amount=total_amount
                 )
-                booking.services.set(services)
+
+                through_rows = []
+                for sid, qty in parsed_services:
+                    event = events[sid]
+                    through_rows.append(BookingServiceThrough(
+                        booking=booking,
+                        event=event,
+                        quantity=qty,
+                        unit_price=event.price
+                    ))
+                BookingServiceThrough.objects.bulk_create(through_rows)
 
                 if status == "CONFIRMED":
                     transaction.on_commit(lambda: sync_booking_to_google(booking))
                     transaction.on_commit(lambda b=booking: send_confirmation_email(b))
-                
+
                 response_data = {
                     "message": "Booking created successfully",
                     "booking_id": booking.id,
                     "client_name": booking.client_name,
                     "client_email": booking.client_email,
                     "start_time": booking.start_time.isoformat(),
-                    "payment_required": is_pre_paid
+                    "payment_required": is_pre_paid,
+                    "original_amount": str(original_amount),
+                    "discount_amount": str(discount_amount),
+                    "total_amount": str(total_amount)
                 }
 
                 if is_pre_paid:
-                    total_amount = sum(s.price for s in services)
-                    company = CompanyProfile.get_solo()
-                    try:
-                        session = create_checkout_session(booking, total_amount, company.currency)
-                        response_data["checkout_url"] = session.url
-                    except stripe.StripeError:
-                        # Rollback is automatic due to transaction.atomic()
-                        raise Exception("Stripe session creation failed")
+                    if total_amount > 0:
+                        company = CompanyProfile.get_solo()
+                        try:
+                            session = create_checkout_session(booking, total_amount, company.currency)
+                            response_data["checkout_url"] = session.url
+                        except stripe.StripeError:
+                            raise Exception("Stripe session creation failed")
+                    else:
+                        response_data["payment_required"] = False
 
         except Exception as e:
             if "Stripe" in str(e):
@@ -151,14 +200,28 @@ class AvailabilityView(APIView):
         service_ids = request.query_params.get('service_ids')
         if not service_ids:
             return Response({"error": "service_ids is required"}, status=400)
-            
+
         try:
             ids = [int(sid) for sid in service_ids.split(',')]
         except ValueError:
             return Response({"error": "Invalid service_ids format"}, status=400)
-            
-        available_dates = get_available_dates(ids)
+
+        quantities_param = request.query_params.get('quantities')
+        quantities = None
+        if quantities_param:
+            try:
+                q_list = [int(q) for q in quantities_param.split(',')]
+                if len(q_list) != len(ids):
+                    return Response({"error": "quantities length must match service_ids length"}, status=400)
+                if any(q < 1 for q in q_list):
+                    return Response({"error": "quantities must be positive integers"}, status=400)
+                quantities = dict(zip(ids, q_list))
+            except ValueError:
+                return Response({"error": "Invalid quantities format"}, status=400)
+
+        available_dates = get_available_dates(ids, quantities=quantities)
         return Response(available_dates)
+
 
 class AvailabilitySlotsView(APIView):
     """
@@ -169,17 +232,30 @@ class AvailabilitySlotsView(APIView):
     def get(self, request, *args, **kwargs):
         service_ids = request.query_params.get('service_ids')
         date_str = request.query_params.get('date')
-        
+
         if not service_ids or not date_str:
             return Response({"error": "service_ids and date are required"}, status=400)
-            
+
         try:
             ids = [int(sid) for sid in service_ids.split(',')]
             target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
         except (ValueError, TypeError):
             return Response({"error": "Invalid service_ids or date format (YYYY-MM-DD)"}, status=400)
-            
-        slots = get_available_slots(target_date, ids)
+
+        quantities_param = request.query_params.get('quantities')
+        quantities = None
+        if quantities_param:
+            try:
+                q_list = [int(q) for q in quantities_param.split(',')]
+                if len(q_list) != len(ids):
+                    return Response({"error": "quantities length must match service_ids length"}, status=400)
+                if any(q < 1 for q in q_list):
+                    return Response({"error": "quantities must be positive integers"}, status=400)
+                quantities = dict(zip(ids, q_list))
+            except ValueError:
+                return Response({"error": "Invalid quantities format"}, status=400)
+
+        slots = get_available_slots(target_date, ids, quantities)
         return Response(slots)
 
 from django.utils.decorators import method_decorator

@@ -7,7 +7,8 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 import stripe
-from .models import CompanyProfile, EventType, Event, Booking
+from django.test import TransactionTestCase
+from .models import CompanyProfile, EventType, Event, Booking, BookingServiceThrough, AvailabilitySlot
 from utils.email import _clean_phone, _build_whatsapp_url, _build_logo_url, send_confirmation_email
 
 
@@ -41,21 +42,21 @@ class BuildWhatsAppUrlTest(TestCase):
 
 
 class BuildLogoUrlTest(TestCase):
-    @override_settings(HOST="https://dashboard.conhilodepilo.localhost")
+    @override_settings(HOST="https://dashboard.conhilodepilo.com")
     def test_returns_absolute_url_when_logo_exists(self):
         company = MagicMock(spec=CompanyProfile)
         company.logo.url = "/media/branding/logo.png"
         company.logo.__bool__ = lambda self: True
         url = _build_logo_url(company)
-        self.assertEqual(url, "https://dashboard.conhilodepilo.localhost/media/branding/logo.png")
+        self.assertEqual(url, "https://dashboard.conhilodepilo.com/media/branding/logo.png")
 
-    @override_settings(HOST="https://dashboard.conhilodepilo.localhost/")
+    @override_settings(HOST="https://dashboard.conhilodepilo.com/")
     def test_strips_trailing_slash_from_host(self):
         company = MagicMock(spec=CompanyProfile)
         company.logo.url = "/media/branding/logo.png"
         company.logo.__bool__ = lambda self: True
         url = _build_logo_url(company)
-        self.assertEqual(url, "https://dashboard.conhilodepilo.localhost/media/branding/logo.png")
+        self.assertEqual(url, "https://dashboard.conhilodepilo.com/media/branding/logo.png")
 
     def test_returns_none_when_no_logo(self):
         company = MagicMock(spec=CompanyProfile)
@@ -95,7 +96,9 @@ class SendConfirmationEmailTest(TestCase):
                 timezone.datetime(2026, 6, 10, 10, 0)
             ),
         )
-        self.booking.services.add(self.event)
+        BookingServiceThrough.objects.create(
+            booking=self.booking, event=self.event, quantity=1, unit_price=self.event.price
+        )
 
     def test_sends_email_to_client_with_bcc_to_admins(self):
         with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
@@ -140,7 +143,7 @@ class SendConfirmationEmailTest(TestCase):
 
             mock_instance.attach_alternative.assert_called_once()
             args, kwargs = mock_instance.attach_alternative.call_args
-            self.assertEqual(kwargs.get("mimetype"), "text/html")
+            self.assertEqual(args[1], "text/html")
             self.assertIn("Hola, Cliente Test", args[0])
 
     @override_settings(EMAILS_NOTIFICATIONS=["", "admin@test.com", "  "])
@@ -175,7 +178,8 @@ class SendConfirmationEmailTest(TestCase):
     EMAILS_NOTIFICATIONS=[],
     HOST="https://dashboard.conhilodepilo.localhost",
 )
-class EmailSentOnCreateBookingViewTest(APITestCase):
+class EmailSentOnCreateBookingViewTest(TransactionTestCase):
+    client_class = APIClient
     def setUp(self):
         CompanyProfile.get_solo()
         self.event_type = EventType.objects.create(
@@ -187,13 +191,17 @@ class EmailSentOnCreateBookingViewTest(APITestCase):
             price=Decimal("15.00"),
             duration_minutes=20,
         )
+        AvailabilitySlot.objects.create(
+            event=self.event, weekday=0,
+            start_time="09:00", end_time="18:00"
+        )
 
-    @patch("utils.email.send_confirmation_email")
+    @patch("booking.views.send_confirmation_email")
     def test_email_sent_when_booking_created_as_confirmed(self, mock_send_email):
         response = self.client.post(
             reverse("api-bookings"),
             {
-                "service_ids": [self.event.id],
+                "services": [{"service_id": self.event.id, "quantity": 1}],
                 "date": "2026-06-15",
                 "startTime": "10:00",
                 "clientName": "Test Client",
@@ -207,12 +215,15 @@ class EmailSentOnCreateBookingViewTest(APITestCase):
         self.assertEqual(booking.client_name, "Test Client")
         self.assertEqual(booking.client_email, "test@example.com")
 
-    @patch("utils.email.send_confirmation_email", side_effect=Exception("SMTP error"))
-    def test_email_failure_does_not_block_booking_creation(self, mock_send_email):
+    @patch("utils.email.EmailMultiAlternatives")
+    def test_email_failure_does_not_block_booking_creation(self, mock_email_cls):
+        mock_instance = MagicMock()
+        mock_instance.send.side_effect = Exception("SMTP connection refused")
+        mock_email_cls.return_value = mock_instance
         response = self.client.post(
             reverse("api-bookings"),
             {
-                "service_ids": [self.event.id],
+                "services": [{"service_id": self.event.id, "quantity": 1}],
                 "date": "2026-06-15",
                 "startTime": "10:00",
                 "clientName": "Test Client",
@@ -234,7 +245,8 @@ class EmailSentOnCreateBookingViewTest(APITestCase):
     EMAILS_NOTIFICATIONS=[],
     HOST="https://dashboard.conhilodepilo.localhost",
 )
-class EmailSentOnStripeWebhookTest(APITestCase):
+class EmailSentOnStripeWebhookTest(TransactionTestCase):
+    client_class = APIClient
     def setUp(self):
         CompanyProfile.get_solo()
         self.event_type = EventType.objects.create(
@@ -246,8 +258,7 @@ class EmailSentOnStripeWebhookTest(APITestCase):
             price=Decimal("15.00"),
             duration_minutes=20,
         )
-
-    @patch("utils.email.send_confirmation_email")
+    @patch("booking.views.send_confirmation_email")
     @patch("stripe.Webhook.construct_event")
     def test_email_sent_when_booking_transitions_to_paid(
         self, mock_construct_event, mock_send_email
@@ -260,11 +271,14 @@ class EmailSentOnStripeWebhookTest(APITestCase):
                 timezone.datetime(2026, 6, 15, 10, 0)
             ),
         )
-        booking.services.add(self.event)
-
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.event, quantity=1, unit_price=self.event.price
+        )
         mock_event = MagicMock()
+        mock_event.id = "evt_test_123"
         mock_event.type = "checkout.session.completed"
-        mock_event.data.object.metadata = {"booking_id": str(booking.id)}
+        mock_event.data.object.metadata = MagicMock()
+        mock_event.data.object.metadata.booking_id = str(booking.id)
         mock_event.data.object.payment_intent = "pi_test_123"
         mock_event.data.object.id = "cs_test_123"
         mock_construct_event.return_value = mock_event

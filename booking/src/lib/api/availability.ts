@@ -2,8 +2,11 @@ export interface Availability {
   available: Date[];
 }
 
-export const fetchAvailability = async (serviceIds: string[], signal: AbortSignal): Promise<Availability> => {
-  const url = `${import.meta.env.PUBLIC_API_URL}availability/days/?service_ids=${serviceIds.join(',')}`;
+export const fetchAvailability = async (serviceIds: string[], signal: AbortSignal, quantities?: string[]): Promise<Availability> => {
+  let url = `${import.meta.env.PUBLIC_API_URL}availability/days/?service_ids=${serviceIds.join(',')}`;
+  if (quantities && quantities.length > 0) {
+    url += `&quantities=${quantities.join(',')}`;
+  }
   const response = await fetch(url, { signal });
 
   if (!response.ok) {
@@ -20,8 +23,11 @@ export const fetchAvailability = async (serviceIds: string[], signal: AbortSigna
   };
 };
 
-export const fetchSlots = async (serviceIds: string[], date: string, signal?: AbortSignal): Promise<string[]> => {
-  const url = `${import.meta.env.PUBLIC_API_URL}availability/slots/?service_ids=${serviceIds.join(',')}&date=${date}`;
+export const fetchSlots = async (serviceIds: string[], date: string, signal?: AbortSignal, quantities?: string[]): Promise<string[]> => {
+  let url = `${import.meta.env.PUBLIC_API_URL}availability/slots/?service_ids=${serviceIds.join(',')}&date=${date}`;
+  if (quantities && quantities.length > 0) {
+    url += `&quantities=${quantities.join(',')}`;
+  }
   const response = await fetch(url, { signal });
 
   if (!response.ok) {

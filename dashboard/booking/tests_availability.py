@@ -1,6 +1,6 @@
 from django.test import TestCase
 from datetime import date, timedelta, time, datetime
-from booking.models import CompanyProfile, EventType, Event, EventAvailability, EventDateOverride, AvailabilitySlot, Booking
+from booking.models import CompanyProfile, EventType, Event, EventAvailability, EventDateOverride, AvailabilitySlot, Booking, BookingServiceThrough
 from utils.availability import get_available_dates
 from django.db import reset_queries
 from django.utils import timezone
@@ -108,7 +108,7 @@ class BookingConflictTest(TestCase):
         Private service should be unavailable if the remaining window is too small.
         """
         target_date = date(2026, 6, 1) # a Monday
-        
+
         # Book 09:30 to 10:30 (leaves two 30-min windows: 09:00-09:30 and 10:30-11:00)
         start_time = timezone.make_aware(datetime.combine(target_date, time(9, 30)))
         booking = Booking.objects.create(
@@ -117,9 +117,12 @@ class BookingConflictTest(TestCase):
             start_time=start_time,
             status="CONFIRMED"
         )
-        booking.services.add(self.service_private) # 60 mins
-        
-        # Service Private needs 60 mins. 
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service_private,
+            quantity=1, unit_price=self.service_private.price
+        )
+
+        # Service Private needs 60 mins.
         # Neither 30-min window is enough.
         available_dates = get_available_dates([self.service_private.id], start_date=target_date)
         self.assertNotIn(target_date.strftime('%Y-%m-%d'), available_dates)
@@ -129,7 +132,7 @@ class BookingConflictTest(TestCase):
         Group service should be available even if someone else booked the same slot.
         """
         target_date = date(2026, 6, 1)
-        
+
         # Book 09:00 to 11:00 (full day)
         start_time = timezone.make_aware(datetime.combine(target_date, time(9, 0)))
         booking = Booking.objects.create(
@@ -138,10 +141,12 @@ class BookingConflictTest(TestCase):
             start_time=start_time,
             status="CONFIRMED"
         )
-        # Add two 60m services to fill the 2h window
-        booking.services.add(self.service_private)
-        booking.services.add(self.service_private)
-        
+        # Use quantity=2 to represent two 60m units of the same service (fills 2h window)
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service_private,
+            quantity=2, unit_price=self.service_private.price
+        )
+
         # Group service needs 60 mins. Overlap is allowed.
         available_dates = get_available_dates([self.service_overlap.id], start_date=target_date)
         self.assertIn(target_date.strftime('%Y-%m-%d'), available_dates)
@@ -151,7 +156,7 @@ class BookingConflictTest(TestCase):
         If one service is private, the whole booking follows strict conflict detection.
         """
         target_date = date(2026, 6, 1)
-        
+
         # Book 09:30 to 10:30
         start_time = timezone.make_aware(datetime.combine(target_date, time(9, 30)))
         booking = Booking.objects.create(
@@ -160,8 +165,11 @@ class BookingConflictTest(TestCase):
             start_time=start_time,
             status="CONFIRMED"
         )
-        booking.services.add(self.service_private)
-        
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service_private,
+            quantity=1, unit_price=self.service_private.price
+        )
+
         # Request both Private and Group. Total 120m.
         # Strict mode will see the booking and fail.
         available_dates = get_available_dates([self.service_private.id, self.service_overlap.id], start_date=target_date)

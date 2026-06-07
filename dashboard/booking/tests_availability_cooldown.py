@@ -1,6 +1,6 @@
 from django.test import TestCase
 from datetime import date, timedelta, time, datetime
-from booking.models import CompanyProfile, EventType, Event, AvailabilitySlot, Booking, CompanyAvailability
+from booking.models import CompanyProfile, EventType, Event, AvailabilitySlot, Booking, BookingServiceThrough, CompanyAvailability
 from utils.availability import get_available_dates, get_available_slots
 from django.utils import timezone
 
@@ -41,7 +41,9 @@ class CooldownTest(TestCase):
             start_time=start_time,
             status="CONFIRMED"
         )
-        booking.services.add(self.service) # 30 mins
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service, quantity=1, unit_price=self.service.price
+        )
         
         # Available slots should respect 15 min cooldown.
         # Booking ends at 10:30. Next slot should be at 10:45 (10:30 + 15 min).
@@ -78,11 +80,9 @@ class CooldownTest(TestCase):
             start_time=start_time,
             status="CONFIRMED"
         )
-        booking.services.add(self.service)
-        
-        # Cooldown is 10 mins.
-        # Window ends at 10:30 + 10 = 10:40.
-        # Next available time is 10:40, but grid alignment should push it to 10:45.
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service, quantity=1, unit_price=self.service.price
+        )
         
         slots = get_available_slots(target_date, [self.service.id])
         self.assertNotIn("10:40", slots)
@@ -108,11 +108,15 @@ class CooldownTest(TestCase):
         booking1 = Booking.objects.create(client_name="T1", client_email="t1@t.com", start_time=b1_start, status="CONFIRMED")
         # Need a service to make it 60 mins
         s60 = Event.objects.create(event_type=self.category, name="S60", price="0", duration_minutes=60)
-        booking1.services.add(s60)
+        BookingServiceThrough.objects.create(
+            booking=booking1, event=s60, quantity=1, unit_price=s60.price
+        )
         
         b2_start = timezone.make_aware(datetime.combine(target_date, time(10, 40)))
         booking2 = Booking.objects.create(client_name="T2", client_email="t2@t.com", start_time=b2_start, status="CONFIRMED")
-        booking2.services.add(s60) # 60 mins, ends at 11:40
+        BookingServiceThrough.objects.create(
+            booking=booking2, event=s60, quantity=1, unit_price=s60.price
+        ) # 60 mins, ends at 11:40
         
         available_dates = get_available_dates([self.service.id], start_date=target_date)
         self.assertNotIn(target_date.strftime('%Y-%m-%d'), available_dates)

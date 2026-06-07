@@ -57,18 +57,24 @@ def get_google_calendar_service():
 
 
 def booking_to_event_body(booking):
-    service_names = ", ".join(s.name for s in booking.services.all())
-    price_total = sum(s.price for s in booking.services.all())
+    booking_services = list(booking.booking_services.all().select_related('event'))
+
+    service_names = ", ".join(f"{bs.event.name} ×{bs.quantity}" for bs in booking_services)
+
+    price_total = sum(bs.quantity * bs.unit_price for bs in booking_services)
 
     summary = f"{booking.client_name} — {service_names}"
     if booking.status == "CANCELLED":
         if not summary.startswith("[CANCELLED] "):
             summary = f"[CANCELLED] {summary}"
 
+    discount = getattr(booking, 'discount_amount', None) or 0
+    discount_str = f" (-{discount} discount)" if discount and discount > 0 else ""
+
     description_parts = [
         f"Cliente: {booking.client_name} ({booking.client_email})",
         f"Servicios: {service_names}",
-        f"Precio total: {price_total}",
+        f"Precio total: {price_total}{discount_str}",
     ]
     if booking.client_phone:
         description_parts.append(f"Teléfono: {booking.client_phone}")

@@ -1,21 +1,38 @@
 from django.db import transaction
-from django.db.models.signals import post_save, post_delete, m2m_changed
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from datetime import timedelta
-from .models import Booking
+from .models import Booking, BookingServiceThrough
 from utils.google_calendar import sync_booking_to_google, delete_google_calendar_event
 
 
-@receiver(m2m_changed, sender=Booking.services.through)
-def update_booking_end_time(sender, instance, action, **kwargs):
-    if action in ["post_add", "post_remove", "post_clear"]:
-        total_duration = sum(event.duration_minutes for event in instance.services.all())
-        instance.end_time = instance.start_time + timedelta(minutes=total_duration)
-        instance.save(update_fields=["end_time"])
+@receiver(post_save, sender=BookingServiceThrough)
+def update_booking_from_through(sender, instance, **kwargs):
+    """Recalculate booking end_time when through model changes."""
+    booking = instance.booking
+    if booking and booking.start_time:
+        total_duration = sum(
+            bs.quantity * bs.event.duration_minutes
+            for bs in booking.booking_services.all()
+        )
+        booking.end_time = booking.start_time + timedelta(minutes=total_duration)
+        booking.save(update_fields=["end_time"])
 
-        # Sync on service changes if not pending
-        if instance.status != "PENDING" and instance.services.exists():
-            transaction.on_commit(lambda: sync_booking_to_google(instance))
+    if booking and booking.status != "PENDING" and booking.booking_services.exists():
+        transaction.on_commit(lambda: sync_booking_to_google(booking))
+
+
+@receiver(post_delete, sender=BookingServiceThrough)
+def update_booking_on_delete(sender, instance, **kwargs):
+    """Recalculate booking end_time when through model row is deleted."""
+    booking = instance.booking
+    if booking and booking.start_time:
+        total_duration = sum(
+            bs.quantity * bs.event.duration_minutes
+            for bs in booking.booking_services.all()
+        )
+        booking.end_time = booking.start_time + timedelta(minutes=total_duration)
+        booking.save(update_fields=["end_time"])
 
 
 @receiver(post_save, sender=Booking)

@@ -3,18 +3,21 @@ from collections import defaultdict
 from django.utils import timezone
 from booking.models import Event, Booking, CompanyAvailability, CompanyWeekdaySlot, CompanyDateOverride, AvailabilitySlot, EventDateOverride, EventAvailability, CompanyProfile
 
-def get_available_dates(service_ids, start_date=None):
+def get_available_dates(service_ids, start_date=None, quantities=None):
     if start_date is None:
         start_date = timezone.now().date()
-    
+
     end_date = start_date + timedelta(days=29)
-    # Prefetch event_type to get allow_overlap flag
     services = list(Event.objects.filter(id__in=service_ids).select_related('event_type'))
-    
+
     if not services:
         return []
 
-    total_duration = sum(s.duration_minutes for s in services)
+    if quantities:
+        total_duration = sum(s.duration_minutes * quantities.get(s.id, 1) for s in services)
+    else:
+        total_duration = sum(s.duration_minutes for s in services)
+
     all_allow_overlap = all(s.event_type.allow_overlap for s in services)
     company_profile = CompanyProfile.get_solo()
     cooldown = company_profile.booking_cooldown_minutes
@@ -138,16 +141,19 @@ def _is_day_available(day, context):
             
     return False
 
-def get_available_slots(day, service_ids):
+def get_available_slots(day, service_ids, quantities=None):
     """
     Returns a list of available HH:MM start times for a specific date and services.
     """
-    # 1. Fetch data for this day
     services = list(Event.objects.filter(id__in=service_ids).select_related('event_type'))
     if not services:
         return []
 
-    total_duration = sum(s.duration_minutes for s in services)
+    if quantities:
+        total_duration = sum(s.duration_minutes * quantities.get(s.id, 1) for s in services)
+    else:
+        total_duration = sum(s.duration_minutes for s in services)
+
     all_allow_overlap = all(s.event_type.allow_overlap for s in services)
 
     # Build a minimal context for this day

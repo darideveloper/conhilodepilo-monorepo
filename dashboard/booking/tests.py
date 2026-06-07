@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import timedelta, time, date
 from django.db import transaction
 from django.db.utils import IntegrityError
-from .models import CompanyProfile, EventType, Event, Booking, CompanyWeekdaySlot
+from .models import CompanyProfile, EventType, Event, Booking, BookingServiceThrough, CompanyWeekdaySlot
 
 class EventTypeTest(TestCase):
     def test_image_is_optional(self):
@@ -45,7 +45,12 @@ class BookingDurationTest(TestCase):
             client_email="test@example.com",
             start_time=start_time
         )
-        booking.services.add(self.event1, self.event2)
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.event1, quantity=1, unit_price=self.event1.price
+        )
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.event2, quantity=1, unit_price=self.event2.price
+        )
         
         # end_time should be start_time + 60 minutes
         expected_end_time = start_time + timedelta(minutes=60)

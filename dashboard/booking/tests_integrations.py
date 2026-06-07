@@ -5,7 +5,7 @@ from django.utils import timezone
 from unittest.mock import patch, MagicMock
 from datetime import date, time, timedelta
 from rest_framework.test import APIClient
-from .models import CompanyProfile, EventType, Event, Booking, CompanyAvailability, CompanyWeekdaySlot
+from .models import CompanyProfile, EventType, Event, Booking, BookingServiceThrough, CompanyAvailability, CompanyWeekdaySlot
 from googleapiclient.errors import HttpError
 
 
@@ -48,7 +48,7 @@ class GoogleCalendarSyncTest(TransactionTestCase):
         mock_service.events().insert().execute.return_value = {"id": "new-event-id"}
 
         payload = {
-            "service_ids": [self.service.id],
+            "services": [{"service_id": self.service.id, "quantity": 1}],
             "date": self.tomorrow.strftime('%Y-%m-%d'),
             "startTime": "10:00",
             "clientName": "Test Client",
@@ -63,7 +63,7 @@ class GoogleCalendarSyncTest(TransactionTestCase):
         self.assertTrue(mock_service.events().insert.called)
         # We check the call on the mock returned by events()
         insert_call = mock_service.events().insert.call_args
-        self.assertEqual(insert_call.kwargs['body']['summary'], "Test Client — Tour")
+        self.assertEqual(insert_call.kwargs['body']['summary'], "Test Client — Tour ×1")
         self.assertEqual(insert_call.kwargs['sendUpdates'], "none")
         self.assertEqual(insert_call.kwargs['body']['extendedProperties']['private']['booking_id'], str(response.data['booking_id']))
 
@@ -75,7 +75,7 @@ class GoogleCalendarSyncTest(TransactionTestCase):
         self.category.save()
 
         payload = {
-            "service_ids": [self.service.id],
+            "services": [{"service_id": self.service.id, "quantity": 1}],
             "date": self.tomorrow.strftime('%Y-%m-%d'),
             "startTime": "10:00",
             "clientName": "Test Client",
@@ -99,9 +99,11 @@ class GoogleCalendarSyncTest(TransactionTestCase):
             google_event_id="existing-id",
             status="CONFIRMED"
         )
-        booking.services.add(self.service)
-        
-        # Reset mock to clear calls from initial m2m sync
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service, quantity=1, unit_price=self.service.price
+        )
+
+        # Reset mock to clear calls from initial through model sync
         mock_service.events().patch.reset_mock()
         
         booking.status = "CANCELLED"
@@ -127,8 +129,10 @@ class GoogleCalendarSyncTest(TransactionTestCase):
             client_email="ghost@example.com",
             status="CONFIRMED"
         )
-        booking.services.add(self.service)
-        
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service, quantity=1, unit_price=self.service.price
+        )
+
         self.assertTrue(mock_service.events().list.called)
         self.assertTrue(mock_service.events().patch.called)
         self.assertFalse(mock_service.events().insert.called)
@@ -180,8 +184,10 @@ class GoogleCalendarSyncTest(TransactionTestCase):
             client_email="fail@example.com",
             google_sync_status="FAILURE"
         )
-        booking.services.add(self.service)
-        
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service, quantity=1, unit_price=self.service.price
+        )
+
         from django.core.management import call_command
         call_command('reconcile_google_calendar')
         

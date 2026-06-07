@@ -4,7 +4,7 @@ export interface BookingPayload {
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  service_ids: number[];
+  services: { service_id: number; quantity: number }[];
   date: string;
   startTime: string;
   specialRequests: string;

@@ -127,7 +127,7 @@ class StripeIntegrationTest(TestCase):
 
         url = reverse('api-bookings')
         payload = {
-            "service_ids": [self.service.id],
+            "services": [{"service_id": self.service.id, "quantity": 1}],
             "date": self.tomorrow.strftime('%Y-%m-%d'),
             "startTime": "10:00",
             "clientName": "Stripe User",
@@ -178,7 +178,7 @@ class StripeIntegrationTest(TestCase):
         """
         url = reverse('api-bookings')
         payload = {
-            "service_ids": [self.post_paid_service.id],
+            "services": [{"service_id": self.post_paid_service.id, "quantity": 1}],
             "date": self.tomorrow.strftime('%Y-%m-%d'),
             "startTime": "11:00",
             "clientName": "Regular User",

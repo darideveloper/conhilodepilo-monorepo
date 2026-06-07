@@ -35,6 +35,7 @@ interface Availability {
 export interface SelectedService {
   serviceTypeId: string;
   serviceId: string;
+  quantity: number;
 }
 
 interface BookingState {
@@ -203,9 +204,12 @@ export const useBookingStore = create<BookingState>()(
       fetchAvailability: async (selectedServices: SelectedService[], signal: AbortSignal) => {
         set({ isAvailabilityLoading: true, availabilityError: null });
         try {
+          const serviceIds = selectedServices.map(s => s.serviceId);
+          const quantities = selectedServices.map(s => s.quantity.toString());
           const availability = await fetchAvailability(
-            selectedServices.map(s => s.serviceId),
-            signal
+            serviceIds,
+            signal,
+            quantities.length > 0 ? quantities : undefined
           );
           set({ availability, isAvailabilityLoading: false });
         } catch (error: any) {
@@ -217,10 +221,13 @@ export const useBookingStore = create<BookingState>()(
       fetchSlots: async (selectedServices: SelectedService[], date: string, signal?: AbortSignal) => {
         set({ isSlotsLoading: true, availableSlots: [] });
         try {
+          const serviceIds = selectedServices.map(s => s.serviceId);
+          const quantities = selectedServices.map(s => s.quantity.toString());
           const slots = await fetchSlots(
-            selectedServices.map(s => s.serviceId),
+            serviceIds,
             date,
-            signal
+            signal,
+            quantities.length > 0 ? quantities : undefined
           );
           set({ availableSlots: slots, isSlotsLoading: false });
         } catch (error: any) {

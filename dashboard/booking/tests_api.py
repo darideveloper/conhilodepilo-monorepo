@@ -155,7 +155,7 @@ class BookingAPITest(APITestCase):
 
     def test_create_booking_success(self):
         payload = {
-            "service_ids": [self.service.id],
+            "services": [{"service_id": self.service.id, "quantity": 1}],
             "date": self.tomorrow.strftime('%Y-%m-%d'),
             "startTime": "10:00",
             "clientName": "John Doe",
@@ -166,14 +166,26 @@ class BookingAPITest(APITestCase):
         response = self.client.post(self.url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json()['client_name'], "John Doe")
+        self.assertIn('original_amount', response.json())
+        self.assertIn('discount_amount', response.json())
+        self.assertIn('total_amount', response.json())
         
         # Verify booking in DB
-        from .models import Booking
+        from .models import Booking, BookingServiceThrough
         self.assertTrue(Booking.objects.filter(client_email="john@example.com").exists())
+        booking = Booking.objects.get(client_email="john@example.com")
+        self.assertEqual(booking.original_amount, 100)
+        self.assertEqual(booking.total_amount, 100)
+        self.assertEqual(booking.discount_amount, 0)
+        # Verify through model rows
+        self.assertEqual(BookingServiceThrough.objects.filter(booking=booking).count(), 1)
+        through = BookingServiceThrough.objects.get(booking=booking)
+        self.assertEqual(through.quantity, 1)
+        self.assertEqual(through.unit_price, 100)
 
     def test_create_booking_unavailable_slot(self):
         payload = {
-            "service_ids": [self.service.id],
+            "services": [{"service_id": self.service.id, "quantity": 1}],
             "date": self.tomorrow.strftime('%Y-%m-%d'),
             "startTime": "09:00", # Outside business hours
             "clientName": "John Doe",
@@ -185,7 +197,7 @@ class BookingAPITest(APITestCase):
 
     def test_create_booking_missing_fields(self):
         payload = {
-            "service_ids": [self.service.id],
+            "services": [{"service_id": self.service.id, "quantity": 1}],
             "date": self.tomorrow.strftime('%Y-%m-%d'),
             # Missing startTime, clientName, clientEmail
         }

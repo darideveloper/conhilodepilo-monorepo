@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from datetime import date, time, datetime
-from booking.models import EventType, Event, AvailabilitySlot, Booking
+from booking.models import EventType, Event, AvailabilitySlot, Booking, BookingServiceThrough
 from django.utils import timezone
 
 class AvailabilitySlotsApiTest(TestCase):
@@ -47,11 +47,13 @@ class AvailabilitySlotsApiTest(TestCase):
             start_time=start_time,
             status="CONFIRMED"
         )
-        booking.services.add(self.service)
-        
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service, quantity=1, unit_price=self.service.price
+        )
+
         url = reverse('api-availability-slots')
         response = self.client.get(url, {'service_ids': self.service.id, 'date': target_date_str})
-        
+
         # Original: 09:00, 09:15, 09:30, 09:45, 10:00, 10:15, 10:30
         # Booked: 09:15-09:45.
         # 09:00 + 30m = 09:30 (overlaps 09:15-09:45). NO.
@@ -59,7 +61,7 @@ class AvailabilitySlotsApiTest(TestCase):
         # 09:30 + 30m = 10:00 (overlaps). NO.
         # 09:45 + 30m = 10:15 (free). YES.
         # 10:00, 10:15, 10:30. YES.
-        
+
         expected_slots = ["09:45", "10:00", "10:15", "10:30"]
         self.assertEqual(response.data, expected_slots)
 
@@ -81,8 +83,9 @@ class AvailabilitySlotsApiTest(TestCase):
             start_time=start_time,
             status="CONFIRMED"
         )
-        booking.services.add(self.service)
-        booking.services.add(self.service) # 2x30m = 1h
+        BookingServiceThrough.objects.create(
+            booking=booking, event=self.service, quantity=2, unit_price=self.service.price
+        ) # 2x30m = 1h
         
         url = reverse('api-availability-slots')
         response = self.client.get(url, {'service_ids': self.service.id, 'date': target_date_str})

@@ -41,6 +41,7 @@ export const translations = {
       close: "Cerrar",
       submitting: "Enviando...",
       additional: "(adicional)",
+      discount: "Descuento",
     },
     stripe: {
       name: "Nombre",
@@ -64,6 +65,9 @@ export const translations = {
     },
     accessibility: {
       toggleTheme: "Cambiar tema",
+    },
+    promo: {
+      buyXgetY: "Compra {buyX} lleva {getY} gratis",
     }
   },
   en: {
@@ -108,6 +112,7 @@ export const translations = {
       close: "Close",
       submitting: "Sending...",
       additional: "(additional)",
+      discount: "Discount",
     },
     stripe: {
       name: "Name",
@@ -131,6 +136,9 @@ export const translations = {
     },
     accessibility: {
       toggleTheme: "Toggle theme",
+    },
+    promo: {
+      buyXgetY: "Buy {buyX} Get {getY} Free",
     }
   }
 };
