@@ -24,13 +24,6 @@ def _build_whatsapp_url(phone: str | None) -> str | None:
     return f"https://wa.me/{digits}"
 
 
-def _build_logo_url(company: CompanyProfile) -> str | None:
-    if company.logo:
-        host = getattr(settings, "HOST", "")
-        if host and "localhost" not in host:
-            return f"{host.rstrip('/')}{company.logo.url}"
-    return None
-
 
 def _build_base_context(booking):
     company = CompanyProfile.get_solo()
@@ -48,7 +41,6 @@ def _build_base_context(booking):
     return {
         "company_name": company.name,
         "brand_color": company.brand_color,
-        "logo_url": _build_logo_url(company),
         "client_name": booking.client_name,
         "services": service_list,
         "original_amount": booking.original_amount,

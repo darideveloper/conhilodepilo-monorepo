@@ -9,7 +9,7 @@ from rest_framework import status
 import stripe
 from django.test import TransactionTestCase
 from .models import CompanyProfile, EventType, Event, Booking, BookingServiceThrough, AvailabilitySlot
-from utils.email import _clean_phone, _build_whatsapp_url, _build_logo_url, send_confirmation_email, send_gift_confirmation_emails
+from utils.email import _clean_phone, _build_whatsapp_url, send_confirmation_email, send_gift_confirmation_emails
 
 
 class CleanPhoneTest(TestCase):
@@ -40,37 +40,6 @@ class BuildWhatsAppUrlTest(TestCase):
     def test_returns_none_for_empty(self):
         self.assertIsNone(_build_whatsapp_url(""))
 
-
-class BuildLogoUrlTest(TestCase):
-    @override_settings(HOST="https://dashboard.conhilodepilo.com")
-    def test_returns_absolute_url_when_logo_exists(self):
-        company = MagicMock(spec=CompanyProfile)
-        company.logo.url = "/media/branding/logo.png"
-        company.logo.__bool__ = lambda self: True
-        url = _build_logo_url(company)
-        self.assertEqual(url, "https://dashboard.conhilodepilo.com/media/branding/logo.png")
-
-    @override_settings(HOST="https://dashboard.conhilodepilo.com/")
-    def test_strips_trailing_slash_from_host(self):
-        company = MagicMock(spec=CompanyProfile)
-        company.logo.url = "/media/branding/logo.png"
-        company.logo.__bool__ = lambda self: True
-        url = _build_logo_url(company)
-        self.assertEqual(url, "https://dashboard.conhilodepilo.com/media/branding/logo.png")
-
-    def test_returns_none_when_no_logo(self):
-        company = MagicMock(spec=CompanyProfile)
-        company.logo = None
-        url = _build_logo_url(company)
-        self.assertIsNone(url)
-
-    @override_settings(HOST="")
-    def test_returns_none_when_no_host(self):
-        company = MagicMock(spec=CompanyProfile)
-        company.logo.url = "/media/branding/logo.png"
-        company.logo.__bool__ = lambda self: True
-        url = _build_logo_url(company)
-        self.assertIsNone(url)
 
 
 @override_settings(
