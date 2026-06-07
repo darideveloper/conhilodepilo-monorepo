@@ -1,35 +1,4 @@
-# dashboard-models Specification
-
-## Purpose
-TBD - created by archiving change group-services-by-type. Update Purpose after archive.
-## Requirements
-### Requirement: Privacy Policy Configuration
-The system MUST allow an administrator to configure a privacy policy URL for the company.
-
-#### Scenario: Fetching company profile
-- **WHEN** the company configuration is requested
-- **THEN** the configuration MUST include a valid `privacy_policy_url`.
-
-### Requirement: Terms and Conditions Configuration
-The system MUST allow an administrator to configure a Terms and Conditions URL for the company.
-
-#### Scenario: Fetching company profile
-- **WHEN** the company configuration is requested
-- **THEN** the configuration MUST include a valid `terms_and_conditions_url`.
-
-### Requirement: Booking Special Requests Storage
-The system MUST store any special requests made by the user during the booking process.
-
-#### Scenario: Persisting a booking
-- **WHEN** a user provides special requests in the contact form
-- **THEN** the system MUST save them in the corresponding booking record.
-
-### Requirement: Global Booking Cooldown
-The system MUST allow an administrator to define a global "cool down" period (in minutes) that is enforced between consecutive bookings.
-
-#### Scenario: Configuring cooldown
-- **WHEN** the administrator updates the Company Profile with a `booking_cooldown_minutes` value of `15`.
-- **THEN** all subsequent availability calculations MUST ensure at least a 15-minute gap exists between the end of one booking and the start of the next.
+## MODIFIED Requirements
 
 ### Requirement: Dashboard Service Categorization
 The dashboard system MUST allow grouping service categories (Event Types) into broader groups to facilitate filtering and specialization of the booking flow, and MUST allow administrators to configure per-service BOGO promotions via `buy_x` and `get_y_free` fields on the Event model.
@@ -44,6 +13,8 @@ The dashboard system MUST allow grouping service categories (Event Types) into b
 - **GIVEN** an existing `Event` "Eyebrow Threading"
 - **WHEN** the admin sets `buy_x=2` and `get_y_free=1` on that Event in Django admin
 - **THEN** the promotion fields SHALL be persisted and returned via the services API
+
+## ADDED Requirements
 
 ### Requirement: Event Promotion Fields
 The `Event` model SHALL have `buy_x` (PositiveIntegerField, default=0) and `get_y_free` (PositiveIntegerField, default=0) fields to configure threshold-style BOGO promotions per service.
@@ -86,4 +57,3 @@ The `Booking.services` ManyToManyField SHALL use a custom through model `Booking
 #### Scenario: Explicit related names
 - **WHEN** code accesses a Booking's service line items
 - **THEN** it SHALL use the `booking_services` related name from `BookingServiceThrough.booking`
-

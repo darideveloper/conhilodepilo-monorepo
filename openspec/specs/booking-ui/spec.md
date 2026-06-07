@@ -27,11 +27,16 @@ The application MUST maintain the correct selected date after page refreshes, re
 - THEN the revived `Date` object MUST represent the same calendar day as originally selected.
 
 ### Requirement: Time Slot Selection
-The system MUST allow users to select an available time slot after choosing a valid day.
+The system MUST allow users to select an available time slot after choosing a valid day, and MUST support multiple quantities of the same service via +/- controls in the cart.
 
 #### Scenario: Displaying available times
 - **WHEN** a valid day is selected in the booking calendar
 - **THEN** the UI MUST present a list of available time slots and require the user to pick one before proceeding to the contact form.
+
+#### Scenario: Service quantity adjustment
+- **WHEN** a user increases or decreases the quantity of a selected service via +/- controls
+- **THEN** the cart SHALL update the quantity and recalculate the subtotal
+- **AND** decreasing from quantity=1 SHALL remove the service entirely
 
 ### Requirement: Minimal Contact Information
 The system MUST collect only necessary contact information without arbitrary extra fields.
@@ -125,4 +130,49 @@ The booking calendar MUST maintain a consistent and functional grid layout acros
 - **WHEN** the user views the booking calendar in Safari on macOS
 - **THEN** the month container MUST be rendered as a grid with proper cell alignment to prevent rendering bugs
 - **AND** the layout MUST NOT collapse or overflow.
+
+### Requirement: Service Quantity in Cart State
+The frontend SHALL track `quantity` per service in the cart state. Adding a service that already exists SHALL increment its quantity instead of being rejected as a duplicate.
+
+#### Scenario: Incrementing quantity for existing service
+- **WHEN** a user selects a service that already exists in their cart
+- **THEN** the quantity SHALL increment rather than being rejected as a duplicate
+
+#### Scenario: Minimum quantity
+- **WHEN** a user tries to reduce the quantity below 1 via the decrement button
+- **THEN** the service SHALL be removed from the cart entirely
+
+### Requirement: Price Summary in Booking Form
+The booking form (Step 3) SHALL display a price summary showing the original subtotal, any promotional discount, and the final total. Discount SHALL be calculated using the threshold BOGO formula `free_count = min((qty // buy_x) * get_y_free, qty)`.
+
+#### Scenario: Booking with promotion in price summary
+- **GIVEN** a cart with "Eyebrow Threading" × 3 at €30 each with Buy 2 Get 1 Free
+- **WHEN** the user views the booking summary on Step 3
+- **THEN** the UI SHALL display: Subtotal €90, Discount -€30, Total €60
+
+#### Scenario: Booking without promotion
+- **GIVEN** a cart with services that have no promotions
+- **WHEN** the user views the booking summary
+- **THEN** the UI SHALL display only the total (or subtotal equal to total with no discount line)
+
+### Requirement: Promotion Badge on Service Items
+The frontend SHALL display a "Buy X Get Y Free" badge on service items that have an active promotion, visible across all booking steps.
+
+#### Scenario: Badge on cart item
+- **GIVEN** a service with an active promotion selected in the cart
+- **WHEN** the cart is displayed on any booking step
+- **THEN** the service item SHALL show a badge with the promotion text (e.g. "Buy 2 Get 1 Free")
+
+#### Scenario: Badge on success confirmation
+- **GIVEN** a booking was created with a promotional discount
+- **WHEN** the success confirmation screen is displayed
+- **THEN** the discount and promotion label SHALL be visible alongside the total
+
+### Requirement: Quantity-Aware Availability Requests
+The frontend SHALL send quantity data alongside service IDs when fetching availability, so the backend computes the correct total duration.
+
+#### Scenario: Fetching availability with quantities
+- **WHEN** the user has selected Service A × 3 and Service B × 1
+- **THEN** the frontend SHALL send both `service_ids=1,2` and `quantities=3,1` to the availability endpoints
+- **AND** the backend SHALL return slots with at least `3×durationA + 1×durationB` free time
 

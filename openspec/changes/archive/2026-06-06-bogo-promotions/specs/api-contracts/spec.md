@@ -1,9 +1,5 @@
-# api-contracts Specification
+## MODIFIED Requirements
 
-## Purpose
-Defines the API contracts for the booking platform, including booking creation, availability queries, and service listings.
-
-## Requirements
 ### Requirement: Create Booking Endpoint
 The system MUST provide an API endpoint to create a new booking record, accepting a services array with quantity information instead of flat service IDs. The endpoint SHALL create `BookingServiceThrough` rows with the specified quantities and booking-time unit prices.
 
@@ -25,6 +21,11 @@ The system MUST provide an API endpoint to create a new booking record, acceptin
 - **WHEN** a booking is submitted with a service quantity of 0 or a negative number
 - **THEN** the API MUST reject the request with HTTP 400
 
+#### Scenario: Backward compatibility note
+- **NOTE** The previous `service_ids` array format is **REMOVED** in favor of the `services` object array format. Clients MUST be updated to send `services` with `service_id` and `quantity` fields.
+
+## ADDED Requirements
+
 ### Requirement: Availability Endpoints Accept Quantities
 The `/api/availability/days/` and `/api/availability/slots/` endpoints SHALL accept an optional `quantities` query parameter (comma-separated integers) parallel to `service_ids` to support quantity-weighted duration calculation.
 
@@ -43,4 +44,3 @@ The `/api/availability/days/` and `/api/availability/slots/` endpoints SHALL acc
 #### Scenario: Availability invalid quantity value
 - **WHEN** `GET /api/availability/slots/?service_ids=1&quantities=-1&date=2026-06-10` is requested
 - **THEN** the endpoint SHALL reject the request with HTTP 400
-
