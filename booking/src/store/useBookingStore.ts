@@ -24,6 +24,8 @@ export interface AppConfig {
   privacy_policy_url: string;
   terms_and_conditions_url: string;
   booking_cooldown_minutes: number;
+  buy_x: number;
+  get_y_free: number;
 }
 
 interface Availability {

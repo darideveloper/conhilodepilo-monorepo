@@ -131,8 +131,22 @@ class SendConfirmationEmailTest(TestCase):
             body = call_kwargs["body"]
             self.assertIn("Cliente Test", body)
             self.assertIn("Depilación Cejas", body)
+            self.assertIn("×1", body)
+            self.assertIn("15.00", body)
             self.assertIn("10/06/2026", body)
             self.assertIn("10:00", body)
+
+    def test_plain_text_body_contains_pricing_summary(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+
+            send_confirmation_email(self.booking)
+
+            call_kwargs = mock_email_cls.call_args.kwargs
+            body = call_kwargs["body"]
+            self.assertIn("Subtotal", body)
+            self.assertIn("Total", body)
 
     def test_html_alternative_is_attached(self):
         with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:

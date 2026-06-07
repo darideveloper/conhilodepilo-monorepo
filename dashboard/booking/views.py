@@ -85,7 +85,12 @@ class CreateBookingView(APIView):
             booking_services_for_pricing.append((event, qty, event.price))
             total_duration += event.duration_minutes * qty
 
-        original_amount, discount_amount, total_amount, _ = calculate_booking_totals(booking_services_for_pricing)
+        company_promo = CompanyProfile.get_solo()
+        original_amount, discount_amount, total_amount, _ = calculate_booking_totals(
+            booking_services_for_pricing,
+            buy_x=company_promo.buy_x,
+            get_y_free=company_promo.get_y_free
+        )
         end_dt = start_dt + timezone.timedelta(minutes=total_duration)
 
         is_pre_paid = any(events[sid].event_type.payment_model == "PRE-PAID" for sid in service_ids)

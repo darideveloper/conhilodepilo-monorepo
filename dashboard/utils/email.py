@@ -1,5 +1,6 @@
 import logging
 import re
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -37,10 +38,16 @@ def send_confirmation_email(booking) -> None:
         whatsapp_url = _build_whatsapp_url(company.contact_phone)
         logo_url = _build_logo_url(company)
 
-        services = booking.services.all()
+        service_through = booking.booking_services.select_related('event').all()
         service_list = [
-            {"name": s.name, "price": s.price, "duration_minutes": s.duration_minutes}
-            for s in services
+            {
+                "name": bs.event.name,
+                "unit_price": bs.unit_price,
+                "quantity": bs.quantity,
+                "subtotal": bs.unit_price * Decimal(str(bs.quantity)),
+                "duration_minutes": bs.event.duration_minutes,
+            }
+            for bs in service_through
         ]
 
         context = {
@@ -49,6 +56,9 @@ def send_confirmation_email(booking) -> None:
             "logo_url": logo_url,
             "client_name": booking.client_name,
             "services": service_list,
+            "original_amount": booking.original_amount,
+            "discount_amount": booking.discount_amount,
+            "total_amount": booking.total_amount,
             "date": booking.start_time.strftime("%d/%m/%Y"),
             "start_time": booking.start_time.strftime("%H:%M"),
             "end_time": booking.end_time.strftime("%H:%M") if booking.end_time else "",
@@ -66,8 +76,19 @@ def send_confirmation_email(booking) -> None:
             f"Hola {booking.client_name},\n\n"
             f"Tu cita ha sido confirmada.\n\n"
             f"Servicios:\n"
-            + "\n".join(f"  - {s['name']} ({s['duration_minutes']} min)" for s in service_list)
-            + f"\n\nFecha: {context['date']}\n"
+            + "\n".join(
+                f"  - {s['name']} ×{s['quantity']} — {s['unit_price']} € "
+                f"(Subtotal: {s['subtotal']} €)"
+                for s in service_list
+            )
+            + f"\n\nPrecios:\n"
+            f"  Subtotal: {context['original_amount']} €\n"
+        )
+        if context["discount_amount"] > 0:
+            plain_text += f"  Descuento: -{context['discount_amount']} €\n"
+        plain_text += (
+            f"  Total: {context['total_amount']} €\n\n"
+            f"Fecha: {context['date']}\n"
             f"Hora: {context['start_time']}"
         )
         if context["end_time"]:

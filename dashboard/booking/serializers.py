@@ -27,6 +27,8 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             'tiktok_url',
             'facebook_url',
             'booking_cooldown_minutes',
+            'buy_x',
+            'get_y_free',
         ]
 
 class BusinessHoursSerializer(serializers.ModelSerializer):
@@ -38,12 +40,10 @@ class EventSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='name')
     duration = serializers.IntegerField(source='duration_minutes')
     image = AbsoluteImageField(read_only=True)
-    buy_x = serializers.IntegerField(read_only=True)
-    get_y_free = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Event
-        fields = ['id', 'title', 'description', 'price', 'duration', 'image', 'buy_x', 'get_y_free']
+        fields = ['id', 'title', 'description', 'price', 'duration', 'image']
 
 class EventTypeSerializer(serializers.ModelSerializer):
     services = EventSerializer(source='events', many=True, read_only=True)

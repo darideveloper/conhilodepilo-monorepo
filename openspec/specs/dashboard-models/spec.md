@@ -32,29 +32,13 @@ The system MUST allow an administrator to define a global "cool down" period (in
 - **THEN** all subsequent availability calculations MUST ensure at least a 15-minute gap exists between the end of one booking and the start of the next.
 
 ### Requirement: Dashboard Service Categorization
-The dashboard system MUST allow grouping service categories (Event Types) into broader groups to facilitate filtering and specialization of the booking flow, and MUST allow administrators to configure per-service BOGO promotions via `buy_x` and `get_y_free` fields on the Event model.
+The dashboard system MUST allow grouping service categories (Event Types) into broader groups to facilitate filtering and specialization of the booking flow. The `Event` model no longer carries per-service promotion fields — promotion configuration is now global via `CompanyProfile`.
 
 #### Scenario: Assign Group to Event Type
 - **Given** an existing `EventType` "Depilación con hilo".
 - **And** a group "Salon Services" with ID 1.
 - **When** the admin assigns "Salon Services" to "Depilación con hilo".
 - **Then** the API MUST return `group_id: 1` for that event type.
-
-#### Scenario: Configure BOGO promotion on a service
-- **GIVEN** an existing `Event` "Eyebrow Threading"
-- **WHEN** the admin sets `buy_x=2` and `get_y_free=1` on that Event in Django admin
-- **THEN** the promotion fields SHALL be persisted and returned via the services API
-
-### Requirement: Event Promotion Fields
-The `Event` model SHALL have `buy_x` (PositiveIntegerField, default=0) and `get_y_free` (PositiveIntegerField, default=0) fields to configure threshold-style BOGO promotions per service.
-
-#### Scenario: Default values on new Event
-- **WHEN** a new Event is created without specifying promotion fields
-- **THEN** `buy_x` SHALL be 0 and `get_y_free` SHALL be 0
-
-#### Scenario: Active promotion
-- **WHEN** an Event has `buy_x > 0` and `get_y_free > 0`
-- **THEN** the promotion SHALL be considered active for that service
 
 ### Requirement: Booking Price Snapshot Fields
 The `Booking` model SHALL have `original_amount`, `discount_amount`, and `total_amount` fields (DecimalField, max_digits=10, decimal_places=2, default=0) to persist the original subtotal, promotional savings, and payable total at booking creation time.
@@ -86,4 +70,15 @@ The `Booking.services` ManyToManyField SHALL use a custom through model `Booking
 #### Scenario: Explicit related names
 - **WHEN** code accesses a Booking's service line items
 - **THEN** it SHALL use the `booking_services` related name from `BookingServiceThrough.booking`
+
+### Requirement: CompanyProfile Promotion Fields
+The `CompanyProfile` singleton model SHALL have `buy_x` (PositiveIntegerField, default=0) and `get_y_free` (PositiveIntegerField, default=0) fields to configure a global threshold-style BOGO promotion applied to all services.
+
+#### Scenario: Default values
+- **WHEN** a new CompanyProfile is created without specifying promotion fields
+- **THEN** `buy_x` SHALL be 0 and `get_y_free` SHALL be 0 (promotion disabled)
+
+#### Scenario: Promotion active globally
+- **WHEN** `CompanyProfile.buy_x > 0` and `CompanyProfile.get_y_free > 0`
+- **THEN** the promotion SHALL be considered active for ALL services
 

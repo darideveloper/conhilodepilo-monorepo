@@ -7,8 +7,6 @@ export interface DashboardService {
   price: string;
   duration: number;
   image: string;
-  buy_x: number;
-  get_y_free: number;
 }
 
 export interface DashboardServiceCategory {

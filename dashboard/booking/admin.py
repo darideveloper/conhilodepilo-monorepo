@@ -147,6 +147,12 @@ class CompanyProfileAdmin(SingletonModelAdmin, ModelAdminUnfoldBase):
                 "booking_cooldown_minutes",
             )
         }),
+        (_("Promotions"), {
+            "fields": (
+                "buy_x",
+                "get_y_free",
+            )
+        }),
         (_("UI Labels"), {
             "fields": (
                 "event_type_label",
@@ -219,8 +225,6 @@ class EventAdmin(ModelAdminUnfoldBase):
                 "description",
                 "price",
                 "duration_minutes",
-                "buy_x",
-                "get_y_free",
                 "image",
             )
         }),

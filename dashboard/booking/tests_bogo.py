@@ -12,6 +12,32 @@ from .models import (
 )
 
 
+class ConfigPromotionFieldsTest(APITestCase):
+    """Test that /api/config/ returns promotion fields."""
+
+    def setUp(self):
+        self.profile = CompanyProfile.get_solo()
+        self.url = reverse("api-config")
+
+    def test_config_returns_promotion_fields_when_active(self):
+        self.profile.buy_x = 2
+        self.profile.get_y_free = 1
+        self.profile.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["buy_x"], 2)
+        self.assertEqual(response.data["get_y_free"], 1)
+
+    def test_config_returns_promotion_fields_when_disabled(self):
+        self.profile.buy_x = 0
+        self.profile.get_y_free = 0
+        self.profile.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["buy_x"], 0)
+        self.assertEqual(response.data["get_y_free"], 0)
+
+
 class BookingServiceThroughTest(APITestCase):
     """Covers 11.4: Test for BookingServiceThrough creation with quantities."""
 
@@ -23,8 +49,6 @@ class BookingServiceThroughTest(APITestCase):
             name="Test Service",
             price=Decimal("50.00"),
             duration_minutes=30,
-            buy_x=0,
-            get_y_free=0
         )
         self.tomorrow = date.today() + timedelta(days=1)
         CompanyAvailability.objects.create(
@@ -65,8 +89,6 @@ class BookingServiceThroughTest(APITestCase):
             name="Service B",
             price=Decimal("30.00"),
             duration_minutes=20,
-            buy_x=0,
-            get_y_free=0
         )
         payload = {
             "services": [
@@ -95,14 +117,15 @@ class CreateBookingWithPromotionsTest(APITestCase):
 
     def setUp(self):
         self.profile = CompanyProfile.get_solo()
+        self.profile.buy_x = 2
+        self.profile.get_y_free = 1
+        self.profile.save()
         self.category = EventType.objects.create(name="Test Category", payment_model="POST-PAID")
         self.service = Event.objects.create(
             event_type=self.category,
             name="Promo Service",
             price=Decimal("30.00"),
             duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
         )
         self.tomorrow = date.today() + timedelta(days=1)
         CompanyAvailability.objects.create(
@@ -217,8 +240,6 @@ class AvailabilityWithQuantitiesTest(APITestCase):
             name="Availability Test",
             price=Decimal("30.00"),
             duration_minutes=30,
-            buy_x=0,
-            get_y_free=0
         )
         self.today = date.today()
         self.tomorrow = self.today + timedelta(days=1)
@@ -299,8 +320,6 @@ class PriceSnapshotTest(APITestCase):
             name="Snapshot Service",
             price=Decimal("100.00"),
             duration_minutes=60,
-            buy_x=0,
-            get_y_free=0
         )
         self.tomorrow = date.today() + timedelta(days=1)
         CompanyAvailability.objects.create(
@@ -357,8 +376,6 @@ class ZeroTotalBookingTest(APITestCase):
             name="Free Service",
             price=Decimal("0.00"),
             duration_minutes=30,
-            buy_x=0,
-            get_y_free=0
         )
         self.tomorrow = date.today() + timedelta(days=1)
         CompanyAvailability.objects.create(
@@ -393,13 +410,14 @@ class ZeroTotalBookingTest(APITestCase):
 
     @patch("utils.stripe_utils.stripe.checkout.Session.create")
     def test_promotion_discount_to_zero_skips_stripe(self, mock_session_create):
+        self.profile.buy_x = 1
+        self.profile.get_y_free = 1
+        self.profile.save()
         promo_service = Event.objects.create(
             event_type=self.category,
             name="Promo to Free",
             price=Decimal("30.00"),
             duration_minutes=30,
-            buy_x=1,
-            get_y_free=1
         )
         payload = {
             "services": [{"service_id": promo_service.id, "quantity": 1}],

@@ -34,6 +34,8 @@ export function BookingForm() {
   const priceSummary = useMemo(() => {
     let original = 0;
     let discount = 0;
+    const buy_x = config?.buy_x || 0;
+    const get_y_free = config?.get_y_free || 0;
     formData.selectedServices.forEach((item: any) => {
       const service = servicesData
         .flatMap((cat: any) => cat.services)
@@ -43,14 +45,14 @@ export function BookingForm() {
       const qty = item.quantity || 1;
       original += price * qty;
 
-      if (service.buy_x > 0 && service.get_y_free > 0 && qty > service.buy_x) {
-        const freeCount = Math.min(Math.floor(qty / service.buy_x) * service.get_y_free, qty);
+      if (buy_x > 0 && get_y_free > 0 && qty >= buy_x) {
+        const freeCount = Math.min(Math.floor(qty / buy_x) * get_y_free, qty);
         discount += price * freeCount;
       }
     });
     const total = original - discount;
     return { original, discount, total };
-  }, [formData.selectedServices, servicesData]);
+  }, [formData.selectedServices, servicesData, config?.buy_x, config?.get_y_free]);
 
   const getServiceTitle = (service: any) => {
     return typeof service.title === 'string' ? service.title : (service.title[language] || service.title.es);
@@ -147,10 +149,16 @@ export function BookingForm() {
                       const service = servicesData
                         .flatMap((cat: any) => cat.services)
                         .find((s: any) => s.id === item.serviceId);
+                      const promoActive = config && config.buy_x > 0 && config.get_y_free > 0;
                       return (
-                        <p key={item.serviceId} className="font-medium leading-tight text-sm">
+                        <p key={item.serviceId} className="font-medium leading-tight text-sm flex items-center gap-2">
                           • {service ? getServiceTitle(service) : item.serviceId}
                           {item.quantity > 1 && ` ×${item.quantity}`}
+                          {promoActive && item.quantity >= config.buy_x && (
+                            <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded whitespace-nowrap">
+                              {t.promo?.buyXgetY?.replace("{buyX}", String(config.buy_x)).replace("{getY}", String(config.get_y_free)) || `Buy ${config.buy_x} Get ${config.get_y_free} Free`}
+                            </span>
+                          )}
                         </p>
                       );
                     })
@@ -167,7 +175,7 @@ export function BookingForm() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Total</p>
-                  <p className="font-medium text-green-600">€{priceSummary.total.toFixed(2)} (-€{priceSummary.discount.toFixed(2)} discount)</p>
+                  <p className="font-medium text-green-600">€{priceSummary.total.toFixed(2)} (-€{priceSummary.discount.toFixed(2)} {t.form.discount?.toLowerCase() || 'discount'})</p>
                 </div>
               </div>
             )}
@@ -337,6 +345,31 @@ export function BookingForm() {
             </div>
           </div>
 
+          <div className="space-y-2 p-3 bg-muted/20 rounded-2xl border border-border/50">
+            <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+              {t.calendar.tourLabel || "Servicios"} ({formData.selectedServices.length})
+            </p>
+            {formData.selectedServices.map((item: any) => {
+              const service = servicesData
+                .flatMap((cat: any) => cat.services)
+                .find((s: any) => s.id === item.serviceId);
+              const promoActive = config && config.buy_x > 0 && config.get_y_free > 0;
+              return (
+                <div key={item.serviceId} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="truncate">{service ? getServiceTitle(service) : item.serviceId}</span>
+                    {promoActive && (
+                      <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded whitespace-nowrap shrink-0">
+                        {t.promo?.buyXgetY?.replace("{buyX}", String(config.buy_x)).replace("{getY}", String(config.get_y_free)) || `Buy ${config.buy_x} Get ${config.get_y_free} Free`}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-muted-foreground shrink-0 ml-2">×{item.quantity}</span>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-xl border border-primary/10">
             <AlertCircle className="w-4 h-4 text-primary shrink-0" />
             <p className="text-[10px] text-muted-foreground italic leading-tight">
@@ -354,7 +387,7 @@ export function BookingForm() {
                 <div className="flex items-center justify-between text-sm text-green-600">
                   <span className="flex items-center gap-1">
                     <Tag className="w-3 h-3" />
-                    Discount
+                    {t.form.discount || 'Discount'}
                   </span>
                   <span className="font-medium">-€{priceSummary.discount.toFixed(2)}</span>
                 </div>

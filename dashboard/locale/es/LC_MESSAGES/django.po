@@ -508,3 +508,23 @@ msgstr "Reconciliar reservas seleccionadas con Google"
 #: booking/admin.py:335
 msgid "Reconciliation complete: {} bookings updated."
 msgstr "Reconciliación completada: {} reservas actualizadas."
+
+#: booking/admin.py:150
+msgid "Promotions"
+msgstr "Promociones"
+
+#: booking/models.py:109
+msgid "Buy X"
+msgstr "Comprar X"
+
+#: booking/models.py:110
+msgid "Get Y Free"
+msgstr "Llevar Y Gratis"
+
+#: booking/models.py:109
+msgid "Buy X items to trigger promotion. Set to 0 to disable."
+msgstr "Compre X artículos para activar la promoción. Establezca 0 para desactivar."
+
+#: booking/models.py:110
+msgid "Free items per threshold. Set to 0 to disable."
+msgstr "Artículos gratis por umbral. Establezca 0 para desactivar."

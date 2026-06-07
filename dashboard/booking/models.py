@@ -105,6 +105,10 @@ class CompanyProfile(SingletonModel):
     facebook_url = models.URLField(_("Facebook URL"), null=True, blank=True)
     booking_cooldown_minutes = models.PositiveIntegerField(_("Booking cooldown (minutes)"), default=0)
 
+    # Global BOGO Promotion
+    buy_x = models.PositiveIntegerField(_("Buy X"), default=0, help_text=_("Buy X items to trigger promotion. Set to 0 to disable."))
+    get_y_free = models.PositiveIntegerField(_("Get Y Free"), default=0, help_text=_("Free items per threshold. Set to 0 to disable."))
+
     def __str__(self):
         return str(_("Company Profile"))
 
@@ -149,8 +153,6 @@ class Event(models.Model):
     price = models.DecimalField(_("Price"), max_digits=10, decimal_places=2)
     duration_minutes = models.PositiveIntegerField(_("Duration (minutes)"))
     image = models.ImageField(_("Image"), upload_to="events/", null=True, blank=True)
-    buy_x = models.PositiveIntegerField(_("Buy X"), default=0, help_text=_("Buy X items to trigger promotion. Set to 0 to disable."))
-    get_y_free = models.PositiveIntegerField(_("Get Y Free"), default=0, help_text=_("Free items per threshold. Set to 0 to disable."))
 
     def __str__(self):
         return self.name

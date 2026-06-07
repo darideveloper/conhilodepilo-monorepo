@@ -1,3 +1,8 @@
+# confirmation-email Specification
+
+## Purpose
+TBD - created by archiving change bogo-global-promotion. Update Purpose after archive.
+## Requirements
 ### Requirement: Send branded HTML confirmation email upon booking confirmation
 The system SHALL send a branded HTML email to the client when a booking is confirmed (post-paid) or marked as paid (pre-paid). The email SHALL use the SMTP configuration from environment variables and branding from CompanyProfile.
 
@@ -15,11 +20,11 @@ The system SHALL send a branded HTML email to the client when a booking is confi
 - **AND** the error is logged
 
 ### Requirement: Email contains service details and appointment info
-The email SHALL include client name, service names, appointment date, start time, end time, and any special requests.
+The email SHALL include client name, service names with quantities, appointment date, start time, end time, and any special requests. Service names SHALL be rendered with quantity (e.g., "Eyebrow Threading ×3") and shown alongside their subtotal (unit price × quantity).
 
 #### Scenario: All booking details rendered in email
 - **WHEN** a confirmation email is sent
-- **THEN** the email body contains: client name, list of service names, date in DD/MM/YYYY format, time range (HH:MM - HH:MM), and special requests text
+- **THEN** the email body contains: client name, list of services with quantities (e.g. "Eyebrow Threading ×3"), each service's subtotal, date in DD/MM/YYYY format, time range (HH:MM - HH:MM), and special requests text
 
 #### Scenario: Plain-text fallback is included
 - **WHEN** a confirmation email is sent
@@ -61,3 +66,27 @@ The system SHALL BCC a copy of the confirmation email to all emails in `settings
 #### Scenario: No admin BCC when EMAILS_NOTIFICATIONS is empty
 - **WHEN** `settings.EMAILS_NOTIFICATIONS` is empty or contains only empty strings
 - **THEN** no BCC SHALL be added to the email
+
+### Requirement: Email shows pricing breakdown with discount
+The email SHALL display a price summary section showing the original subtotal, any promotional discount, and the final total. When no discount applies, only the total is shown.
+
+#### Scenario: Email shows price summary with discount
+- **GIVEN** a booking was created with a promotional discount (e.g. Buy 2 Get 1 Free)
+- **WHEN** the confirmation email is sent
+- **THEN** the email SHALL display: Subtotal (sum of all line subtotals), Discount amount (e.g. "-€30.00"), and Total amount
+
+#### Scenario: Email shows total only when no discount
+- **GIVEN** a booking was created without any promotional discount
+- **WHEN** the confirmation email is sent
+- **THEN** the email SHALL display the total amount
+- **AND** SHALL NOT show a discount line
+
+### Requirement: Email fetches service data from through model
+The confirmation email SHALL fetch service line items from `BookingServiceThrough` (via `booking.booking_services.all()`) instead of `booking.services.all()`, to access stored `quantity` and `unit_price` per service.
+
+#### Scenario: Email renders quantity and unit price from through model
+- **GIVEN** a booking with Service A × 3 at a stored unit_price of €30.00
+- **WHEN** `send_confirmation_email()` is called
+- **THEN** the service list SHALL include `quantity=3` and `unit_price=30.00` from the through model
+- **AND** the subtotal SHALL be calculated as `3 × 30.00 = 90.00`
+

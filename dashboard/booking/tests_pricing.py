@@ -1,153 +1,62 @@
 from decimal import Decimal
 from django.test import TestCase
-from .models import EventType, Event
+from .models import EventType, Event, CompanyProfile
 from utils.pricing import calculate_service_discount, calculate_booking_totals
 
 
 class CalculateServiceDiscountTest(TestCase):
-    def setUp(self):
-        self.event_type = EventType.objects.create(name="Test Type")
-
     def test_no_promotion_buy_x_zero(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="No Promo Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=0,
-            get_y_free=0
-        )
-        discount, free_count = calculate_service_discount(event, 3)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 3, 0, 0)
         self.assertEqual(discount, Decimal('0.00'))
         self.assertEqual(free_count, 0)
 
     def test_no_promotion_get_y_zero(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="No Promo Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=0
-        )
-        discount, free_count = calculate_service_discount(event, 3)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 3, 2, 0)
         self.assertEqual(discount, Decimal('0.00'))
         self.assertEqual(free_count, 0)
 
     def test_qty_below_threshold(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="BOGO Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
-        )
-        discount, free_count = calculate_service_discount(event, 1)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 1, 2, 1)
         self.assertEqual(discount, Decimal('0.00'))
         self.assertEqual(free_count, 0)
 
     def test_qty_at_threshold_buy_2_get_1(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="BOGO Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
-        )
-        discount, free_count = calculate_service_discount(event, 2)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 2, 2, 1)
         self.assertEqual(discount, Decimal('30.00'))
         self.assertEqual(free_count, 1)
 
     def test_qty_above_threshold_buy_2_get_1(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="BOGO Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
-        )
-        discount, free_count = calculate_service_discount(event, 3)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 3, 2, 1)
         self.assertEqual(discount, Decimal('30.00'))
         self.assertEqual(free_count, 1)
 
     def test_qty_4_above_threshold_buy_2_get_1(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="BOGO Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
-        )
-        discount, free_count = calculate_service_discount(event, 4)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 4, 2, 1)
         self.assertEqual(discount, Decimal('60.00'))
         self.assertEqual(free_count, 2)
 
     def test_stacking_buy_3_get_1(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="BOGO Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=3,
-            get_y_free=1
-        )
-        discount, free_count = calculate_service_discount(event, 6)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 6, 3, 1)
         self.assertEqual(discount, Decimal('60.00'))
         self.assertEqual(free_count, 2)
 
     def test_qty_zero(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="BOGO Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
-        )
-        discount, free_count = calculate_service_discount(event, 0)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 0, 2, 1)
         self.assertEqual(discount, Decimal('0.00'))
         self.assertEqual(free_count, 0)
 
     def test_get_y_free_greater_than_buy_x(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="Aggressive Promo",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=1,
-            get_y_free=10
-        )
-        discount, free_count = calculate_service_discount(event, 5)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 5, 1, 10)
         self.assertEqual(discount, Decimal('150.00'))
         self.assertEqual(free_count, 5)
 
     def test_capped_at_qty(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="BOGO Service",
-            price=Decimal('30.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=5
-        )
-        discount, free_count = calculate_service_discount(event, 3)
+        discount, free_count = calculate_service_discount(Decimal('30.00'), 3, 2, 5)
         self.assertEqual(free_count, 3)
         self.assertEqual(discount, Decimal('90.00'))
 
     def test_different_price(self):
-        event = Event.objects.create(
-            event_type=self.event_type,
-            name="Expensive Service",
-            price=Decimal('50.00'),
-            duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
-        )
-        discount, free_count = calculate_service_discount(event, 2)
+        discount, free_count = calculate_service_discount(Decimal('50.00'), 2, 2, 1)
         self.assertEqual(discount, Decimal('50.00'))
         self.assertEqual(free_count, 1)
 
@@ -160,23 +69,19 @@ class CalculateBookingTotalsTest(TestCase):
             name="Service A",
             price=Decimal('30.00'),
             duration_minutes=30,
-            buy_x=2,
-            get_y_free=1
         )
         self.event2 = Event.objects.create(
             event_type=self.event_type,
             name="Service B",
             price=Decimal('50.00'),
             duration_minutes=60,
-            buy_x=0,
-            get_y_free=0
         )
 
     def test_booking_with_discount(self):
         booking_services = [
             (self.event1, 3, Decimal('30.00'))
         ]
-        original, discount, total, duration = calculate_booking_totals(booking_services)
+        original, discount, total, duration = calculate_booking_totals(booking_services, buy_x=2, get_y_free=1)
         self.assertEqual(original, Decimal('90.00'))
         self.assertEqual(discount, Decimal('30.00'))
         self.assertEqual(total, Decimal('60.00'))
@@ -186,7 +91,7 @@ class CalculateBookingTotalsTest(TestCase):
         booking_services = [
             (self.event2, 2, Decimal('50.00'))
         ]
-        original, discount, total, duration = calculate_booking_totals(booking_services)
+        original, discount, total, duration = calculate_booking_totals(booking_services, buy_x=0, get_y_free=0)
         self.assertEqual(original, Decimal('100.00'))
         self.assertEqual(discount, Decimal('0.00'))
         self.assertEqual(total, Decimal('100.00'))
@@ -197,7 +102,7 @@ class CalculateBookingTotalsTest(TestCase):
             (self.event1, 3, Decimal('30.00')),
             (self.event2, 1, Decimal('50.00'))
         ]
-        original, discount, total, duration = calculate_booking_totals(booking_services)
+        original, discount, total, duration = calculate_booking_totals(booking_services, buy_x=2, get_y_free=1)
         self.assertEqual(original, Decimal('140.00'))
         self.assertEqual(discount, Decimal('30.00'))
         self.assertEqual(total, Decimal('110.00'))
@@ -205,8 +110,22 @@ class CalculateBookingTotalsTest(TestCase):
 
     def test_empty_services(self):
         booking_services = []
-        original, discount, total, duration = calculate_booking_totals(booking_services)
+        original, discount, total, duration = calculate_booking_totals(booking_services, buy_x=2, get_y_free=1)
         self.assertEqual(original, Decimal('0.00'))
         self.assertEqual(discount, Decimal('0.00'))
         self.assertEqual(total, Decimal('0.00'))
         self.assertEqual(duration, 0)
+
+    def test_fallback_to_company_profile(self):
+        cp = CompanyProfile.get_solo()
+        cp.buy_x = 2
+        cp.get_y_free = 1
+        cp.save()
+        booking_services = [
+            (self.event1, 3, Decimal('30.00'))
+        ]
+        original, discount, total, duration = calculate_booking_totals(booking_services)
+        self.assertEqual(original, Decimal('90.00'))
+        self.assertEqual(discount, Decimal('30.00'))
+        self.assertEqual(total, Decimal('60.00'))
+        self.assertEqual(duration, 90)

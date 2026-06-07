@@ -100,13 +100,10 @@ export function BookingServiceSelection() {
     return service ? parseFloat(service.price) : 0;
   };
 
-  const getServicePromotion = (serviceId: string) => {
-    const service = servicesData
-      .flatMap((cat: any) => cat.services)
-      .find((s: any) => s.id === serviceId);
-    if (!service) return null;
-    if (service.buy_x > 0 && service.get_y_free > 0) {
-      return { buy_x: service.buy_x, get_y_free: service.get_y_free };
+  const getServicePromotion = (_serviceId: string) => {
+    if (!config) return null;
+    if (config.buy_x > 0 && config.get_y_free > 0) {
+      return { buy_x: config.buy_x, get_y_free: config.get_y_free };
     }
     return null;
   };

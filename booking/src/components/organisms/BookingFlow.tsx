@@ -63,7 +63,8 @@ export default function BookingFlow({ initialServiceId }: { initialServiceId?: s
           selectedServices: [
             { 
               serviceId: serviceQuery,
-              serviceTypeId: category ? category.id : (null as any)
+              serviceTypeId: category ? category.id : (null as any),
+              quantity: 1
             }
           ]
         });

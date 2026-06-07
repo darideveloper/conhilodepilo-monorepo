@@ -2,26 +2,14 @@
 
 ## Purpose
 The `config-api` specification defines the central configuration management for the system, including company profile data, contact information, social media links, and branding details, exposed via a central API for consumption across all platform services.
-
 ## Requirements
 ### Requirement: Global Configuration Fetching
-The system MUST provide a way to fetch the global company configuration from the dashboard API, and the services API MUST include promotion fields for each service.
+The system MUST provide a way to fetch the global company configuration from the dashboard API. The `/api/config/` endpoint SHALL now include the global BOGO promotion fields (`buy_x` and `get_y_free`). The services API no longer returns per-service promotion fields.
 
 #### Scenario: Fetch configuration from API
 1.  **Given** the dashboard API is available at `/api/config/`.
 2.  **When** the `getConfig` utility is called.
-3.  **Then** it should return an object containing `contact_phone`, `contact_email`, and other branding details.
-
-### Requirement: Services API Exposes Promotion Fields
-The `/api/services/` endpoint SHALL include `buy_x` and `get_y_free` fields in each service object so the frontend can display promotion badges and calculate discounts.
-
-#### Scenario: Service with active promotion
-- **WHEN** a service has `buy_x=2` and `get_y_free=1`
-- **THEN** the API response for that service SHALL include `buy_x: 2` and `get_y_free: 1`
-
-#### Scenario: Service without promotion
-- **WHEN** a service has `buy_x=0` and `get_y_free=0`
-- **THEN** the API response SHALL include `buy_x: 0` and `get_y_free: 0`
+3.  **Then** it should return an object containing `contact_phone`, `contact_email`, `buy_x`, and `get_y_free`.
 
 ### Requirement: Availability Endpoints Accept Quantities
 The `/api/availability/days/` and `/api/availability/slots/` endpoints SHALL accept an optional `quantities` query parameter (comma-separated integers) parallel to `service_ids`, representing the quantity of each service. When provided, total duration SHALL be computed as `SUM(duration × quantity)` instead of `SUM(duration)`.
@@ -97,4 +85,15 @@ The landing page footer SHALL render clickable Instagram and TikTok icons pointi
 #### Scenario: Social links open in new tab
 - **WHEN** a user clicks a social media icon in the footer
 - **THEN** the link opens in a new browser tab with `rel="noopener noreferrer"`
+
+### Requirement: Config API Exposes Global Promotion Fields
+The `/api/config/` endpoint SHALL include `buy_x` and `get_y_free` fields so the frontend can read the global promotion config.
+
+#### Scenario: Global promotion active
+- **WHEN** `CompanyProfile.buy_x=2` and `CompanyProfile.get_y_free=1`
+- **THEN** the config API response SHALL include `buy_x: 2` and `get_y_free: 1`
+
+#### Scenario: Global promotion disabled
+- **WHEN** `CompanyProfile.buy_x=0` and `CompanyProfile.get_y_free=0`
+- **THEN** the config API response SHALL include `buy_x: 0` and `get_y_free: 0`
 
