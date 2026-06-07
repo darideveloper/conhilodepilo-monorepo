@@ -130,6 +130,9 @@ def send_confirmation_email(booking) -> None:
 
 
 def send_gift_confirmation_emails(booking) -> None:
+    recipient_email = booking.recipient_email or booking.client_email
+    recipient_name = booking.recipient_name or booking.client_name
+
     try:
         context = _build_base_context(booking)
         context.update({
@@ -138,11 +141,11 @@ def send_gift_confirmation_emails(booking) -> None:
             "greeting": f"{booking.buyer_name} te ha regalado una cita. Aquí tienes los detalles:",
             "gift_buyer_name": booking.buyer_name,
             "gift_buyer_email": booking.buyer_email,
-            "recipient_name": booking.client_name,
-            "recipient_email": booking.client_email,
+            "recipient_name": recipient_name,
+            "recipient_email": recipient_email,
         })
         _send_email(
-            to_email=booking.client_email,
+            to_email=recipient_email,
             subject=f"Has recibido un regalo de {booking.buyer_name} - {context['company_name']}",
             context=context,
         )
@@ -154,16 +157,16 @@ def send_gift_confirmation_emails(booking) -> None:
         context.update({
             "is_gift": True,
             "email_role": "buyer",
-            "greeting": f"Has regalado una cita a {booking.client_name}.",
+            "greeting": f"Has regalado una cita a {recipient_name}.",
             "gift_buyer_name": booking.buyer_name,
             "gift_buyer_email": booking.buyer_email,
-            "recipient_name": booking.client_name,
-            "recipient_email": booking.client_email,
+            "recipient_name": recipient_name,
+            "recipient_email": recipient_email,
             "client_name": booking.buyer_name,
         })
         _send_email(
             to_email=booking.buyer_email,
-            subject=f"Has regalado una cita a {booking.client_name} - {context['company_name']}",
+            subject=f"Has regalado una cita a {recipient_name} - {context['company_name']}",
             context=context,
         )
     except Exception:

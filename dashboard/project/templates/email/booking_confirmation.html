@@ -14,9 +14,6 @@
 <!-- Header -->
 <tr>
 <td align="center" style="background-color:{{ brand_color }};padding:32px 24px;">
-{% if logo_url %}
-<img src="{{ logo_url }}" alt="{{ company_name }}" style="max-width:180px;height:auto;margin-bottom:12px;">
-{% endif %}
 <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:bold;">{{ company_name }}</h1>
 </td>
 </tr>
@@ -26,7 +23,7 @@
 <td style="padding:32px 24px 8px;">
 {% if is_gift and email_role == "buyer" %}
 <h2 style="margin:0;color:#333333;font-size:20px;">Hola, {{ gift_buyer_name }}</h2>
-<p style="margin:8px 0 0;color:#555555;font-size:16px;">Has regalado una cita a {{ client_name }}. Abajo tienes todos los detalles.</p>
+<p style="margin:8px 0 0;color:#555555;font-size:16px;">Has regalado una cita a {{ recipient_name }}. Abajo tienes todos los detalles.</p>
 {% elif is_gift and email_role == "recipient" %}
 <h2 style="margin:0;color:#333333;font-size:20px;">Hola, {{ client_name }}</h2>
 <p style="margin:8px 0 0;color:#555555;font-size:16px;">{{ gift_buyer_name }} te ha regalado una cita. Aquí tienes los detalles:</p>

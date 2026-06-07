@@ -113,8 +113,8 @@ class CreateBookingView(APIView):
                 booking = Booking.objects.create(
                     start_time=start_dt,
                     end_time=end_dt,
-                    client_name=client_name,
-                    client_email=client_email,
+                    client_name=recipient_name if is_gift else client_name,
+                    client_email=recipient_email if is_gift else client_email,
                     client_phone=client_phone,
                     special_requests=special_requests,
                     status=status,
@@ -124,8 +124,8 @@ class CreateBookingView(APIView):
                     is_gift=is_gift,
                     buyer_name=buyer_name,
                     buyer_email=buyer_email,
-                    recipient_name=client_name if is_gift else None,
-                    recipient_email=client_email if is_gift else None,
+                    recipient_name=recipient_name if is_gift else None,
+                    recipient_email=recipient_email if is_gift else None,
                 )
 
                 through_rows = []

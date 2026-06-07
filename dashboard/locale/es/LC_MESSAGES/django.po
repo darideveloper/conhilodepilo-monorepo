@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-29 02:30+0200\n"
+"POT-Creation-Date: 2026-06-07 14:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,450 +19,637 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: booking/admin.py:70 booking/admin.py:223 booking/models.py:227
+#: booking/admin.py:71 booking/admin.py:238 booking/admin.py:313
+#: booking/models.py:215 booking/models.py:286
 msgid "Booking"
 msgstr "Reserva"
 
-#: booking/admin.py:71 booking/models.py:228 project/settings.py:289
+#: booking/admin.py:72 booking/models.py:287 project/settings.py:322
 msgid "Bookings"
 msgstr "Reservas"
 
-#: booking/admin.py:81
+#: booking/admin.py:82
 msgid "Client"
 msgstr "Cliente"
 
-#: booking/admin.py:85
+#: booking/admin.py:86
 msgid "Date/Time"
 msgstr "Fecha/Hora"
 
-#: booking/admin.py:89 booking/models.py:218
+#: booking/admin.py:90 booking/models.py:242
 msgid "Status"
 msgstr "Estado"
 
-#: booking/admin.py:98
+#: booking/admin.py:94
+msgid "Qty"
+msgstr ""
+
+#: booking/admin.py:103
 msgid "Manage"
 msgstr "Gestionar"
 
-#: booking/admin.py:100
+#: booking/admin.py:105
 msgid "Actions"
 msgstr "Acciones"
 
-#: booking/admin.py:121 booking/admin.py:154 booking/admin.py:177
-#: booking/admin.py:190 booking/admin.py:206 booking/admin.py:219
+#: booking/admin.py:126 booking/admin.py:169 booking/admin.py:192
+#: booking/admin.py:205 booking/admin.py:221 booking/admin.py:234
 msgid "General"
 msgstr "General"
 
-#: booking/admin.py:130
+#: booking/admin.py:136
 msgid "Contact Information"
 msgstr "Información de Contacto"
 
-#: booking/admin.py:136
+#: booking/admin.py:145
 msgid "Scheduling Configuration"
 msgstr "Configuración de Programación"
 
-#: booking/admin.py:141 booking/admin.py:155
+#: booking/admin.py:150
+msgid "Promotions"
+msgstr "Promociones"
+
+#: booking/admin.py:156 booking/admin.py:170
 msgid "UI Labels"
 msgstr "Etiquetas de UI"
 
-#: booking/admin.py:156
+#: booking/admin.py:171
 msgid "Global Availability"
 msgstr "Disponibilidad Global"
 
-#: booking/admin.py:157
+#: booking/admin.py:172
 msgid "Business Hours"
 msgstr "Horario Comercial"
 
-#: booking/admin.py:158
+#: booking/admin.py:173
 msgid "Holidays"
 msgstr "Festivos"
 
-#: booking/admin.py:191 booking/admin.py:269 booking/models.py:153
-#: booking/models.py:212 project/settings.py:294
+#: booking/admin.py:206 booking/models.py:162 booking/models.py:236
+#: project/settings.py:327
 msgid "Services"
 msgstr "Servicios"
 
-#: booking/admin.py:220
+#: booking/admin.py:235
 msgid "Service Week Slots"
 msgstr "Franjas horarias de servicio"
 
-#: booking/admin.py:221 booking/models.py:185
+#: booking/admin.py:236 booking/models.py:194
 msgid "Service Availability"
 msgstr "Disponibilidad de Servicio"
 
-#: booking/admin.py:222 booking/models.py:201
+#: booking/admin.py:237 booking/models.py:210
 msgid "Service Date Overrides"
 msgstr "Excepciones de Fecha de Servicio"
 
-#: booking/admin.py:263
+#: booking/admin.py:278 booking/models.py:161 booking/models.py:191
+#: booking/models.py:198 booking/models.py:206 booking/models.py:216
+msgid "Service"
+msgstr "Servicio"
+
+#: booking/admin.py:294
 msgid "Client Information"
 msgstr "Información del Cliente"
 
-#: booking/admin.py:266
+#: booking/admin.py:297
 msgid "Scheduling"
 msgstr "Programación"
 
-#: booking/admin.py:272
+#: booking/admin.py:300
+#, fuzzy
+#| msgid "Price"
+msgid "Pricing"
+msgstr "Precio"
+
+#: booking/admin.py:303 booking/admin.py:314
 msgid "Integrations"
 msgstr "Integraciones"
+
+#: booking/admin.py:307 booking/admin.py:315
+msgid "Google Calendar"
+msgstr "Google Calendar"
+
+#: booking/admin.py:321
+#, fuzzy
+#| msgid "Client"
+msgid "Cliente"
+msgstr "Cliente"
+
+#: booking/admin.py:326
+msgid "Estado"
+msgstr ""
+
+#: booking/admin.py:330
+#, fuzzy
+#| msgid "Services"
+msgid "Servicios"
+msgstr "Servicios"
+
+#: booking/admin.py:334
+msgid "Precio"
+msgstr ""
+
+#: booking/admin.py:342
+msgid "Fecha de compra"
+msgstr ""
+
+#: booking/admin.py:346
+msgid "Fecha del servicio"
+msgstr ""
+
+#: booking/admin.py:350
+msgid "Retry Google Calendar Sync"
+msgstr "Reintentar sincronización con Google Calendar"
+
+#: booking/admin.py:360
+msgid "{} of {} bookings synced successfully."
+msgstr "{} de {} reservas sincronizadas correctamente."
+
+#: booking/admin.py:363
+msgid "Reconcile selected bookings with Google"
+msgstr "Reconciliar reservas seleccionadas con Google"
+
+#: booking/admin.py:382
+msgid "Reconciliation complete: {} bookings updated."
+msgstr "Reconciliación completada: {} reservas actualizadas."
 
 #: booking/apps.py:8
 msgid "Booking Management"
 msgstr "Gestión de Reservas"
 
-#: booking/models.py:10
+#: booking/models.py:11
 msgid "Start date"
 msgstr "Fecha de inicio"
 
-#: booking/models.py:11
+#: booking/models.py:12
 msgid "End date"
 msgstr "Fecha de fin"
 
-#: booking/models.py:21
+#: booking/models.py:22
 msgid "Start date cannot be after end date."
 msgstr "La fecha de inicio no puede ser posterior a la fecha de fin."
 
-#: booking/models.py:25
+#: booking/models.py:26
 msgid "Monday"
 msgstr "Lunes"
 
-#: booking/models.py:26
+#: booking/models.py:27
 msgid "Tuesday"
 msgstr "Martes"
 
-#: booking/models.py:27
+#: booking/models.py:28
 msgid "Wednesday"
 msgstr "Miércoles"
 
-#: booking/models.py:28
+#: booking/models.py:29
 msgid "Thursday"
 msgstr "Jueves"
 
-#: booking/models.py:29
+#: booking/models.py:30
 msgid "Friday"
 msgstr "Viernes"
 
-#: booking/models.py:30
+#: booking/models.py:31
 msgid "Saturday"
 msgstr "Sábado"
 
-#: booking/models.py:31
+#: booking/models.py:32
 msgid "Sunday"
 msgstr "Domingo"
 
-#: booking/models.py:33
+#: booking/models.py:34
 msgid "Weekday"
 msgstr "Día de la semana"
 
-#: booking/models.py:34 booking/models.py:51 booking/models.py:213
+#: booking/models.py:35 booking/models.py:52 booking/models.py:237
 msgid "Start time"
 msgstr "Hora de inicio"
 
-#: booking/models.py:35 booking/models.py:52 booking/models.py:214
+#: booking/models.py:36 booking/models.py:53 booking/models.py:238
 msgid "End time"
 msgstr "Hora de fin"
 
-#: booking/models.py:46 booking/models.py:68 booking/models.py:71
+#: booking/models.py:47 booking/models.py:69 booking/models.py:72
 msgid "Start time must be before end time."
 msgstr "La hora de inicio debe ser anterior a la hora de fin."
 
-#: booking/models.py:49
+#: booking/models.py:50
 msgid "Date"
 msgstr "Fecha"
 
-#: booking/models.py:50
+#: booking/models.py:51
 msgid "Is available"
 msgstr "Está disponible"
 
-#: booking/models.py:58 booking/models.py:96
+#: booking/models.py:59 booking/models.py:97
 msgid "Available"
 msgstr "Disponible"
 
-#: booking/models.py:58
+#: booking/models.py:59
 msgid "Unavailable"
 msgstr "No disponible"
 
-#: booking/models.py:66
+#: booking/models.py:67
 msgid "Start and end times are required if available."
 msgstr "Las horas de inicio y fin son obligatorias si está disponible."
 
-#: booking/models.py:76 booking/models.py:112 booking/models.py:127
-#: booking/models.py:142
+#: booking/models.py:77 booking/models.py:121 booking/models.py:136
+#: booking/models.py:151
 msgid "Name"
 msgstr "Nombre"
 
-#: booking/models.py:78
+#: booking/models.py:79
 msgid "Brand color"
 msgstr "Color de marca"
 
-#: booking/models.py:84
+#: booking/models.py:85
 msgid "Enter a valid HEX color or OKLCH format (e.g., oklch(0.68 0.28 296))"
 msgstr "Ingrese un color HEX válido o formato OKLCH (ej: oklch(0.68 0.28 296))"
 
-#: booking/models.py:88
+#: booking/models.py:89
 msgid "Logo"
 msgstr "Logotipo"
 
-#: booking/models.py:89
+#: booking/models.py:90
 msgid "Contact email"
 msgstr "Correo de contacto"
 
-#: booking/models.py:90
+#: booking/models.py:91
 msgid "Contact phone"
 msgstr "Teléfono de contacto"
 
-#: booking/models.py:91
+#: booking/models.py:92
 msgid "Currency"
 msgstr "Moneda"
 
-#: booking/models.py:94
+#: booking/models.py:95
 msgid "Event type label"
 msgstr "Etiqueta de tipo de servicio"
 
-#: booking/models.py:94
+#: booking/models.py:95
 msgid "Service Category"
 msgstr "Categoría de Servicio"
 
-#: booking/models.py:95
+#: booking/models.py:96
 msgid "Event label"
 msgstr "Etiqueta de servicio"
 
-#: booking/models.py:95
+#: booking/models.py:96
 msgid "Consultation"
 msgstr "Consulta"
 
-#: booking/models.py:96
+#: booking/models.py:97
 msgid "Availability free label"
 msgstr "Etiqueta de disponibilidad libre"
 
-#: booking/models.py:97
+#: booking/models.py:98
 msgid "Availability regular label"
 msgstr "Etiqueta de disponibilidad parcial"
 
-#: booking/models.py:97
+#: booking/models.py:98
 msgid "Partial"
 msgstr "Parcial"
 
-#: booking/models.py:98
+#: booking/models.py:99
 msgid "Availability no free label"
 msgstr "Etiqueta de disponibilidad completa"
 
-#: booking/models.py:98
+#: booking/models.py:99
 msgid "Fully Booked"
 msgstr "Completo"
 
-#: booking/models.py:99
+#: booking/models.py:100
 msgid "Extras label"
 msgstr "Etiqueta de extras"
 
-#: booking/models.py:99
+#: booking/models.py:100
 msgid "Add-ons"
 msgstr "Extras"
 
-#: booking/models.py:100
+#: booking/models.py:101
 msgid "Privacy policy URL"
 msgstr "URL de política de privacidad"
 
-#: booking/models.py:101
+#: booking/models.py:102
+msgid "Terms and conditions URL"
+msgstr ""
+
+#: booking/models.py:103
+msgid "Instagram URL"
+msgstr ""
+
+#: booking/models.py:104
+msgid "TikTok URL"
+msgstr ""
+
+#: booking/models.py:105
+msgid "Facebook URL"
+msgstr ""
+
+#: booking/models.py:106
 msgid "Booking cooldown (minutes)"
 msgstr "Tiempo de espera entre reservas (minutos)"
 
-#: booking/models.py:104 booking/models.py:107 project/settings.py:306
+#: booking/models.py:109
+msgid "Buy X"
+msgstr "Comprar X"
+
+#: booking/models.py:109
+msgid "Buy X items to trigger promotion. Set to 0 to disable."
+msgstr ""
+"Compre X artículos para activar la promoción. Establezca 0 para desactivar."
+
+#: booking/models.py:110
+msgid "Get Y Free"
+msgstr "Llevar Y Gratis"
+
+#: booking/models.py:110
+msgid "Free items per threshold. Set to 0 to disable."
+msgstr "Artículos gratis por umbral. Establezca 0 para desactivar."
+
+#: booking/models.py:113 booking/models.py:116 project/settings.py:339
 msgid "Company Profile"
 msgstr "Perfil de Empresa"
-#: booking/models.py:118
+
+#: booking/models.py:127
 msgid "Event Type Group"
 msgstr "Agrupación de servicios"
 
-#: booking/models.py:119
+#: booking/models.py:128
 msgid "Event Type Groups"
 msgstr "Agrupaciones de servicios"
 
-#: booking/models.py:123
+#: booking/models.py:132
 msgid "Pre-paid"
 msgstr "Prepago"
 
-#: booking/models.py:124
+#: booking/models.py:133
 msgid "Post-paid"
 msgstr "Pago posterior"
 
-#: booking/models.py:126
+#: booking/models.py:135
 msgid "Group"
 msgstr "Agrupación"
 
-#: booking/models.py:128 booking/models.py:143
+#: booking/models.py:137 booking/models.py:152
 msgid "Description"
 msgstr "Descripción"
 
-#: booking/models.py:129
+#: booking/models.py:138
 msgid "Payment model"
 msgstr "Modelo de pago"
 
-#: booking/models.py:130
+#: booking/models.py:139
 msgid "Allow overlap"
 msgstr "Permitir solapamiento"
 
-#: booking/models.py:131 booking/models.py:146
+#: booking/models.py:140 booking/models.py:155
 msgid "Image"
 msgstr "Imagen"
 
-#: booking/models.py:137
+#: booking/models.py:146
 msgid "Event Type"
 msgstr "Tipo de Evento"
 
-#: booking/models.py:138
+#: booking/models.py:147
 msgid "Event Types"
 msgstr "Tipos de Evento"
 
-#: booking/models.py:141
+#: booking/models.py:150
 msgid "Event type"
 msgstr "Tipo de evento"
 
-#: booking/models.py:144
+#: booking/models.py:153
 msgid "Price"
 msgstr "Precio"
 
-#: booking/models.py:145
+#: booking/models.py:154
 msgid "Duration (minutes)"
 msgstr "Duración (minutos)"
 
-#: booking/models.py:152 booking/models.py:182 booking/models.py:189
-#: booking/models.py:197
-msgid "Service"
-msgstr "Servicio"
-
-#: booking/models.py:158 booking/models.py:165 booking/models.py:173
+#: booking/models.py:167 booking/models.py:174 booking/models.py:182
 msgid "Company"
 msgstr "Empresa"
 
-#: booking/models.py:161
+#: booking/models.py:170
 msgid "Company Availability"
 msgstr "Disponibilidad de Empresa"
 
-#: booking/models.py:162
+#: booking/models.py:171
 msgid "Company Availabilities"
 msgstr "Disponibilidades de Empresa"
 
-#: booking/models.py:168
+#: booking/models.py:177
 msgid "Company Weekday Slot"
 msgstr "Franja Horaria de Empresa"
 
-#: booking/models.py:169
+#: booking/models.py:178
 msgid "Company Weekday Slots"
 msgstr "Franjas Horarias de Empresa"
 
-#: booking/models.py:176
+#: booking/models.py:185
 msgid "Company Date Override"
 msgstr "Excepción de Fecha de Empresa"
 
-#: booking/models.py:177
+#: booking/models.py:186
 msgid "Company Date Overrides"
 msgstr "Excepciones de Fecha de Empresa"
 
-#: booking/models.py:186
+#: booking/models.py:195
 msgid "Service Availabilities"
 msgstr "Disponibilidades de Servicio"
 
-#: booking/models.py:192
+#: booking/models.py:201
 msgid "Service Weekday Slot"
 msgstr "Franja Horaria de Servicio"
 
-#: booking/models.py:193
+#: booking/models.py:202
 msgid "Service Weekday Slots"
 msgstr "Franjas Horarias de Servicio"
 
-#: booking/models.py:200
+#: booking/models.py:209
 msgid "Service Date Override"
 msgstr "Excepción de Fecha de Servicio"
 
-#: booking/models.py:207
+#: booking/models.py:217
+msgid "Quantity"
+msgstr ""
+
+#: booking/models.py:218
+msgid "Unit price"
+msgstr ""
+
+#: booking/models.py:221
+#, fuzzy
+#| msgid "Booking"
+msgid "Booking Service"
+msgstr "Reserva"
+
+#: booking/models.py:222
+#, fuzzy
+#| msgid "Services"
+msgid "Booking Services"
+msgstr "Servicios"
+
+#: booking/models.py:231 booking/models.py:248
 msgid "Pending"
 msgstr "Pendiente"
 
-#: booking/models.py:208
+#: booking/models.py:232
 msgid "Confirmed"
 msgstr "Confirmada"
 
-#: booking/models.py:209
+#: booking/models.py:233
 msgid "Paid"
 msgstr "Pagada"
 
-#: booking/models.py:210
+#: booking/models.py:234
 msgid "Cancelled"
 msgstr "Cancelada"
 
-#: booking/models.py:215
+#: booking/models.py:239
 msgid "Client name"
 msgstr "Nombre del cliente"
 
-#: booking/models.py:216
+#: booking/models.py:240
 msgid "Client email"
 msgstr "Correo del cliente"
 
-#: booking/models.py:217
+#: booking/models.py:241
 msgid "Client phone"
 msgstr "Teléfono del cliente"
 
-#: booking/models.py:219
+#: booking/models.py:243
 msgid "Special requests"
 msgstr "Peticiones especiales"
 
-#: booking/models.py:220
+#: booking/models.py:244
+msgid "Original amount"
+msgstr ""
+
+#: booking/models.py:245
+msgid "Discount amount"
+msgstr ""
+
+#: booking/models.py:246
+msgid "Total amount"
+msgstr ""
+
+#: booking/models.py:249
+msgid "Success"
+msgstr ""
+
+#: booking/models.py:250
+msgid "Failure"
+msgstr ""
+
+#: booking/models.py:251
+msgid "Disabled"
+msgstr ""
+
+#: booking/models.py:253
 msgid "Google event ID"
 msgstr "ID de evento de Google"
 
-#: booking/models.py:221
+#: booking/models.py:255
+#, fuzzy
+#| msgid "Google Sync"
+msgid "Google sync status"
+msgstr "Sincronización con Google"
+
+#: booking/models.py:257
+#, fuzzy
+#| msgid "Google Sync"
+msgid "Google sync error"
+msgstr "Sincronización con Google"
+
+#: booking/models.py:258
+msgid "Last synced at"
+msgstr ""
+
+#: booking/models.py:261
 msgid "Stripe payment ID"
 msgstr "ID de pago de Stripe"
 
-#: project/settings.py:137
+#: booking/models.py:264
+msgid "Is gift"
+msgstr ""
+
+#: booking/models.py:265
+msgid "Buyer name"
+msgstr ""
+
+#: booking/models.py:266
+#, fuzzy
+#| msgid "Client email"
+msgid "Buyer email"
+msgstr "Correo del cliente"
+
+#: booking/models.py:267
+#, fuzzy
+#| msgid "Client name"
+msgid "Recipient name"
+msgstr "Nombre del cliente"
+
+#: booking/models.py:268
+#, fuzzy
+#| msgid "Client email"
+msgid "Recipient email"
+msgstr "Correo del cliente"
+
+#: project/admin.py:34
+msgid "Edit"
+msgstr ""
+
+#: project/settings.py:150
 msgid "Spanish"
 msgstr "Español"
 
-#: project/settings.py:138
+#: project/settings.py:151
 msgid "English"
 msgstr "Inglés"
 
-#: project/settings.py:247
+#: project/settings.py:281
 msgid "Dashboard"
 msgstr "Panel de Control"
 
-#: project/settings.py:284
+#: project/settings.py:317
 msgid "Management"
 msgstr "Gestión"
 
-#: project/settings.py:301
+#: project/settings.py:334
 msgid "Configuration"
 msgstr "Configuración"
 
-#: project/settings.py:313
+#: project/settings.py:346
 msgid "Authentication"
 msgstr "Autenticación"
 
-#: project/settings.py:318
+#: project/settings.py:351
 msgid "Users"
 msgstr "Usuarios"
 
-#: project/settings.py:323
+#: project/settings.py:356
 msgid "Groups"
 msgstr "Grupos"
 
-#: utils/callbacks.py:11
+#: utils/callbacks.py:10
 msgid "Production"
 msgstr "Producción"
 
-#: utils/callbacks.py:12
+#: utils/callbacks.py:11
 msgid "Staging"
 msgstr "Pruebas (Staging)"
 
-#: utils/callbacks.py:13
+#: utils/callbacks.py:12
 msgid "Development"
 msgstr "Desarrollo"
 
-#: utils/callbacks.py:14
+#: utils/callbacks.py:13
 msgid "Local"
 msgstr "Local"
 
-#: utils/callbacks.py:16
+#: utils/callbacks.py:15
 msgid "Unknown"
 msgstr "Desconocido"
 
@@ -484,47 +671,3 @@ msgstr "Desconocido"
 
 #~ msgid "Search"
 #~ msgstr "Buscar"
-
-#: booking/admin.py:288
-msgid "Google Sync"
-msgstr "Sincronización con Google"
-
-#: booking/admin.py:304
-msgid "Retry Google Calendar Sync"
-msgstr "Reintentar sincronización con Google Calendar"
-
-#: booking/admin.py:315
-msgid "{} of {} bookings synced successfully."
-msgstr "{} de {} reservas sincronizadas correctamente."
-
-#: booking/admin.py:277 booking/admin.py:285
-msgid "Google Calendar"
-msgstr "Google Calendar"
-
-#: booking/admin.py:318
-msgid "Reconcile selected bookings with Google"
-msgstr "Reconciliar reservas seleccionadas con Google"
-
-#: booking/admin.py:335
-msgid "Reconciliation complete: {} bookings updated."
-msgstr "Reconciliación completada: {} reservas actualizadas."
-
-#: booking/admin.py:150
-msgid "Promotions"
-msgstr "Promociones"
-
-#: booking/models.py:109
-msgid "Buy X"
-msgstr "Comprar X"
-
-#: booking/models.py:110
-msgid "Get Y Free"
-msgstr "Llevar Y Gratis"
-
-#: booking/models.py:109
-msgid "Buy X items to trigger promotion. Set to 0 to disable."
-msgstr "Compre X artículos para activar la promoción. Establezca 0 para desactivar."
-
-#: booking/models.py:110
-msgid "Free items per threshold. Set to 0 to disable."
-msgstr "Artículos gratis por umbral. Establezca 0 para desactivar."

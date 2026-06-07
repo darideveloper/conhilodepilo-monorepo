@@ -7,6 +7,7 @@ from unfold.admin import ModelAdmin
 from unfold.decorators import action
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 admin.site.unregister(User)
 admin.site.unregister(Group)
@@ -30,6 +31,6 @@ class ModelAdminUnfoldBase(ModelAdmin):
     
     actions_row = ["edit"]
 
-    @action(description="Edit", permissions=["change"])
+    @action(description=_("Edit"), permissions=["change"])
     def edit(self, request, object_id):
         return redirect(reverse(f"admin:{self.model._meta.app_label}_{self.model._meta.model_name}_change", args=[object_id]))
