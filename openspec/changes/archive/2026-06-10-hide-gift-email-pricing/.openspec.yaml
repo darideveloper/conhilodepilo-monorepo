@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-06-10
+goal: Hide prices in gift recipient emails while showing them in regular and
+  buyer emails

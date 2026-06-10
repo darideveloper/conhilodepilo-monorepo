@@ -48,27 +48,34 @@ The recipient's notification email SHALL state that they received a gift and SHA
 - **THEN** the subject or body SHALL clearly indicate "Has recibido un regalo de [buyer_name]"
 - **AND** the email SHALL include the buyer's name and appointment details
 
-### Requirement: Email content differs by role (buyer vs recipient)
-The email template SHALL accept a `role` parameter (`"buyer"` or `"recipient"`) to render role-specific copy while sharing the same booking details (services, date, time, location).
+### Requirement: Email content and pricing differs by role (buyer vs recipient)
+The email template SHALL accept a `role` parameter (`"buyer"` or `"recipient"`) to render role-specific copy. Buyer and regular booking emails SHALL include full service details with subtotals and a pricing summary. Gift recipient emails SHALL show services without prices and SHALL NOT include any pricing summary.
 
 #### Scenario: Buyer email includes purchase confirmation language
 - **WHEN** rendering the buyer's email
 - **THEN** the greeting SHALL address the buyer
 - **AND** the body SHALL confirm the gift purchase
 - **AND** the WhatsApp CTA SHALL be for the buyer's needs
+- **AND** the email SHALL include full pricing breakdown
 
 #### Scenario: Recipient email includes gift surprise language
 - **WHEN** rendering the recipient's email
 - **THEN** the greeting SHALL address the recipient
 - **AND** the body SHALL announce the gift
 - **AND** the WhatsApp CTA SHALL offer rescheduling assistance
+- **AND** the email SHALL NOT display any pricing information
 
 ### Requirement: Email contains service details and appointment info
-The email SHALL include client name, service names with quantities, appointment date, start time, end time, and any special requests. Service names SHALL be rendered with quantity (e.g., "Eyebrow Threading ×3") and shown alongside their subtotal (unit price × quantity).
+The email SHALL include client name, service names with quantities, appointment date, start time, end time, and any special requests. Service names SHALL be rendered with quantity (e.g., "Eyebrow Threading ×3"). For buyer and regular booking emails, services SHALL be shown alongside their subtotal (unit price × quantity). For gift recipient emails, services SHALL be shown without subtotals.
 
-#### Scenario: All booking details rendered in email
-- **WHEN** a confirmation email is sent
+#### Scenario: All booking details rendered in buyer and regular email
+- **WHEN** a confirmation email is sent to a buyer or regular client
 - **THEN** the email body contains: client name, list of services with quantities (e.g. "Eyebrow Threading ×3"), each service's subtotal, date in DD/MM/YYYY format, time range (HH:MM - HH:MM), and special requests text
+
+#### Scenario: Services shown without prices in gift recipient email
+- **WHEN** a recipient notification email is sent for a gift booking
+- **THEN** the email body contains: client name, list of services with quantities (e.g. "Eyebrow Threading ×3"), appointment date, time range, and special requests text
+- **AND** SHALL NOT include per-service subtotals
 
 #### Scenario: Plain-text fallback is included
 - **WHEN** a confirmation email is sent
@@ -98,18 +105,23 @@ The email SHALL use the company name, brand color, and social media URLs from `C
 - **THEN** the email footer contains links to Instagram, TikTok, and Facebook from `CompanyProfile`
 
 ### Requirement: Email shows pricing breakdown with discount
-The email SHALL display a price summary section showing the original subtotal, any promotional discount, and the final total. When no discount applies, only the total is shown.
+The email SHALL display a price summary section showing the original subtotal, any promotional discount, and the final total. When no discount applies, only the total is shown. This pricing summary SHALL be hidden in gift recipient emails.
 
 #### Scenario: Email shows price summary with discount
 - **GIVEN** a booking was created with a promotional discount (e.g. Buy 2 Get 1 Free)
-- **WHEN** the confirmation email is sent
+- **WHEN** the confirmation email is sent to a buyer or regular client
 - **THEN** the email SHALL display: Subtotal (sum of all line subtotals), Discount amount (e.g. "-€30.00"), and Total amount
 
 #### Scenario: Email shows total only when no discount
 - **GIVEN** a booking was created without any promotional discount
-- **WHEN** the confirmation email is sent
+- **WHEN** the confirmation email is sent to a buyer or regular client
 - **THEN** the email SHALL display the total amount
 - **AND** SHALL NOT show a discount line
+
+#### Scenario: Pricing hidden in gift recipient email
+- **GIVEN** a gift booking with any pricing
+- **WHEN** the recipient notification email is sent
+- **THEN** the email SHALL NOT display any pricing information (no Subtotal column, no per-service subtotals, no discount, no total)
 
 ### Requirement: Email fetches service data from through model
 The confirmation email SHALL fetch service line items from `BookingServiceThrough` (via `booking.booking_services.all()`) instead of `booking.services.all()`, to access stored `quantity` and `unit_price` per service.
