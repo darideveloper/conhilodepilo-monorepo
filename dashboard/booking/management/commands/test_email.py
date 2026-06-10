@@ -16,12 +16,13 @@ Usage:
     python manage.py test_email user@example.com          # direct argument
     EMAIL_TO=user@example.com python manage.py test_email # env variable
     python manage.py test_email user@example.com --no-send  # dry-run
+    python manage.py test_email --gift user@example.com     # gift email test
 """
 from django.core.management.base import BaseCommand, CommandError
 from decimal import Decimal
 from django.utils import timezone
 from booking.models import Booking, BookingServiceThrough, Event, CompanyProfile
-from utils.email import send_confirmation_email
+from utils.email import send_confirmation_email, send_gift_confirmation_emails
 
 
 class Command(BaseCommand):
@@ -34,9 +35,15 @@ class Command(BaseCommand):
             action="store_true",
             help="Dry-run: create booking but skip sending the email",
         )
+        parser.add_argument(
+            "--gift",
+            action="store_true",
+            help="Test gift booking emails (sends both recipient and buyer emails to the given address)",
+        )
 
     def handle(self, *args, **options):
         recipient = options["email"]
+        is_gift = options["gift"]
 
         # Resolve recipient: arg > env > terminal prompt
         if not recipient:
@@ -59,17 +66,28 @@ class Command(BaseCommand):
         cp.get_y_free = 1
         cp.save()
 
-        booking = Booking.objects.create(
-            client_name="Test User",
-            client_email="test@example.com",
-            client_phone="+34 600 000 000",
-            start_time=timezone.now(),
-            end_time=timezone.now() + timezone.timedelta(minutes=event.duration_minutes * 3),
-            status="CONFIRMED",
-            original_amount=Decimal("90.00"),
-            discount_amount=Decimal("30.00"),
-            total_amount=Decimal("60.00"),
-        )
+        booking_kwargs = {
+            "client_name": "Test User",
+            "client_email": "test@example.com",
+            "client_phone": "+34 600 000 000",
+            "start_time": timezone.now(),
+            "end_time": timezone.now() + timezone.timedelta(minutes=event.duration_minutes * 3),
+            "status": "CONFIRMED",
+            "original_amount": Decimal("90.00"),
+            "discount_amount": Decimal("30.00"),
+            "total_amount": Decimal("60.00"),
+        }
+
+        if is_gift:
+            booking_kwargs.update({
+                "is_gift": True,
+                "buyer_name": "Test Buyer",
+                "buyer_email": recipient,
+                "recipient_name": "Test User",
+                "recipient_email": recipient,
+            })
+
+        booking = Booking.objects.create(**booking_kwargs)
 
         BookingServiceThrough.objects.create(
             booking=booking, event=event, quantity=3, unit_price=event.price
@@ -79,12 +97,19 @@ class Command(BaseCommand):
 
         try:
             if options["no_send"]:
-                self.stdout.write(f"[DRY-RUN] Would send confirmation email to: {recipient}")
+                if is_gift:
+                    self.stdout.write(f"[DRY-RUN] Would send gift recipient + buyer emails to: {recipient}")
+                else:
+                    self.stdout.write(f"[DRY-RUN] Would send confirmation email to: {recipient}")
                 return
 
-            booking.client_email = recipient
-            send_confirmation_email(booking)
-            self.stdout.write(self.style.SUCCESS(f"✓ Confirmation email sent to: {recipient}"))
+            if is_gift:
+                send_gift_confirmation_emails(booking)
+                self.stdout.write(self.style.SUCCESS(f"✓ Gift recipient + buyer emails sent to: {recipient}"))
+            else:
+                booking.client_email = recipient
+                send_confirmation_email(booking)
+                self.stdout.write(self.style.SUCCESS(f"✓ Confirmation email sent to: {recipient}"))
         except Exception as e:
             self.stderr.write(self.style.ERROR(f"✗ FAILED to send email: {e}"))
             raise

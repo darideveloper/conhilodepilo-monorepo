@@ -366,3 +366,44 @@ class GiftEmailTest(TestCase):
                 send_gift_confirmation_emails(self.booking)
                 self.assertEqual(mock_logger.exception.call_count, 1)
                 self.assertEqual(mock_email_cls.call_count, 2)
+
+    def test_recipient_email_plain_text_hides_prices(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            recipient_body = mock_email_cls.call_args_list[0].kwargs["body"]
+            self.assertNotIn("15.00", recipient_body)
+            self.assertNotIn("Precios:", recipient_body)
+            self.assertNotIn("Subtotal", recipient_body)
+            self.assertNotIn("Total", recipient_body)
+
+    def test_buyer_email_plain_text_shows_prices(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            buyer_body = mock_email_cls.call_args_list[1].kwargs["body"]
+            self.assertIn("15.00", buyer_body)
+            self.assertIn("Precios:", buyer_body)
+            self.assertIn("Subtotal", buyer_body)
+            self.assertIn("Total", buyer_body)
+
+    def test_recipient_email_html_hides_prices(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            recipient_html = mock_instance.attach_alternative.call_args_list[0][0][0]
+            self.assertNotIn("15,00", recipient_html)
+            self.assertNotIn("15.00", recipient_html)
+            self.assertNotIn("Subtotal", recipient_html)
+
+    def test_buyer_email_html_shows_prices(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            buyer_html = mock_instance.attach_alternative.call_args_list[1][0][0]
+            self.assertIn("15,00", buyer_html)
+            self.assertIn("Subtotal", buyer_html)

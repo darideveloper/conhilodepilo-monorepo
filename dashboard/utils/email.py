@@ -58,22 +58,32 @@ def _build_base_context(booking):
 
 
 def _build_plain_text(context):
+    show_pricing = context.get("show_pricing", True)
     text = (
         f"Hola {context['client_name']},\n\n"
         f"{context['greeting']}\n\n"
         f"Servicios:\n"
-        + "\n".join(
+    )
+    if show_pricing:
+        text += "\n".join(
             f"  - {s['name']} ×{s['quantity']} — {s['unit_price']} € "
             f"(Subtotal: {s['subtotal']} €)"
             for s in context["services"]
         )
-        + f"\n\nPrecios:\n"
-        f"  Subtotal: {context['original_amount']} €\n"
-    )
-    if context["discount_amount"] > 0:
-        text += f"  Descuento: -{context['discount_amount']} €\n"
+        text += (
+            f"\n\nPrecios:\n"
+            f"  Subtotal: {context['original_amount']} €\n"
+        )
+        if context["discount_amount"] > 0:
+            text += f"  Descuento: -{context['discount_amount']} €\n"
+        text += f"  Total: {context['total_amount']} €\n\n"
+    else:
+        text += "\n".join(
+            f"  - {s['name']} ×{s['quantity']}"
+            for s in context["services"]
+        )
+        text += "\n\n"
     text += (
-        f"  Total: {context['total_amount']} €\n\n"
         f"Fecha: {context['date']}\n"
         f"Hora: {context['start_time']}"
     )
@@ -109,6 +119,7 @@ def send_confirmation_email(booking) -> None:
         context.update({
             "is_gift": False,
             "email_role": "recipient",
+            "show_pricing": True,
             "greeting": "Tu cita ha sido confirmada. Aquí tienes los detalles:",
             "gift_buyer_name": booking.buyer_name or booking.client_name,
         })
@@ -130,6 +141,7 @@ def send_gift_confirmation_emails(booking) -> None:
         context.update({
             "is_gift": True,
             "email_role": "recipient",
+            "show_pricing": False,
             "greeting": f"{booking.buyer_name} te ha regalado una cita. Aquí tienes los detalles:",
             "gift_buyer_name": booking.buyer_name,
             "gift_buyer_email": booking.buyer_email,
@@ -149,6 +161,7 @@ def send_gift_confirmation_emails(booking) -> None:
         context.update({
             "is_gift": True,
             "email_role": "buyer",
+            "show_pricing": True,
             "greeting": f"Has regalado una cita a {recipient_name}.",
             "gift_buyer_name": booking.buyer_name,
             "gift_buyer_email": booking.buyer_email,
