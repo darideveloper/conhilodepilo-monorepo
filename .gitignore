@@ -66,3 +66,6 @@ logs/
 
 *-PLAN.md
 *.sqlite
+
+# contains mailbox password in plaintext
+conhilodepilo-mail.mobileconfig
