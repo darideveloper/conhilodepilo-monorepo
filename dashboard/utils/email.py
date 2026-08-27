@@ -107,6 +107,7 @@ def _send_email(to_email, subject, context):
         body=plain_text,
         from_email=settings.EMAIL_FROM,
         to=[to_email],
+        reply_to=[settings.EMAIL_REPLY_TO],
         bcc=bcc,
     )
     msg.attach_alternative(html_content, "text/html")

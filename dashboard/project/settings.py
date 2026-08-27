@@ -272,6 +272,7 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL") == "True"
 EMAIL_FROM = EMAIL_HOST_USER
+EMAIL_REPLY_TO = os.getenv("EMAIL_REPLY_TO", "info@conhilodepilo.com")
 EMAILS_NOTIFICATIONS = os.getenv("EMAILS_NOTIFICATIONS", "").split(",")
 
 # Unfold Settings

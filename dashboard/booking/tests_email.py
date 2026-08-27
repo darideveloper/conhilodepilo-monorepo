@@ -117,6 +117,27 @@ class SendConfirmationEmailTest(TestCase):
             self.assertIn("Subtotal", body)
             self.assertIn("Total", body)
 
+    def test_email_includes_reply_to_header(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+
+            send_confirmation_email(self.booking)
+
+            call_kwargs = mock_email_cls.call_args.kwargs
+            self.assertEqual(call_kwargs["reply_to"], ["info@conhilodepilo.com"])
+
+    @override_settings(EMAIL_REPLY_TO="custom@example.com")
+    def test_reply_to_can_be_overridden(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+
+            send_confirmation_email(self.booking)
+
+            call_kwargs = mock_email_cls.call_args.kwargs
+            self.assertEqual(call_kwargs["reply_to"], ["custom@example.com"])
+
     def test_html_alternative_is_attached(self):
         with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
             mock_instance = MagicMock()
@@ -349,6 +370,16 @@ class GiftEmailTest(TestCase):
                 kwargs = call_args.kwargs
                 self.assertIn("admin@conhilodepilo.com", kwargs["bcc"])
                 self.assertIn("notifications@conhilodepilo.com", kwargs["bcc"])
+
+    def test_both_emails_include_reply_to_header(self):
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(self.booking)
+            for call_args in mock_email_cls.call_args_list:
+                self.assertEqual(
+                    call_args.kwargs["reply_to"], ["info@conhilodepilo.com"]
+                )
 
     def test_html_alternative_attached_to_both_emails(self):
         with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:

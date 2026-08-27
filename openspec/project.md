@@ -41,7 +41,7 @@ A Django-based administration dashboard and REST API that manages the entire eco
 - **Framework:** Python 3.12, Django 5.2+
 - **API:** Django REST Framework (DRF) with Token + Session authentication
 - **Admin UI:** Django Unfold (Tailwind-based, fully translated to Spanish)
-- **Database:** PostgreSQL (production), SQLite (development/testing)
+- **Database:** PostgreSQL (production and development), SQLite only for `manage.py test`
 - **ORM extras:** `django-solo` for singleton models, `django-filter` for dynamic API filtering
 - **Storage:** Local filesystem (dev) / AWS S3 via `django-storages` + `boto3` (prod). Three storage dashboards: `PublicMediaStorage`, `StaticStorage`, `PrivateMediaStorage`.
 - **Static files:** WhiteNoise for production static serving
@@ -69,10 +69,10 @@ A Django-based administration dashboard and REST API that manages the entire eco
 ### Stripe
 - Payment model per `EventType`: `PRE-PAID` (Stripe Checkout) or `POST-PAID` (direct confirmation).
 - Keys configured per `CompanyProfile` in settings (env vars: `STRIPE_PUBLIC_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`).
-- Webhook at `/stripe/webhook/` listens for `checkout.session.completed` → sets booking to `PAID` → syncs to Google Calendar.
+- Webhook at `/api/stripe/webhook/` listens for `checkout.session.completed` → sets booking to `PAID` → syncs to Google Calendar.
 
 ### Google Calendar
-- Single Service Account manages all calendars (credentials via `GOOGLE_CALENDAR_ID` env var).
+- Single Service Account manages all calendars (credentials via `GOOGLE_SERVICE_ACCOUNT_JSON` env var; `GOOGLE_CALENDAR_ID` is the target calendar ID).
 - Bookings auto-sync via Django signals (`post_save`, `post_delete`).
 - **End Time Sync:** `Booking.end_time` is automatically recalculated whenever `start_time` or `services` change, ensuring calendar events stay accurate during rescheduling.
 - **Duplication Prevention:** Initial sync is skipped during the first `post_save` (creation) to wait for services to be attached; sync only occurs once complete data is available. Sync logic updates the in-memory instance to prevent race conditions during rapid updates.
@@ -111,14 +111,14 @@ The marketing and landing page for the Con Hilo Depilo beauty services business 
 # Service: Booking Application
 
 ## Purpose
-An SSR booking application for scheduling appointments. Handles service selection, date/time selection, customer form submission, and real-time availability checking against the Django dashboard.
+A static (SSG) booking application for scheduling appointments, embedded as an iframe in the landing page. Handles service selection, date/time selection, customer form submission, and real-time availability checking against the Django dashboard.
 
 ## Directory
 `booking/` (package name: `granada-go-tours`; dev port alias: `booking`)
 
 ## Tech Stack
-- **Framework:** Astro 5 (SSR), TypeScript
-- **Output:** Server-side rendered via `@astrojs/node` (standalone mode)
+- **Framework:** Astro 5, TypeScript
+- **Output:** Static (SSG) — `output: 'static'`, no server adapter
 - **Styling:** Tailwind CSS v4
 - **React:** React 19 (all interactive UI is React)
 - **State management:** Zustand (`useBookingStore`)
@@ -151,4 +151,4 @@ Located in `src/lib/api/`:
 - **Component strategy:** `.astro` for static/layout UI, `.tsx` for all interactive components.
 - **Styling:** Scoped `<style>` tags for Astro; standard CSS/Tailwind utilities for React. Preference for `clsx` + `tailwind-merge` (`cn()` util).
 - **State:** All booking wizard state lives in Zustand (`src/store/useBookingStore.ts`).
-- **Routes:** `src/pages/index.astro` (home/redirect) and `src/pages/[id].astro` (company-specific booking page).
+- **Routes:** Single route `src/pages/index.astro` — the service is pre-selected via the `?service={id}` query parameter (set by the landing iframe), not via a route parameter.
