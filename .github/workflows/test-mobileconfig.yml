@@ -1,0 +1,22 @@
+name: test-mobileconfig
+on: [workflow_dispatch]
+jobs:
+  test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate ephemeral mobileconfigs (no commit)
+        env:
+          MAIL_PW: ${{ secrets.MAIL_PW }}
+        run: |
+          python3 scripts/gen-mobileconfig.py --email info@conhilodepilo.com --password "$MAIL_PW" --out /tmp/info.mobileconfig
+          python3 scripts/gen-mobileconfig.py --email rosa@conhilodepilo.com --password "$MAIL_PW" --out /tmp/rosa.mobileconfig
+          plutil -lint /tmp/info.mobileconfig && plutil -lint /tmp/rosa.mobileconfig
+          echo "Lint OK"
+      - name: Safe dump (no password)
+        run: python3 -c "import plistlib; d=plistlib.load(open('/tmp/info.mobileconfig','rb')); print(d['PayloadIdentifier'], d['PayloadContent'][0]['EmailAddress'])"
+      - name: Install profile (may need interaction)
+        continue-on-error: true
+        run: |
+          sudo profiles install -type configuration -path /tmp/info.mobileconfig || echo "profiles install requires UI (expected on runner)"
+          profiles show -type configuration | grep -v "MAIL_PW" | head -n 80 || true

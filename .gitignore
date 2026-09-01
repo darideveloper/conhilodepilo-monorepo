@@ -67,5 +67,7 @@ logs/
 *-PLAN.md
 *.sqlite
 
-# contains mailbox password in plaintext
+# contains mailbox passwords in plaintext (Apple mobileconfigs)
 conhilodepilo-mail.mobileconfig
+mobileconfigs/
+*.mobileconfig
