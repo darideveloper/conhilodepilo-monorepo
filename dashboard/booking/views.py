@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import datetime, time
+import logging
 import stripe
 from .models import CompanyProfile, CompanyWeekdaySlot, EventType, Event, Booking, BookingServiceThrough, ProcessedStripeEvent
 from .serializers import CompanyProfileSerializer, BusinessHoursSerializer, EventTypeSerializer
@@ -16,6 +17,8 @@ from utils.stripe_utils import create_checkout_session
 from utils.google_calendar import sync_booking_to_google
 from utils.email import send_confirmation_email, send_gift_confirmation_emails
 from utils.pricing import calculate_booking_totals
+
+logger = logging.getLogger(__name__)
 
 class CreateBookingView(APIView):
     """
@@ -168,13 +171,31 @@ class CreateBookingView(APIView):
                         try:
                             session = create_checkout_session(booking, total_amount, company.currency)
                             response_data["checkout_url"] = session.url
-                        except stripe.StripeError:
-                            raise Exception("Stripe session creation failed")
+                        except stripe.StripeError as se:
+                            key = getattr(settings, "STRIPE_SECRET_KEY", None) or ""
+                            logger.exception(
+                                "Stripe session creation failed: type=%s code=%s param=%s http_status=%s "
+                                "message=%s total_amount=%s currency=%s service_ids=%s "
+                                "landing_url=%s stripe_sdk=%s key_prefix=%s",
+                                type(se).__name__,
+                                getattr(se, "code", None),
+                                getattr(se, "param", None),
+                                getattr(se, "http_status", None),
+                                str(se),
+                                total_amount,
+                                getattr(company, "currency", None),
+                                service_ids,
+                                getattr(settings, "LANDING_URL", None),
+                                getattr(stripe, "VERSION", "unknown"),
+                                key[:7] if key else None,
+                            )
+                            raise Exception("Stripe session creation failed") from se
                     else:
                         response_data["payment_required"] = False
 
         except Exception as e:
             if "Stripe" in str(e):
+                logger.error("Returning 503 for booking failure: %s", e)
                 return Response({"error": "Payment service is currently unavailable. Please try again later."}, status=503)
             raise e
 
