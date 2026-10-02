@@ -35,4 +35,4 @@ django-storages==1.14.4    # Custom storage backends (S3, etc.)
 boto3==1.34.162            # AWS SDK for Python
 
 # stripe
-stripe>=11.4.0             # Stripe Python library
+stripe==16.0.0             # Stripe Python library (pinned: v16 rejects payment_method_types)

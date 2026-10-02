@@ -67,7 +67,7 @@ If the team later wants an audit row, switching to `CANCELLED` is a one-line cha
 `CompanyProfile` is a `django-solo` singleton, so `get_solo()` is cheap and safe. The fallback (`"Booking"`) is for the edge case of a fresh database where the singleton has not been customized. No localization concern at the Stripe layer — the user sees the Stripe Checkout page in their own locale; product name is descriptive metadata.
 
 ## What this proposal does NOT do
-- Migrate from `checkout.session.completed` to `payment_intent.succeeded`. With `payment_method_types=['card']`, the existing event is reliable and synchronous. Revisit when adding async payment methods (SEPA, ACH).
+- Migrate from `checkout.session.completed` to `payment_intent.succeeded`. With `payment_method_types=['card']`, the existing event is reliable and synchronous. Revisit when adding async payment methods (SEPA, ACH). _(Superseded 2026-10-02: `payment_method_types` was removed in favour of dynamic payment methods — see `2026-10-02-fix-stripe-checkout-payment-methods`.)_
 - Add Stripe Tax, coupons, or multi-line items. Out of scope.
 - Change the frontend redirect logic or success/cancel pages.
 - Replace the Stripe SDK pinning. `>=11.4.0` is current.

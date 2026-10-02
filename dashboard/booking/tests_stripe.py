@@ -146,6 +146,7 @@ class StripeIntegrationTest(TestCase):
         args, kwargs = mock_session_create.call_args
         self.assertEqual(kwargs['line_items'][0]['price_data']['unit_amount'], 15050)
         self.assertEqual(kwargs['success_url'], "http://test-landing.com/success?session_id={CHECKOUT_SESSION_ID}")
+        self.assertNotIn('payment_method_types', kwargs)
 
     @patch('utils.stripe_utils.stripe.checkout.Session.create')
     def test_create_checkout_session_product_name(self, mock_session_create):
@@ -171,6 +172,7 @@ class StripeIntegrationTest(TestCase):
         mock_session_create.assert_called_once()
         kwargs = mock_session_create.call_args[1]
         self.assertEqual(kwargs['line_items'][0]['price_data']['product_data']['name'], "My Studio")
+        self.assertNotIn('payment_method_types', kwargs)
 
     def test_create_booking_post_paid_skips_stripe(self):
         """

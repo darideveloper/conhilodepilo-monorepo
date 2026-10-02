@@ -33,7 +33,6 @@ def create_checkout_session(booking, total_amount: Decimal, currency: str) -> st
     site_url = settings.LANDING_URL.rstrip('/') if settings.LANDING_URL else "http://localhost:4321"
 
     session = stripe.checkout.Session.create(
-        payment_method_types=['card'],
         line_items=[{
             'price_data': {
                 'currency': currency.lower(),
