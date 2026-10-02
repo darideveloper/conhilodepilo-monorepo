@@ -5,6 +5,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 from booking.models import CompanyProfile
 
@@ -38,6 +39,8 @@ def _build_base_context(booking):
         }
         for bs in service_through
     ]
+    local_start = timezone.localtime(booking.start_time)
+    local_end = timezone.localtime(booking.end_time) if booking.end_time else None
     return {
         "company_name": company.name,
         "brand_color": company.brand_color,
@@ -46,9 +49,9 @@ def _build_base_context(booking):
         "original_amount": booking.original_amount,
         "discount_amount": booking.discount_amount,
         "total_amount": booking.total_amount,
-        "date": booking.start_time.strftime("%d/%m/%Y"),
-        "start_time": booking.start_time.strftime("%H:%M"),
-        "end_time": booking.end_time.strftime("%H:%M") if booking.end_time else "",
+        "date": local_start.strftime("%d/%m/%Y"),
+        "start_time": local_start.strftime("%H:%M"),
+        "end_time": local_end.strftime("%H:%M") if local_end else "",
         "special_requests": booking.special_requests or "",
         "whatsapp_url": _build_whatsapp_url(company.contact_phone),
         "instagram_url": company.instagram_url,

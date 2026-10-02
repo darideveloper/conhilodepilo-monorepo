@@ -1,7 +1,7 @@
 from django.test import TestCase, override_settings
 from unittest.mock import patch, MagicMock
 from decimal import Decimal
-from datetime import date, time, timedelta
+from datetime import date, time, timedelta, datetime, timezone as dt_timezone
 from django.utils import timezone
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
@@ -199,6 +199,10 @@ class EmailSentOnCreateBookingViewTest(TransactionTestCase):
             event=self.event, weekday=0,
             start_time="09:00", end_time="18:00"
         )
+        # Next Monday (weekday=0) so the slot is always in the future.
+        today = date.today()
+        days_ahead = (0 - today.weekday()) % 7 or 7
+        self.booking_date = (today + timedelta(days=days_ahead)).strftime("%Y-%m-%d")
 
     @patch("booking.views.send_confirmation_email")
     def test_email_sent_when_booking_created_as_confirmed(self, mock_send_email):
@@ -206,7 +210,7 @@ class EmailSentOnCreateBookingViewTest(TransactionTestCase):
             reverse("api-bookings"),
             {
                 "services": [{"service_id": self.event.id, "quantity": 1}],
-                "date": "2026-06-15",
+                "date": self.booking_date,
                 "startTime": "10:00",
                 "clientName": "Test Client",
                 "clientEmail": "test@example.com",
@@ -228,7 +232,7 @@ class EmailSentOnCreateBookingViewTest(TransactionTestCase):
             reverse("api-bookings"),
             {
                 "services": [{"service_id": self.event.id, "quantity": 1}],
-                "date": "2026-06-15",
+                "date": self.booking_date,
                 "startTime": "10:00",
                 "clientName": "Test Client",
                 "clientEmail": "test@example.com",
@@ -438,3 +442,96 @@ class GiftEmailTest(TestCase):
             buyer_html = mock_instance.attach_alternative.call_args_list[1][0][0]
             self.assertIn("15,00", buyer_html)
             self.assertIn("Subtotal", buyer_html)
+
+
+@override_settings(
+    TIME_ZONE="Europe/Madrid",
+    EMAIL_FROM="test@conhilodepilo.com",
+    EMAILS_NOTIFICATIONS=[],
+    HOST="https://dashboard.conhilodepilo.localhost",
+)
+class EmailTimezoneTest(TestCase):
+    def _make_booking(self, *, start_utc, duration_minutes=20, quantity=1, is_gift=False):
+        event_type = EventType.objects.create(name="Test Type")
+        event = Event.objects.create(
+            event_type=event_type,
+            name="Depilación Cejas",
+            price=Decimal("15.00"),
+            duration_minutes=duration_minutes,
+        )
+        booking = Booking.objects.create(
+            client_name="Bob Recipient" if is_gift else "Cliente Test",
+            client_email="bob@example.com" if is_gift else "cliente@example.com",
+            status="CONFIRMED",
+            is_gift=is_gift,
+            buyer_name="Alice Buyer" if is_gift else None,
+            buyer_email="alice@example.com" if is_gift else None,
+            recipient_name="Bob Recipient" if is_gift else None,
+            recipient_email="bob@example.com" if is_gift else None,
+            start_time=start_utc,
+        )
+        BookingServiceThrough.objects.create(
+            booking=booking, event=event, quantity=quantity, unit_price=event.price
+        )
+        booking.refresh_from_db()
+        return booking
+
+    def test_db_loaded_booking_renders_local_start_time(self):
+        booking = self._make_booking(
+            start_utc=datetime(2026, 10, 31, 11, 15, tzinfo=dt_timezone.utc)
+        )
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_confirmation_email(booking)
+            body = mock_email_cls.call_args.kwargs["body"]
+            html = mock_instance.attach_alternative.call_args[0][0]
+        self.assertIn("12:15", body)
+        self.assertIn("12:15", html)
+        self.assertNotIn("11:15", body)
+        self.assertNotIn("11:15", html)
+
+    def test_db_loaded_booking_renders_local_end_time_and_duration(self):
+        booking = self._make_booking(
+            start_utc=datetime(2026, 10, 31, 11, 15, tzinfo=dt_timezone.utc),
+            duration_minutes=60,
+            quantity=4,
+        )
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_confirmation_email(booking)
+            body = mock_email_cls.call_args.kwargs["body"]
+            html = mock_instance.attach_alternative.call_args[0][0]
+        self.assertIn("12:15 - 16:15", body)
+        self.assertIn("12:15", html)
+        self.assertIn("16:15", html)
+
+    def test_db_loaded_booking_renders_local_date_across_midnight(self):
+        booking = self._make_booking(
+            start_utc=datetime(2026, 10, 31, 23, 30, tzinfo=dt_timezone.utc)
+        )
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_confirmation_email(booking)
+            body = mock_email_cls.call_args.kwargs["body"]
+        self.assertIn("01/11/2026", body)
+        self.assertIn("00:30", body)
+
+    def test_gift_emails_render_local_start_time(self):
+        booking = self._make_booking(
+            start_utc=datetime(2026, 10, 31, 11, 15, tzinfo=dt_timezone.utc),
+            is_gift=True,
+        )
+        with patch("utils.email.EmailMultiAlternatives") as mock_email_cls:
+            mock_instance = MagicMock()
+            mock_email_cls.return_value = mock_instance
+            send_gift_confirmation_emails(booking)
+            bodies = [c.kwargs["body"] for c in mock_email_cls.call_args_list]
+            htmls = [c[0][0] for c in mock_instance.attach_alternative.call_args_list]
+        self.assertEqual(len(bodies), 2)
+        for body in bodies:
+            self.assertIn("12:15", body)
+        for html in htmls:
+            self.assertIn("12:15", html)
