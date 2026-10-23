@@ -35,6 +35,11 @@ if HOST:
 # Trust the X-Forwarded-Proto header to detect HTTPS behind a proxy
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Security hardening — values live in Coolify env vars; defaults are prod-safe.
+SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", str(not DEBUG)).lower() == "true"
+SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", str(not DEBUG)).lower() == "true"
+CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", str(not DEBUG)).lower() == "true"
+
 print(f"DEBUG: {DEBUG}")
 print(f"ENV: {ENV}")
 
